@@ -1,0 +1,175 @@
+[
+  {
+    "Operator": "a BETWEEN x AND y",
+    "Description": "between",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE order_date BETWEEN '2024-01-01' AND '2024-03-31';",
+    "Tree": "(a_expr_between BETWEEN AND)",
+    "Compensate": [
+      "Notice that <code>BETWEEN</code> treats the endpoint values as included in the range. <code>NOT BETWEEN</code> does the opposite comparison:",
+      " <code>BETWEEN SYMMETRIC</code> is like <code>BETWEEN</code> except there is no requirement that the argument to the left of <code>AND</code> be less than or equal to the argument on the right. If it is not, those two arguments are automatically swapped, so that a nonempty range is always implied."
+    ]
+  },
+  {
+    "Operator": "a NOT BETWEEN x AND y",
+    "Description": "not between",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE order_date NOT BETWEEN '2024-01-01' AND '2024-03-31';",
+    "Tree": "(a_expr_between NOT BETWEEN AND)",
+    "Compensate": [
+      "Notice that <code>BETWEEN</code> treats the endpoint values as included in the range. <code>NOT BETWEEN</code> does the opposite comparison:",
+      " <code>BETWEEN SYMMETRIC</code> is like <code>BETWEEN</code> except there is no requirement that the argument to the left of <code>AND</code> be less than or equal to the argument on the right. If it is not, those two arguments are automatically swapped, so that a nonempty range is always implied."
+    ]
+  },
+  {
+    "Operator": "a BETWEEN SYMMETRIC x AND y",
+    "Description": "between, after sorting the comparison values",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE amount BETWEEN SYMMETRIC 100 AND 200;",
+    "Tree": "(a_expr_between BETWEEN SYMMETRIC AND)",
+    "Compensate": [
+      " The <code>BETWEEN</code> predicate simplifies range tests:",
+      "Notice that <code>BETWEEN</code> treats the endpoint values as included in the range. <code>NOT BETWEEN</code> does the opposite comparison:",
+      " <code>BETWEEN SYMMETRIC</code> is like <code>BETWEEN</code> except there is no requirement that the argument to the left of <code>AND</code> be less than or equal to the argument on the right. If it is not, those two arguments are automatically swapped, so that a nonempty range is always implied."
+    ]
+  },
+  {
+    "Operator": "a NOT BETWEEN SYMMETRIC x AND y",
+    "Description": "not between, after sorting the comparison values",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE amount NOT BETWEEN SYMMETRIC 100 AND 200;",
+    "Tree": "(a_expr_between NOT BETWEEN SYMMETRIC AND)",
+    "Compensate": [
+      " The <code>BETWEEN</code> predicate simplifies range tests:",
+      "Notice that <code>BETWEEN</code> treats the endpoint values as included in the range. <code>NOT BETWEEN</code> does the opposite comparison:",
+      " <code>BETWEEN SYMMETRIC</code> is like <code>BETWEEN</code> except there is no requirement that the argument to the left of <code>AND</code> be less than or equal to the argument on the right. If it is not, those two arguments are automatically swapped, so that a nonempty range is always implied."
+    ]
+  },
+  {
+    "Operator": "a IS DISTINCT FROM b",
+    "Description": "not equal, treating null like an ordinary value",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE customer_name IS DISTINCT FROM 'John Doe';",
+    "Tree": "(a_expr_is_not IS DISTINCT FROM)",
+    "Compensate": [
+      "  Ordinary comparison operators yield null (signifying \u201cunknown\u201d), not true or false, when either input is null. For example, <code>7 = NULL</code> yields null, as does <code>7 <> NULL</code>. When this behavior is not suitable, use the <code>IS [ NOT ] DISTINCT FROM</code> predicates:",
+      "For non-null inputs, <code>IS DISTINCT FROM</code> is the same as the <code><></code> operator. However, if both inputs are null it returns false, and if only one input is null it returns true. Similarly, <code>IS NOT DISTINCT FROM</code> is identical to <code>=</code> for non-null inputs, but it returns true when both inputs are null, and false when only one input is null. Thus, these predicates effectively act as though null were a normal data value, rather than \u201cunknown\u201d.",
+      "If the <code>expression</code> is row-valued, then <code>IS NULL</code> is true when the row expression itself is null or when all the row's fields are null, while <code>IS NOT NULL</code> is true when the row expression itself is non-null and all the row's fields are non-null. Because of this behavior, <code>IS NULL</code> and <code>IS NOT NULL</code> do not always return inverse results for row-valued expressions; in particular, a row-valued expression that contains both null and non-null fields will return false for both tests. In some cases, it may be preferable to write <code>row</code> <code>IS DISTINCT FROM NULL</code> or <code>row</code> <code>IS NOT DISTINCT FROM NULL</code>, which will simply check whether the overall row value is null without any additional tests on the row fields."
+    ]
+  },
+  {
+    "Operator": "a IS NOT DISTINCT FROM b",
+    "Description": "equal, treating null like an ordinary value",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE customer_name IS NOT DISTINCT FROM 'John Doe';",
+    "Tree": "(a_expr_is_not IS NOT DISTINCT FROM)",
+    "Compensate": [
+      "  Ordinary comparison operators yield null (signifying \u201cunknown\u201d), not true or false, when either input is null. For example, <code>7 = NULL</code> yields null, as does <code>7 <> NULL</code>. When this behavior is not suitable, use the <code>IS [ NOT ] DISTINCT FROM</code> predicates:",
+      "For non-null inputs, <code>IS DISTINCT FROM</code> is the same as the <code><></code> operator. However, if both inputs are null it returns false, and if only one input is null it returns true. Similarly, <code>IS NOT DISTINCT FROM</code> is identical to <code>=</code> for non-null inputs, but it returns true when both inputs are null, and false when only one input is null. Thus, these predicates effectively act as though null were a normal data value, rather than \u201cunknown\u201d.",
+      "If the <code>expression</code> is row-valued, then <code>IS NULL</code> is true when the row expression itself is null or when all the row's fields are null, while <code>IS NOT NULL</code> is true when the row expression itself is non-null and all the row's fields are non-null. Because of this behavior, <code>IS NULL</code> and <code>IS NOT NULL</code> do not always return inverse results for row-valued expressions; in particular, a row-valued expression that contains both null and non-null fields will return false for both tests. In some cases, it may be preferable to write <code>row</code> <code>IS DISTINCT FROM NULL</code> or <code>row</code> <code>IS NOT DISTINCT FROM NULL</code>, which will simply check whether the overall row value is null without any additional tests on the row fields."
+    ]
+  },
+  {
+    "Operator": "expression IS NULL",
+    "Description": "is null",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Example": "SELECT * FROM orders WHERE order_date IS NULL;",
+    "Tree": "(a_expr_is_not IS NULL)",
+    "Compensate": [
+      "  Ordinary comparison operators yield null (signifying \u201cunknown\u201d), not true or false, when either input is null. For example, <code>7 = NULL</code> yields null, as does <code>7 <> NULL</code>. When this behavior is not suitable, use the <code>IS [ NOT ] DISTINCT FROM</code> predicates:",
+      "Do not write <code>expression = NULL</code> because <code>NULL</code> is not \u201cequal to\u201d <code>NULL</code>. (The null value represents an unknown value, and it is not known whether two unknown values are equal.)",
+      "Some applications might expect that <code>expression = NULL</code> returns true if <code>expression</code> evaluates to the null value. It is highly recommended that these applications be modified to comply with the SQL standard. However, if that cannot be done the transform_null_equals configuration variable is available. If it is enabled, PostgreSQL will convert <code>x = NULL</code> clauses to <code>x IS NULL</code>.",
+      "If the <code>expression</code> is row-valued, then <code>IS NULL</code> is true when the row expression itself is null or when all the row's fields are null, while <code>IS NOT NULL</code> is true when the row expression itself is non-null and all the row's fields are non-null. Because of this behavior, <code>IS NULL</code> and <code>IS NOT NULL</code> do not always return inverse results for row-valued expressions; in particular, a row-valued expression that contains both null and non-null fields will return false for both tests. In some cases, it may be preferable to write <code>row</code> <code>IS DISTINCT FROM NULL</code> or <code>row</code> <code>IS NOT DISTINCT FROM NULL</code>, which will simply check whether the overall row value is null without any additional tests on the row fields.",
+      "These will always return true or false, never a null value, even when the operand is null. A null input is treated as the logical value \u201cunknown\u201d. Notice that <code>IS UNKNOWN</code> and <code>IS NOT UNKNOWN</code> are effectively the same as <code>IS NULL</code> and <code>IS NOT NULL</code>, respectively, except that the input expression must be of Boolean type."
+    ]
+  },
+  {
+    "Operator": "expression IS NOT NULL",
+    "Description": "is not null",
+    "Example": "SELECT * FROM orders WHERE order_date IS NOT NULL;",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Tree": "(a_expr_is_not IS NOT NULL)",
+    "Compensate": [
+      "  Ordinary comparison operators yield null (signifying \u201cunknown\u201d), not true or false, when either input is null. For example, <code>7 = NULL</code> yields null, as does <code>7 <> NULL</code>. When this behavior is not suitable, use the <code>IS [ NOT ] DISTINCT FROM</code> predicates:",
+      "Do not write <code>expression = NULL</code> because <code>NULL</code> is not \u201cequal to\u201d <code>NULL</code>. (The null value represents an unknown value, and it is not known whether two unknown values are equal.)",
+      "Some applications might expect that <code>expression = NULL</code> returns true if <code>expression</code> evaluates to the null value. It is highly recommended that these applications be modified to comply with the SQL standard. However, if that cannot be done the transform_null_equals configuration variable is available. If it is enabled, PostgreSQL will convert <code>x = NULL</code> clauses to <code>x IS NULL</code>.",
+      "If the <code>expression</code> is row-valued, then <code>IS NULL</code> is true when the row expression itself is null or when all the row's fields are null, while <code>IS NOT NULL</code> is true when the row expression itself is non-null and all the row's fields are non-null. Because of this behavior, <code>IS NULL</code> and <code>IS NOT NULL</code> do not always return inverse results for row-valued expressions; in particular, a row-valued expression that contains both null and non-null fields will return false for both tests. In some cases, it may be preferable to write <code>row</code> <code>IS DISTINCT FROM NULL</code> or <code>row</code> <code>IS NOT DISTINCT FROM NULL</code>, which will simply check whether the overall row value is null without any additional tests on the row fields.",
+      "These will always return true or false, never a null value, even when the operand is null. A null input is treated as the logical value \u201cunknown\u201d. Notice that <code>IS UNKNOWN</code> and <code>IS NOT UNKNOWN</code> are effectively the same as <code>IS NULL</code> and <code>IS NOT NULL</code>, respectively, except that the input expression must be of Boolean type."
+    ]
+  },
+  {
+    "Operator": "expression ISNULL",
+    "Description": "is null (nonstandard syntax)",
+    "Example": "SELECT * FROM orders WHERE order_date ISNULL;",
+    "Tree": "(a_expr_isnull ISNULL)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": []
+  },
+  {
+    "Operator": "expression NOTNULL",
+    "Description": "is not null (nonstandard syntax)",
+    "Example": "SELECT * FROM orders WHERE order_date NOTNULL;",
+    "Tree": "(a_expr_isnull NOTNULL)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": []
+  },
+  {
+    "Operator": "boolean_expression IS TRUE",
+    "Description": "is true",
+    "Example": "SELECT * FROM orders WHERE status IS TRUE;",
+    "Tree": "(a_expr_is_not IS TRUE)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": []
+  },
+  {
+    "Operator": "boolean_expression IS NOT TRUE",
+    "Description": "is false or unknown",
+    "Example": "SELECT * FROM orders WHERE status IS NOT TRUE;",
+    "Tree": "(a_expr_is_not IS NOT TRUE)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": []
+  },
+  {
+    "Operator": "boolean_expression IS FALSE",
+    "Description": "is false",
+    "Example": "SELECT * FROM orders WHERE status IS FALSE;",
+    "Tree": "(a_expr_is_not IS FALSE)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": []
+  },
+  {
+    "Operator": "boolean_expression IS NOT FALSE",
+    "Description": "is true or unknown",
+    "Example": "SELECT * FROM orders WHERE status IS NOT FALSE;",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Tree": "(a_expr_is_not IS NOT FALSE)",
+    "Compensate": [
+      "Notice that <code>BETWEEN</code> treats the endpoint values as included in the range. <code>NOT BETWEEN</code> does the opposite comparison:",
+      "  Ordinary comparison operators yield null (signifying \u201cunknown\u201d), not true or false, when either input is null. For example, <code>7 = NULL</code> yields null, as does <code>7 <> NULL</code>. When this behavior is not suitable, use the <code>IS [ NOT ] DISTINCT FROM</code> predicates:",
+      "For non-null inputs, <code>IS DISTINCT FROM</code> is the same as the <code><></code> operator. However, if both inputs are null it returns false, and if only one input is null it returns true. Similarly, <code>IS NOT DISTINCT FROM</code> is identical to <code>=</code> for non-null inputs, but it returns true when both inputs are null, and false when only one input is null. Thus, these predicates effectively act as though null were a normal data value, rather than \u201cunknown\u201d.",
+      "Some applications might expect that <code>expression = NULL</code> returns true if <code>expression</code> evaluates to the null value. It is highly recommended that these applications be modified to comply with the SQL standard. However, if that cannot be done the transform_null_equals configuration variable is available. If it is enabled, PostgreSQL will convert <code>x = NULL</code> clauses to <code>x IS NULL</code>.",
+      "If the <code>expression</code> is row-valued, then <code>IS NULL</code> is true when the row expression itself is null or when all the row's fields are null, while <code>IS NOT NULL</code> is true when the row expression itself is non-null and all the row's fields are non-null. Because of this behavior, <code>IS NULL</code> and <code>IS NOT NULL</code> do not always return inverse results for row-valued expressions; in particular, a row-valued expression that contains both null and non-null fields will return false for both tests. In some cases, it may be preferable to write <code>row</code> <code>IS DISTINCT FROM NULL</code> or <code>row</code> <code>IS NOT DISTINCT FROM NULL</code>, which will simply check whether the overall row value is null without any additional tests on the row fields.",
+      "These will always return true or false, never a null value, even when the operand is null. A null input is treated as the logical value \u201cunknown\u201d. Notice that <code>IS UNKNOWN</code> and <code>IS NOT UNKNOWN</code> are effectively the same as <code>IS NULL</code> and <code>IS NOT NULL</code>, respectively, except that the input expression must be of Boolean type."
+    ]
+  },
+  {
+    "Operator": "boolean_expression IS UNKNOWN",
+    "Description": "is unknown",
+    "Example": "SELECT * FROM orders WHERE status IS UNKNOWN;",
+    "Tree": "(a_expr_is_not IS UNKNOWN)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": [
+      "These will always return true or false, never a null value, even when the operand is null. A null input is treated as the logical value \u201cunknown\u201d. Notice that <code>IS UNKNOWN</code> and <code>IS NOT UNKNOWN</code> are effectively the same as <code>IS NULL</code> and <code>IS NOT NULL</code>, respectively, except that the input expression must be of Boolean type."
+    ]
+  },
+  {
+    "Operator": "boolean_expression IS NOT UNKNOWN",
+    "Description": "is true or false",
+    "Example": "SELECT * FROM orders WHERE status IS NOT UNKNOWN;",
+    "Tree": "(a_expr_is_not IS NOT UNKNOWN)",
+    "Link": "https://www.postgresql.org/docs/12/functions-comparison.html",
+    "Compensate": [
+      "These will always return true or false, never a null value, even when the operand is null. A null input is treated as the logical value \u201cunknown\u201d. Notice that <code>IS UNKNOWN</code> and <code>IS NOT UNKNOWN</code> are effectively the same as <code>IS NULL</code> and <code>IS NOT NULL</code>, respectively, except that the input expression must be of Boolean type."
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+[
+    {
+        "Operator": "+",
+        "Description": "Addition operator",
+        "Link": "https://dev.mysql.com/doc/refman/8.4/en/arithmetic-functions.html#operator_plus",
+        "Tree": "(expressionAtom (addOperator +))",
+        "Detail": "+ Addition: mysql> SELECT 3+5; -> 8"
+    },
+    {
+        "Operator": "-",
+        "Description": "Minus operator",
+        "Link": "https://dev.mysql.com/doc/refman/8.4/en/arithmetic-functions.html#operator_minus",
+        "Tree": "(expressionAtom (addOperator -))",
+        "Detail": "- Subtraction: mysql> SELECT 3-5; -> -2"
+    },
+    {
+        "Operator": "/",
+        "Description": "Division operator",
+        "Link": "https://dev.mysql.com/doc/refman/8.4/en/arithmetic-functions.html#operator_divide",
+        "Tree": "(expressionAtom (multOperator -))",
+        "Detail": "/ Division: mysql> SELECT 3/5; -> 0.60 Division by zero produces a NULL result: mysql> SELECT 102/(1-1); -> NULL A division is calculated with BIGINT arithmetic only if performed in a context where its result is converted to an integer."
+    },
+    {
+        "Operator": "*",
+        "Description": "Multiplication operator",
+        "Link": "https://dev.mysql.com/doc/refman/8.4/en/arithmetic-functions.html#operator_times",
+        "Tree": "(expressionAtom (multOperator *))",
+        "Detail": "* Multiplication: mysql> SELECT 3*5; -> 15 mysql> SELECT 18014398509481984*18014398509481984.0; -> 324518553658426726783156020576256.0 mysql> SELECT 18014398509481984*18014398509481984; -> out-of-range error The last expression produces an error because the result of the integer multiplication exceeds the 64-bit range of BIGINT calculations. (See Section 13.1, \u201cNumeric Data Types\u201d .)"
+    }
+]
