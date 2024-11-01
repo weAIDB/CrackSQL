@@ -10,18 +10,6 @@ This is the code respository of **CrackSQL**, which performs SQL translations am
 
 **The example of the problem instructions can be found at: `./translator/xxxx_prompt.py`.**
 
-**The translated queries of different methods can be found at: [`RESULT.md`](https://anonymous.4open.science/r/CrackSQL-EC35/RESULT.md).**
-
-| MySQL | SQLGlot | jOOQ | SQLines | GPT-4o | CrackSQL |
-| :--: | :--: | :--: | :--: | :--: | :--: |
-| SELECT DISTINCT `t3`.`currency` FROM `transactions_1k` AS `t1` INNER JOIN `gasstations` AS `t2` ON `t1`.`gasstationid` = `t2`.`gasstationid` INNER JOIN `customers` AS `t3` ON `t1`.`customerid` = `t3`.`customerid` WHERE `t1`.`date` = '2012-08-24' AND `t1`.`time` = '16:25:00'  | SELECT DISTINCT "t3"."currency" FROM "transactions_1k" "t1" INNER JOIN "gasstations" "t2" ON "t1"."gasstationid" = "t2"."gasstationid" INNER JOIN "customers" "t3" ON "t1"."customerid" = "t3"."customerid" WHERE "t1"."date" = '2012-08-24' AND "t1"."time" = '16:25:00' |  select distinct "t3"."currency" from "transactions_1k" "t1"   join "gasstations" "t2"     on "t1"."gasstationid" = "t2"."gasstationid"   join "customers" "t3"     on "t1"."customerid" = "t3"."customerid" where (   "t1"."date" = '2012-08-24'   and "t1"."time" = '16:25:00' ) | SELECT DISTINCT t3.currency FROM transactions_1k t1 INNER JOIN gasstations t2 ON t1.gasstationid = t2.gasstationid INNER JOIN customers t3 ON t1.customerid = t3.customerid WHERE t1.date = '2012-08-24' AND t1.time = '16:25:00'  | SELECT DISTINCT t3.currency FROM transactions_1k t1 JOIN gasstations t2 ON t1.gasstationid = t2.gasstationid JOIN customers t3 ON t1.customerid = t3.customerid WHERE t1.date = TO_DATE('2012-08-24', 'YYYY-MM-DD') AND t1.time = TO_CHAR(TO_DATE('2012-08-24 16:25:00', 'YYYY-MM-DD HH24:MI:SS'), 'HH24:MI:SS') | SELECT DISTINCT "t3"."currency" FROM "transactions_1k" "t1" INNER JOIN "gasstations" "t2" ON "t1"."gasstationid" = "t2"."gasstationid" INNER JOIN "customers" "t3" ON "t1"."customerid" = "t3"."customerid" WHERE "t1"."date" = TO_DATE('2012-08-24', 'YYYY-MM-DD') AND "t1"."time" = TO_CHAR(TO_DATE('2012-08-24 16:25:00', 'YYYY-MM-DD HH24:MI:SS'), 'HH24:MI:SS') |
-| Source Dialect | ORA-01861: literal does not match format string Help: https://docs.oracle.com/error-help/db/ora-01861/ | ORA-01861: literal does not match format string Help: https://docs.oracle.com/error-help/db/ora-01861/ | ORA-01747: invalid user.table.column, table.column, or column specification Help: https://docs.oracle.com/error-help/db/ora-01747/ | ORA-01747: invalid user.table.column, table.column, or column specification Help: https://docs.oracle.com/error-help/db/ora-01747/ | √ |
-| ... | ... | ... | ... | ... | ... |
-
-**Please refer to [`RESULT.md`](https://anonymous.4open.science/r/CrackSQL-EC35/RESULT.md) for more results.**
-
-
-
 ## Project Structure
 
 The followings are the code structure of our **CrackSQL** project, where the critical files are annotated with additional comments.
