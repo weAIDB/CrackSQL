@@ -279,6 +279,7 @@ def load_config(config_file=None):
         'use_test': config.getboolean("MODE", 'use_test'),
         'reflect_on': config.getboolean("MODE", 'reflection_on'),
         'mask_on': config.getboolean("MODE", 'mask_on'),
+        "min_mask_len": config.getint("MODE", 'min_mask_len'),
         'slice_only': config.getboolean("MODE", 'slice_only'),
         'locate_by_err': config.getboolean("MODE", 'locate_by_err'),
         'oracle_locate_open': config.getboolean("MODE", 'oracle_locate_open'),
