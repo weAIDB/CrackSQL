@@ -4,13 +4,13 @@ from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode
 from CrackSQL.preprocessor.query_simplifier.normalize import father_value_list_compare
 
 
-def mask_column(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, index: int) -> tuple[Dict, int]:
+def mask_column(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
     flag = False
     if src_dialect == 'oracle':
         if root_node.value == 'general_element':
             flag = True
     elif src_dialect == 'mysql':
-        if root_node.value == 'fullColumnName' or (root_node.value == 'stringLiteral' and str(root_node).startswith('`')
+        if root_node.value == 'fullColumnName' or (root_node.value == 'stringLiteral' and str(root_node).startswith('"')
                                                    and father_value_list_compare(ori_node,
                                                                                  ['constant', 'expressionAtom'])):
             flag = True
@@ -26,13 +26,13 @@ def mask_column(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, index
         return {f"column_{index}": ori_str}, index + 1
     res = {}
     for i in range(len(root_node.children)):
-        rep_map, index = mask_column(root_node.children[i], ori_node.children[i], src_dialect, index)
+        rep_map, index = mask_column(root_node.children[i], ori_node.children[i], src_dialect, tgt_dialect, index)
         if len(rep_map) > 0:
             res = {**res, **rep_map}
     return res, index
 
 
-def mask_table(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, index: int) -> tuple[Dict, int]:
+def mask_table(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
     flag = False
     if src_dialect == 'oracle':
         if root_node.value == 'tableview_name':
@@ -52,13 +52,13 @@ def mask_table(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, index:
         return {f"table_{index}": ori_str}, index + 1
     res = {}
     for i in range(len(root_node.children)):
-        rep_map, index = mask_table(root_node.children[i], ori_node.children[i], src_dialect, index)
+        rep_map, index = mask_table(root_node.children[i], ori_node.children[i], src_dialect, tgt_dialect, index)
         if len(rep_map) > 0:
             res = {**res, **rep_map}
     return res, index
 
 
-def mask_sub_query(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, index: int) -> tuple[Dict, int]:
+def mask_sub_query(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
     flag = False
     if src_dialect == 'oracle':
         if ((root_node.value == 'dml_table_expression_clause' and
@@ -89,15 +89,15 @@ def mask_sub_query(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, in
         return {f"subquery_{index}": ori_str}, index + 1
     res = {}
     for i in range(len(root_node.children)):
-        rep_map, index = mask_sub_query(root_node.children[i], ori_node.children[i], src_dialect, index)
+        rep_map, index = mask_sub_query(root_node.children[i], ori_node.children[i], src_dialect, tgt_dialect, index)
         if len(rep_map) > 0:
             res = {**res, **rep_map}
     return res, index
 
 
-def mask_type_node(root_node: TreeNode, src_dialect: str) -> tuple[str, Dict]:
+def mask_type_node(root_node: TreeNode, src_dialect: str, tgt_dialect: str) -> tuple[str, Dict]:
     clone_node = root_node.clone()
-    rep_sub_query_map, _ = mask_sub_query(clone_node, root_node, src_dialect, 0)
-    rep_column_map, _ = mask_column(clone_node, root_node, src_dialect, 0)
-    rep_table_map, _ = mask_table(clone_node, root_node, src_dialect, 0)
+    rep_sub_query_map, _ = mask_sub_query(clone_node, root_node, src_dialect, tgt_dialect, 0)
+    rep_column_map, _ = mask_column(clone_node, root_node, src_dialect, tgt_dialect, 0)
+    rep_table_map, _ = mask_table(clone_node, root_node, src_dialect, tgt_dialect, 0)
     return str(clone_node), {**rep_column_map, **rep_table_map, **rep_sub_query_map}
