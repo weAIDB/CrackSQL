@@ -27,6 +27,7 @@ from CrackSQL.preprocessor.query_simplifier.rewrite import get_all_piece, reform
 from CrackSQL.preprocessor.query_simplifier.locate import locate_node_piece, replace_piece, get_func_name, \
     find_piece
 from CrackSQL.preprocessor.query_simplifier.normalize import normalize
+from CrackSQL.preprocessor.query_simplifier.type_mask import mask_type_node
 
 from CrackSQL.retriever.retrieval_model import RetrievalModel, CodeDescEmbedding
 from CrackSQL.retriever.vector_db import VectorDB
@@ -454,7 +455,34 @@ def local_rewrite(translator, retriever, vector_db, src_sql: str,
                 if piece['FatherPiece'] is None:
                     piece['FatherPiece'] = root_piece
             all_pieces.append(root_piece)
-
+        if slice_only:
+            if mask_on:
+                slices = []
+                for piece in all_pieces:
+                    new_sql, rep_map = mask_type_node(piece['Node'], src_dialect)
+                    slices.append({
+                        "ori_sql": str(piece['Node']),
+                        "mask_sql": new_sql,
+                        "rep_map": rep_map
+                    })
+                all_pieces = {
+                    "src_sql": src_sql,
+                    "src_dialect": src_dialect,
+                    'slices': slices
+                }
+                return all_pieces, [], [], []
+            rewrite_slices = {
+                "src_sql": src_sql,
+                "src_dialect": src_dialect,
+                "slices": [
+                    {
+                        "Keyword": piece['Keyword'],
+                        "str": str(piece['Node']),
+                        "Desc": piece['Description']
+                    } for piece in all_pieces
+                ]
+            }
+            return rewrite_slices, [], [], []
         normalize(root_node, src_dialect, tgt_dialect)
         src_sql = str(root_node)
     except ValueError as ve:
@@ -463,22 +491,6 @@ def local_rewrite(translator, retriever, vector_db, src_sql: str,
               f"dialect: {src_dialect}\n{ve}", file=sys.stderr)
         # return "", []
         return str(ve), [], [], []
-
-    if slice_only:
-        if mask_on:
-            all_pieces = [get_masked_slices(piece, src_dialect) for piece in all_pieces]
-        rewrite_slices = {
-            "src_sql": src_sql,
-            "src_dialect": src_dialect,
-            "slices": [
-                {
-                    "Keyword": piece['Keyword'],
-                    "str": str(piece['Node']),
-                    "Desc": piece['Description']
-                } for piece in all_pieces
-            ]
-        }
-        return rewrite_slices, [], [], []
 
     if len(all_pieces) == 0:
         return src_sql, ['Warning: No piece find'], [], []
@@ -909,8 +921,7 @@ def rewrite_piece(ori_piece, piece, translator, retriever, vector_db,
 
     elif mask_on:
         mask_info = str()
-        flag, masked_sql, replace_map = try_mark_tree_node(piece['Node'],
-                                                           piece['Tree'], {}, src_dialect)
+        masked_sql, replace_map = mask_type_node(piece['Node'], src_dialect)
         new_dict = {k: str(v) for k, v in replace_map.items() if k.strip() != str(v)}
         for key in new_dict:
             mask_info = mask_info + f"- `{key}` denotes: `{new_dict[key]}`\n"

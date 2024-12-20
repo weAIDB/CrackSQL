@@ -47,6 +47,7 @@ class TreeNode:
         flag_paren = True
         if self.is_terminal:
             res = self.value
+            return res
         if self.dialect == 'mysql':
             if self.value in ['comparisonOperator', 'logicalOperator', 'bitOperator', 'multOperator', 'jsonOperator']:
                 for child in self.children:
@@ -273,6 +274,13 @@ class TreeNode:
                 return root_node, ori_sql[:i + j]
             else:
                 return None, ori_sql[:i + j]
+
+    def clone(self):
+        new_node = TreeNode(self.value, self.dialect, self.is_terminal)
+        new_node.model_get = self.model_get
+        for child in self.children:
+            new_node.add_child(child.clone())
+        return new_node
 
     @staticmethod
     def locate_node(root_node, column: int, ori_sql: str):
