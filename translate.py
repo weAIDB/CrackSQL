@@ -459,7 +459,7 @@ def local_rewrite(translator, retriever, vector_db, src_sql: str,
             if mask_on:
                 slices = []
                 for piece in all_pieces:
-                    new_sql, rep_map = mask_type_node(piece['Node'], src_dialect)
+                    new_sql, rep_map = mask_type_node(piece['Node'], src_dialect, tgt_dialect)
                     slices.append({
                         "ori_sql": str(piece['Node']),
                         "mask_sql": new_sql,
@@ -921,7 +921,7 @@ def rewrite_piece(ori_piece, piece, translator, retriever, vector_db,
 
     elif mask_on:
         mask_info = str()
-        masked_sql, replace_map = mask_type_node(piece['Node'], src_dialect)
+        masked_sql, replace_map = mask_type_node(piece['Node'], src_dialect, tgt_dialect)
         new_dict = {k: str(v) for k, v in replace_map.items() if k.strip() != str(v)}
         for key in new_dict:
             mask_info = mask_info + f"- `{key}` denotes: `{new_dict[key]}`\n"
