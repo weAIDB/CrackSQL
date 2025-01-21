@@ -1,0 +1,28 @@
+flask_cors==3.0.10
+flask==2.2.5
+flask-sqlalchemy==3.0.2
+flask_migrate==3.1.0
+pymysql==1.0.2
+PyJWT==2.3.0
+PyYAML==6.0
+Flask-APScheduler==1.12.3
+flask_caching==1.10.1
+aliyun-python-sdk-core==2.13.36
+gunicorn
+
+# 文档处理
+tiktoken>=0.3.3
+
+# LLM相关
+langchain-community>=0.3.13
+langchain>=0.1.0
+langchain-openai>=0.2.14
+openai>=1.3.0
+aiohttp>=3.8.0  # 用于异步HTTP请求
+tenacity>=8.2.0  # 用于重试机制
+transformers>=4.30.0  # 用于本地模型支持
+torch>=2.0.0  # PyTorch，用于本地模型
+sentence-transformers>=2.2.0  # 用于文本向量化
+numpy>=1.24.0  # 科学计算
+scikit-learn>=1.0.0  # 用于向量计算
+chromadb>=0.4.15  # Chroma向量数据库
