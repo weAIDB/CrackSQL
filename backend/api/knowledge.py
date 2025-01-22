@@ -231,6 +231,8 @@ def add_items():
         kb_name = data.get('kb_name')
         items = data.get('items')  # 可以是单个对象或对象数组
         user_id = session.get('user_id')
+
+        print("===========:", user_id)
         
         if not kb_name or not items:
             res.update(code=ResponseCode.InvalidParameter, msg="缺少必要参数或格式错误")

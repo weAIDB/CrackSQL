@@ -28,6 +28,26 @@
     </div>
 
     <div class="columnCC">
+      <el-popconfirm title="Are you sure you want to log out?" @confirm="onExitClick">
+        <template #reference>
+          <div class="columnCC"
+               style="margin-bottom: 10px; cursor: pointer; background: RGBA(232, 231, 230, 1.00); padding: 2px; border-radius: 8px"
+          >
+            <svg t="1714963942080" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 p-id="8799" width="32" height="32">
+              <path
+                  d="M662.1 670.2c-13.7 0-24.8 11.1-24.8 24.8v64.5c0 13.2-14.6 26.2-27.8 26.2H285.2c-13.2 0-27.4-13-27.4-26.2V267.8c0-13.2 14.2-26.8 27.4-26.8h324.4c13.2 0 27.8 13.6 27.8 26.8v62.5c0 13.7 11.1 24.8 24.8 24.8 13.7 0 24.8-11.1 24.8-24.8v-62.5c0-40.5-36.8-76.3-77.3-76.3H285.2c-40.5 0-76.9 35.8-76.9 76.3v491.7c0 40.5 36.4 75.7 76.9 75.7h324.4c40.5 0 77.3-35.2 77.3-75.7V695c0-13.7-11.1-24.8-24.8-24.8z"
+                  fill="#1A1A1A" p-id="8800"></path>
+              <path
+                  d="M666.3 488.5H484.7c-13.7 0-24.8 11.1-24.8 24.8 0 13.7 11.1 24.8 24.8 24.8h181.6c13.7 0 24.8-11.1 24.8-24.8-0.1-13.7-11.2-24.8-24.8-24.8z"
+                  fill="#E73F32" p-id="8801"></path>
+              <path
+                  d="M797.5 464.7l-71.1-71.1c-9.7-9.7-25.3-9.7-35 0s-9.7 25.3 0 35l71.1 71.2c3.7 3.7 5.8 8.7 5.8 13.9 0 5.3-2.1 10.2-5.8 14l-71.1 71.1c-9.7 9.7-9.7 25.3 0 35 4.8 4.8 11.2 7.3 17.5 7.3 6.3 0 12.7-2.4 17.5-7.3l71.1-71.1c13.1-13.1 20.3-30.5 20.3-49 0-18.6-7.2-36-20.3-49z"
+                  fill="#E73F32" p-id="8802"></path>
+            </svg>
+          </div>
+        </template>
+      </el-popconfirm>
       <el-tooltip
           class="box-item"
           effect="dark"
@@ -158,7 +178,9 @@ const activeMenu = computed(() => {
 function goToHome() {
   router.push('/');
 }
-
+const onExitClick = () => {
+  basicStore.resetStateAndToLogin()
+}
 const onLanguageClick = () => {
   const {language, setLanguage} = useConfigStore()
   setLanguage(language === 'zh' ? 'en' : 'zh')

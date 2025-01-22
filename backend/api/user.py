@@ -31,7 +31,7 @@ def login():
     """
     res = ResMsg()
     obj = request.get_json(force=True)
-    user_name = obj.get("user_name")
+    user_name = obj.get("username")
     password = obj.get("password")
     # 未获取到参数或参数不存在
     if not obj or not user_name or not password:
@@ -112,25 +112,25 @@ def refresh_token():
     return res.data
 
 
-# @route(bp, '/register', methods=["POST"])
-# def register():
-#     """
-#     注册
-#     :return:
-#     """
-#     res = ResMsg()
-#     obj = request.get_json(force=True)
-#     name = obj.get("name", None)
-#     passwd = obj.get("passwd", None)
-#
-#     # 参数错误
-#     if name is None or passwd is None:
-#         res.update(code=ResponseCode.InvalidParameter)
-#         return res.data
-#
-#     data = password_register(name, passwd, obj.get("level"))
-#     if data is None:
-#         res.update(code=ResponseCode.Fail)
-#         return res.data
-#     res.update(data=data)
-#     return res.data
+@route(bp, '/register', methods=["POST"])
+def register():
+    """
+    注册
+    :return:
+    """
+    res = ResMsg()
+    obj = request.get_json(force=True)
+    name = obj.get("username", None)
+    passwd = obj.get("password", None)
+
+    # 参数错误
+    if name is None or passwd is None:
+        res.update(code=ResponseCode.InvalidParameter)
+        return res.data
+
+    data = password_register(name, passwd, obj.get("level"))
+    if data is None:
+        res.update(code=ResponseCode.Fail)
+        return res.data
+    res.update(data=data)
+    return res.data

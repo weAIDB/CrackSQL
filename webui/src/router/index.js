@@ -3,6 +3,11 @@ import {createRouter, createWebHistory} from 'vue-router'
 
 export const constantRoutes = [
   {
+    path: '/login',
+    component: () => import('@/views/login/index.vue'),
+    hidden: true
+  },
+  {
     path: '/404',
     component: () => import('@/views/error-page/404.vue'),
     hidden: true

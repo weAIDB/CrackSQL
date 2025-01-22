@@ -13,15 +13,20 @@ def password_login(user_name, password):
     """
     # 判断用户是否存在与本系统
     user_login = UserLoginMethod.query.filter(
-        UserLoginMethod.login_method == "user_name",
-        UserLoginMethod.identification == user_name,
-        UserLoginMethod.access_code == password).first()
+        UserLoginMethod.login_type == "user_name",
+        UserLoginMethod.identifier == user_name,
+        UserLoginMethod.credential == password).first()
 
     # 存在则直接返回用户信息
     if user_login:
         user = User.query.filter(
             User.id == user_login.user_id).first()
-        data = query_to_dict(user)
+        data = {
+            "id": user.id,
+            "username": user.username,
+            "nickname": user.nickname,
+            "last_login": user.last_login
+        }
         return data
     # 不存在则返回用户错误
     else:
@@ -37,13 +42,13 @@ def password_update(user_id, old_password, new_password):
     :return:
     """
     user_login = UserLoginMethod.query.filter(
-        UserLoginMethod.login_method == "user_name",
+        UserLoginMethod.login_type == "user_name",
         UserLoginMethod.user_id == user_id).first()
 
-    if user_login.access_code != old_password:
+    if user_login.credential != old_password:
         return False
 
-    user_login.access_code = new_password
+    user_login.credential = new_password
     db.session.commit()
 
     return True
@@ -58,9 +63,7 @@ def password_register(user_name, passwd, level=1):
     :return:
     """
     # 判断用户是否存在与本系统
-    user = UserLoginMethod.query.filter(
-        UserLoginMethod.login_method == "user_name",
-        UserLoginMethod.identification == user_name).first()
+    user = UserLoginMethod.query.filter(UserLoginMethod.identifier == user_name).first()
 
     # 存在用户信息, 不能注册
     if user:
@@ -70,14 +73,14 @@ def password_register(user_name, passwd, level=1):
     else:
         try:
             # 新建用户信息
-            new_user = User(name=user_name, level=level)
+            new_user = User(username=user_name, level=level)
             db.session.add(new_user)
             db.session.flush()
             # 新建用户登陆方式
             new_user_login = UserLoginMethod(user_id=new_user.id,
-                                             login_method="user_name",
-                                             identification=user_name,
-                                             access_code=passwd)
+                                             login_type="user_name",
+                                             identifier=user_name,
+                                             credential=passwd)
             db.session.add(new_user_login)
             db.session.commit()
         except Exception as e:
@@ -85,6 +88,6 @@ def password_register(user_name, passwd, level=1):
             logger.error(f"password_register error: {e}")
             return None
 
-        data = dict(id=new_user.id, name=user_name)
-        print('========:', data)
+        data = dict(id=new_user.id, username=user_name)
         return data
+
