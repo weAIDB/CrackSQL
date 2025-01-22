@@ -7,6 +7,7 @@ from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
 import hashlib
 from config.db_config import db
+import uuid
 
 def process_json_data(kb_name: str, json_items: list, user_id: int = None):
     """处理JSON数据"""
@@ -77,9 +78,10 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                     }
                 
                 try:
-                    # 批量保存内容
-                    db.session.bulk_save_objects(all_contents)
+                    # 使用add_all替代bulk_save_objects
+                    db.session.add_all(all_contents)
                     db.session.commit()
+                    # commit会自动flush，此时contents中的对象已经有ID
                 except Exception as e:
                     db.session.rollback()
                     logger.error(f"保存内容记录失败: {str(e)}")
@@ -99,9 +101,9 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                         model_name=kb.embedding_model_name
                     )
                     
-                    # 生成向量ID
+                    # 使用uuid生成唯一ID
                     vector_ids = [
-                        f"{kb.collection_id}_{c.id}_{hashlib.sha256(c.content_hash.encode()).hexdigest()[:8]}"
+                        str(uuid.uuid4())
                         for c in contents
                     ]
                     
@@ -111,13 +113,17 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                         metadata = {
                             'content_id': str(c.id),
                             'knowledge_base_id': str(kb.id),
-                            'token_count': c.token_count,
-                            'content': c.content
                         }
                         metadatas.append(metadata)
                     
                     # 保存到Chroma
                     store = ChromaStore()
+
+                    print("==========metadatas==========:", metadatas)
+                    print("==========embedding_texts==========:", embedding_texts)
+                    print("==========embeddings==========:", embeddings)
+                    print("==========vector_ids==========:", vector_ids)
+
                     store.add_texts(
                         collection_id=kb.collection_id,
                         texts=embedding_texts,
@@ -126,25 +132,20 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                         metadatas=metadatas
                     )
                     
-                    # 更新状态
+                    # 更新状态 - 直接更新内存中的对象
                     for content, vector_id in zip(contents, vector_ids):
-                        # 直接更新数据库中的记录，而不是内存中的对象
-                        db.session.query(JSONContent).filter_by(id=content.id).update({
-                            'status': 'completed',
-                            'vector_id': vector_id
-                        })
-                        print("=-========执行成功：", content.id)
+                        content.status = 'completed'
+                        content.vector_id = vector_id
+                        print(f"执行成功，content_id: {content.id}")
                         
                     db.session.commit()
                 except Exception as e:
                     db.session.rollback()
                     logger.error(f"向量化处理失败: {str(e)}")
-                    # 将所有内容标记为失败
+                    # 更新失败状态 - 直接更新内存中的对象
                     for content in contents:
-                        db.session.query(JSONContent).filter_by(id=content.id).update({
-                            'status': 'failed',
-                            'error_msg': f"向量化处理失败: {str(e)}"
-                        })
+                        content.status = 'failed'
+                        content.error_msg = f"向量化处理失败: {str(e)}"
                     db.session.commit()
                     
                     return {

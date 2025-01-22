@@ -340,7 +340,14 @@ def update_knowledge_base(kb_name: str, data: Dict) -> Dict:
         raise
 
 def delete_knowledge_base(kb_name: str) -> Dict:
-    """删除知识库"""
+    """删除知识库及其所有关联数据
+    
+    Args:
+        kb_name: 知识库名称
+        
+    Returns:
+        Dict: 删除结果
+    """
     try:
         # 获取知识库
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
@@ -351,17 +358,22 @@ def delete_knowledge_base(kb_name: str) -> Dict:
             }
 
         try:
-            # 删除Chroma集合
+            # 1. 删除所有JSON内容记录
+            JSONContent.query.filter_by(knowledge_base_id=kb.id).delete()
+            
+            # 2. 删除Chroma集合（会自动删除集合中的所有向量）
             store = ChromaStore()
             store.delete_collection(kb.collection_id)
+            
         except Exception as e:
-            logger.error(f"删除Chroma集合失败: {str(e)}")
+            logger.error(f"删除关联数据失败: {str(e)}")
+            db.session.rollback()
             return {
                 "status": False,
-                "msg": f"删除向量库失败: {str(e)}"
+                "msg": f"删除关联数据失败: {str(e)}"
             }
 
-        # 删除知识库及关联数据
+        # 3. 最后删除知识库本身
         db.session.delete(kb)
         db.session.commit()
 

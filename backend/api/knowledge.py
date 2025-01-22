@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Blueprint, request, session, jsonify
+from flask import Blueprint, request, jsonify, session
 from api.utils.code import ResponseCode
 from api.utils.response import ResMsg
 from api.utils.scheduler import scheduler
@@ -80,7 +80,7 @@ def create_kb():
             kb_info=data.get('kb_info'),
             embedding_model_name=data.get('embedding_model_name'),
             db_type=data.get('db_type'),
-            embedding_key=data.get('embedding_key')
+            embedding_key=data.get('embedding_key', 'Description')
         )
 
         if not result['status']:
@@ -232,8 +232,6 @@ def add_items():
         items = data.get('items')  # 可以是单个对象或对象数组
         user_id = session.get('user_id')
 
-        print("===========:", user_id)
-        
         if not kb_name or not items:
             res.update(code=ResponseCode.InvalidParameter, msg="缺少必要参数或格式错误")
             return res.data
@@ -248,7 +246,7 @@ def add_items():
             func=process_json_data,  # 使用同步包装函数
             args=[kb_name, items, user_id],
             trigger='date',
-            run_date=datetime.datetime.now() + datetime.timedelta(seconds=2),
+            run_date=datetime.datetime.now(),
             id=job_id,
             replace_existing=True,
             misfire_grace_time=3600,

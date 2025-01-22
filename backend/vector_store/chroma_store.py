@@ -10,6 +10,24 @@ import hashlib
 import re
 
 
+def convert_distance_to_score(distance: float) -> float:
+    """
+    将Chroma的距离值转换为0-100的相似度分数
+    Chroma使用cosine distance (1 - cosine_similarity)
+    distance = 0 表示完全相同，distance = 2 表示完全相反
+    我们将其转换为：0 表示完全不同，100 表示完全相同
+    """
+    
+    if distance is None:
+        return 0
+    # 将distance从[0,2]映射到[0,100]
+    score = (1 - distance/2) * 100
+    # 小数点后两位
+    score = round(score, 2)
+    # 确保分数在0-100范围内
+    return max(0, min(100, score))
+
+
 def generate_kb_name(kb_name: str) -> str:
     """生成知识库名称
     Args:
@@ -85,8 +103,11 @@ class ChromaStore:
             except Exception:
                 # 如果集合不存在，创建新集合
                 metadata = {
+                    "hnsw:space": "cosine",
                     "dimension": str(dimension),
-                    "hnsw:space": "cosine"  # 只保留必要的配置
+                    "hnsw:search_ef": 200,
+                    "hnsw:construction_ef": 200,
+                    "hnsw:M": 32
                 }
                 
                 collection = self.client.create_collection(
@@ -154,15 +175,17 @@ class ChromaStore:
                 query_embeddings=[query_embedding],
                 n_results=top_k,
                 where=where,
+                include=["documents", "metadatas", "distances"],
                 where_document=where_document,
                 **kwargs
             )
+            
             
             return [
                 {
                     'content': doc,
                     'metadata': meta if meta else {},
-                    'score': float(distance) if distance else None,
+                    'score': convert_distance_to_score(distance),
                     'id': id_
                 }
                 for doc, meta, distance, id_ in zip(

@@ -152,7 +152,7 @@ class KnowledgeBase(db.Model, BaseModel):
     kb_name = db.Column(db.String(256), unique=True, nullable=False, comment="知识库名称")
     kb_info = db.Column(db.Text, nullable=True, comment="知识库描述")
     db_type = db.Column(db.String(32), nullable=False, comment="数据库类型:mysql/postgresql/oracle")
-    embedding_key = db.Column(db.String(256), nullable=True, default="description", comment="向量化字段名")
+    embedding_key = db.Column(db.String(256), nullable=True, default="Description", comment="向量化字段名")
     user_id = db.Column(
         db.Integer, 
         db.ForeignKey('user.id', name='fk_knowledge_base_user_id'), 
