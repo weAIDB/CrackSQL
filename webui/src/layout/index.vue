@@ -41,9 +41,21 @@
       />
       <el-tour-step
           placement="right"
+          target="#knowledge"
+          title="知识库管理"
+          description="在这里可以进行知识库管理"
+      />
+      <el-tour-step
+          placement="right"
           target="#database"
           title="数据库配置"
           description="管理目标数据库的连接配置"
+      />
+      <el-tour-step
+          placement="right"
+          target="#modelmanagement"
+          title="模型管理"
+          description="LLM和Embedding模型在这里进行配置"
       />
       <el-tour-step
           placement="right"
