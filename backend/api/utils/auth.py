@@ -123,7 +123,6 @@ def login_required(f):
     :param f:
     :return:
     """
-
     @wraps(f)
     def wrapper(*args, **kwargs):
         res = ResMsg()
@@ -133,13 +132,13 @@ def login_required(f):
             return res.data
 
         auth = Auth()
-        user_name = auth.identify(token)
-        if not user_name:
+        payload = auth.identify(token)
+        if not payload:
             res.update(code=ResponseCode.PleaseSignIn)
             return res.data
 
-        # 获取到用户并写入到session中,方便后续使用
-        session["user_name"] = user_name
+        # 获取到用户信息并写入到session中,方便后续使用
+        session["user_id"] = payload
         return f(*args, **kwargs)
 
     return wrapper

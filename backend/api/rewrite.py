@@ -61,7 +61,7 @@ def latest_api():
     try:
         result = RewriteService.get_latest_history()
         if not result:
-            res.update(code=ResponseCode.NotFound, msg="暂无历史记录")
+            res.update(code=ResponseCode.Success, msg="暂无历史记录")
             return res.data
             
         res.update(data=result)

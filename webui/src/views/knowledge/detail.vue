@@ -9,8 +9,13 @@
         </div>
       </div>
       <div class="rowEC" style="width: 100%; flex-shrink: 1;">
-        <div v-if="activeIndex === 'dataset'" class="upload-container" @click="onOpenUpdateDialog">
-          <span>添加新文件</span>
+        <div v-if="activeIndex === 'dataset'" class="rowBC">
+          <div class="upload-container" @click="onOpenUpdateDialog">
+            <span>导入JSON文件</span>
+          </div>
+          <div class="upload-container" style="margin-left: 10px;" @click="showAddItemDialog">
+            <span>添加单条数据</span>
+          </div>
         </div>
         <div v-else-if="activeIndex === 'search'" class="rowBC" style="width: 100%">
           <el-input
@@ -71,10 +76,10 @@
                       >
                         {{ getStatusText(item.status) }}
                       </el-tag>
-                      <div class="actions" v-if="item.status === 'completed'">
-                        <el-button type="primary" link @click="handleEdit(index)">
+                      <div class="actions" v-if="item.status === 'completed' || item.status === 'failed'">
+                        <!-- <el-button type="primary" link @click="handleEdit(index)">
                           编辑
-                        </el-button>
+                        </el-button> -->
                         <el-button type="danger" link @click="handleDeleteItem(index)">
                           删除
                         </el-button>
@@ -259,6 +264,57 @@
         </el-collapse-item>
       </el-collapse>
     </el-dialog>
+    <!-- 添加新知识对话框 -->
+    <el-dialog
+      v-model="addItemDialogVisible"
+      title="添加新知识"
+      width="80%"
+      :close-on-click-modal="false"
+    >
+      <div
+        v-loading="addingItem"
+        element-loading-text="正在添加..."
+        element-loading-background="rgba(255, 255, 255, 0.7)"
+      >
+        <el-form v-if="newItem" label-width="100px" class="edit-form">
+          <el-form-item label="操作符">
+            <el-input v-model="newItem.Operator" />
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input
+              v-model="newItem.Description"
+              type="textarea"
+              :rows="3"
+            />
+          </el-form-item>
+          <el-form-item label="链接">
+            <el-input v-model="newItem.Link" />
+          </el-form-item>
+          <el-form-item label="语法树">
+            <el-input
+              v-model="newItem.Tree"
+              type="textarea"
+              :rows="3"
+            />
+          </el-form-item>
+          <el-form-item label="详细信息">
+            <el-input
+              v-model="newItem.Detail"
+              type="textarea"
+              :rows="5"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="addItemDialogVisible = false" :disabled="addingItem">取消</el-button>
+          <el-button type="primary" @click="handleAddItem" :loading="addingItem">
+            确认
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -307,6 +363,17 @@ const editDialogVisible = ref(false)
 const currentEditItem = ref<JsonItem | null>(null)
 const currentEditIndex = ref(-1)
 
+// 添加新知识相关
+const addItemDialogVisible = ref(false)
+const addingItem = ref(false)
+const newItem = ref({
+  Operator: '',
+  Description: '',
+  Link: '',
+  Tree: '',
+  Detail: ''
+})
+
 watch(() => activeIndex.value,
     (newValue, oldValue) => {
       console.log('activeIndex', newValue, oldValue)
@@ -341,7 +408,7 @@ const getItems = () => {
 
     // 检查是否有文档正在处理中
     const hasProcessing = itemList.value.some(doc =>
-        doc.status === 'processing'
+        doc.status === 'pending'
     )
     if (hasProcessing) {
       startPolling()
@@ -354,9 +421,10 @@ const getItems = () => {
 // 开始轮询
 const startPolling = () => {
   if (pollingTimer.value) return
+  // 设置轮询间隔
   pollingTimer.value = setInterval(() => {
     getItems()
-  }, 5000)
+  }, 5000) // 每5秒轮询一次
 }
 
 // 停止轮询
@@ -544,33 +612,6 @@ onMounted(() => {
   getKnowledgeBaseDetail()
 })
 
-// 添加删除文档的处理函数
-const handleDeleteDocument = (document) => {
-  ElMessageBox.confirm(
-      '此操作除删除文档外，也会删除文档对应的向量，不可恢复。',
-      '确定要删除吗？',
-      {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
-  ).then(async () => {
-    try {
-      const res = await deleteDocumentReq(document.id)
-      if (res.code === 0) {
-        ElMessage.success('文档删除成功')
-        getDocuments() // 刷新文档列表
-      } else {
-        ElMessage.error(res.msg || '删除失败')
-      }
-    } catch (error) {
-      console.error('删除文档失败:', error)
-      ElMessage.error('删除文档失败')
-    }
-  }).catch(() => {
-    // 用户取消删除
-  })
-}
 
 interface JsonItem {
   Operator: string
@@ -616,13 +657,42 @@ const handleDeleteItem = async (index: number) => {
     )
     
     // 这里需要添加删除知识库项目的API调用
-    await deleteKnowledgeBaseItemReq(itemList.value[index].id)
+    await deleteKnowledgeBaseItemsReq(route.query.kb_name, [itemList.value[index].id])
     itemList.value.splice(index, 1)
     ElMessage.success('删除成功')
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
     }
+  }
+}
+
+// 显示添加对话框
+const showAddItemDialog = () => {
+  newItem.value = {
+    Operator: '',
+    Description: '',
+    Link: '',
+    Tree: '',
+    Detail: ''
+  }
+  addItemDialogVisible.value = true
+}
+
+// 处理添加新知识
+const handleAddItem = async () => {
+  try {
+    addingItem.value = true
+    await addKnowledgeBaseItemsReq(route.query.kb_name, [newItem.value])
+    addItemDialogVisible.value = false
+    setTimeout(() => {
+      getItems()
+      addingItem.value = false
+    }, 1000)
+    ElMessage.success('添加成功')
+  } catch (error: any) {
+    ElMessage.error(error.message || '添加失败')
+    addingItem.value = false
   }
 }
 
@@ -840,6 +910,10 @@ const handleDeleteItem = async (index: number) => {
   border-radius: 10px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   width: 120px;
+  
+  &:hover {
+    opacity: 0.9;
+  }
 }
 
 .action-container {
