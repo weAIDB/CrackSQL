@@ -2,20 +2,16 @@
   <div class="model-management">
     <div class="header-actions">
       <el-button v-if="activeTab === 'llm'" size="default" type="primary" @click="handleCreate">
-        <el-icon>
-          <Plus/>
-        </el-icon>
-        添加LLM模型
+        <el-icon><Plus/></el-icon>
+        {{ $t('models.add.llm') }}
       </el-button>
       <el-button v-else size="default" type="primary" @click="handleCreate">
-        <el-icon>
-          <Plus/>
-        </el-icon>
-        添加Embedding模型
+        <el-icon><Plus/></el-icon>
+        {{ $t('models.add.embedding') }}
       </el-button>
     </div>
     <el-tabs v-model="activeTab" class="model-tabs">
-      <el-tab-pane label="LLM模型" name="llm">
+      <el-tab-pane :label="$t('models.tabs.llm')" name="llm">
         <div class="models-container">
           <div v-for="model in llmModels" :key="model.id" class="model-card">
             <div class="model-header">
@@ -24,12 +20,12 @@
                   <component :is="model.deployment_type === 'cloud' ? 'Cloudy' : 'Monitor'"/>
                 </el-icon>
                 <el-tag :type="model.deployment_type === 'cloud' ? 'success' : 'warning'" size="small">
-                  {{ model.deployment_type === 'cloud' ? '云端' : '本地' }}
+                  {{ $t(`models.deploymentType.${model.deployment_type}`) }}
                 </el-tag>
                 <span class="model-name">{{ model.name }}</span>
               </div>
               <el-tag :type="model.is_active ? 'success' : 'warning'" size="small">
-                {{ model.is_active ? '启用中' : '已禁用' }}
+                {{ $t(`models.status.${model.is_active ? 'active' : 'inactive'}`) }}
               </el-tag>
             </div>
 
@@ -40,7 +36,7 @@
                     <Link/>
                   </el-icon>
                   <el-tooltip :content="model.api_base" placement="top" :disabled="!model.api_base">
-                    <span class="info-text">{{ model.api_base || '未设置API地址' }}</span>
+                    <span class="info-text">{{ model.api_base || $t('models.placeholder.apiBase') }}</span>
                   </el-tooltip>
                 </div>
               </template>
@@ -50,7 +46,7 @@
                     <FolderOpened/>
                   </el-icon>
                   <el-tooltip :content="model.path" placement="top" :disabled="!model.path">
-                    <span class="info-text">{{ model.path || '未设置模型路径' }}</span>
+                    <span class="info-text">{{ model.path || $t('models.placeholder.path') }}</span>
                   </el-tooltip>
                 </div>
               </template>
@@ -58,29 +54,29 @@
                 <el-icon>
                   <TrendCharts/>
                 </el-icon>
-                <span class="info-text">温度: {{ model.temperature }}</span>
+                <span class="info-text">{{ $t('models.info.temperature', { value: model.temperature }) }}</span>
               </div>
               <div class="info-item">
                 <el-icon>
                   <Tickets/>
                 </el-icon>
-                <span class="info-text">最大Token: {{ model.max_tokens || '未设置' }}</span>
+                <span class="info-text">{{ $t('models.info.maxTokens', { value: model.max_tokens || $t('models.placeholder.notSet') }) }}</span>
               </div>
             </div>
 
             <div class="model-desc" :title="model.description">
-              {{ model.description || '暂无描述' }}
+              {{ model.description || $t('models.placeholder.noDesc') }}
             </div>
 
             <div class="model-footer">
-              <el-tooltip content="编辑模型" placement="top">
+              <el-tooltip :content="$t('models.tooltip.edit')" placement="top">
                 <el-button size="default" type="primary" plain @click="handleEdit(model)">
                   <el-icon>
                     <Edit/>
                   </el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="删除模型" placement="top">
+              <el-tooltip :content="$t('models.tooltip.delete')" placement="top">
                 <el-button size="default" type="danger" plain @click="handleDelete(model)">
                   <el-icon>
                     <Delete/>
@@ -92,7 +88,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Embedding模型" name="embedding">
+      <el-tab-pane :label="$t('models.tabs.embedding')" name="embedding">
         <div class="models-container">
           <div v-for="model in embedModels" :key="model.id" class="model-card">
             <div class="model-header">
@@ -101,12 +97,12 @@
                   <component :is="model.deployment_type === 'cloud' ? 'Cloudy' : 'Monitor'"/>
                 </el-icon>
                 <el-tag :type="model.deployment_type === 'cloud' ? 'success' : 'warning'" size="small">
-                  {{ model.deployment_type === 'cloud' ? '云端' : '本地' }}
+                  {{ $t(`models.deploymentType.${model.deployment_type}`) }}
                 </el-tag>
                 <span class="model-name">{{ model.name }}</span>
               </div>
               <el-tag :type="model.is_active ? 'success' : 'warning'" size="small">
-                {{ model.is_active ? '启用中' : '已禁用' }}
+                {{ $t(`models.status.${model.is_active ? 'active' : 'inactive'}`) }}
               </el-tag>
             </div>
 
@@ -117,7 +113,7 @@
                     <Link/>
                   </el-icon>
                   <el-tooltip :content="model.api_base" placement="top" :disabled="!model.api_base">
-                    <span class="info-text">{{ model.api_base || '未设置API地址' }}</span>
+                    <span class="info-text">{{ model.api_base || $t('models.placeholder.apiBase') }}</span>
                   </el-tooltip>
                 </div>
               </template>
@@ -127,7 +123,7 @@
                     <FolderOpened/>
                   </el-icon>
                   <el-tooltip :content="model.path" placement="top" :disabled="!model.path">
-                    <span class="info-text">{{ model.path || '未设置模型路径' }}</span>
+                    <span class="info-text">{{ model.path || $t('models.placeholder.path') }}</span>
                   </el-tooltip>
                 </div>
               </template>
@@ -135,23 +131,23 @@
                 <el-icon>
                   <Histogram/>
                 </el-icon>
-                <span class="info-text">向量维度: {{ model.dimension }}</span>
+                <span class="info-text">{{ $t('models.info.dimension', { value: model.dimension }) }}</span>
               </div>
             </div>
 
             <div class="model-desc" :title="model.description">
-              {{ model.description || '暂无描述' }}
+              {{ model.description || $t('models.placeholder.noDesc') }}
             </div>
 
             <div class="model-footer">
-              <el-tooltip content="编辑模型" placement="top">
+              <el-tooltip :content="$t('models.tooltip.edit')" placement="top">
                 <el-button size="default" type="primary" plain @click="handleEdit(model)">
                   <el-icon>
                     <Edit/>
                   </el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="删除模型" placement="top">
+              <el-tooltip :content="$t('models.tooltip.delete')" placement="top">
                 <el-button size="default" type="danger" plain @click="handleDelete(model)">
                   <el-icon>
                     <Delete/>
@@ -164,50 +160,50 @@
       </el-tab-pane>
     </el-tabs>
     <!-- LLM模型表单对话框 -->
-    <el-dialog v-model="dialogVisible" :title="modelForm.id ? '编辑模型' : '添加模型'" width="600px">
-      <el-form ref="formRef" size="default" :model="modelForm" :rules="modelRules" label-width="100px">
-        <el-form-item label="模型名称" prop="name">
+    <el-dialog v-model="dialogVisible" :title="modelForm.id ? $t('models.dialog.edit') : $t('models.dialog.add')" width="80%">
+      <el-form ref="formRef" size="default" :model="modelForm" :rules="modelRules">
+        <el-form-item :label="$t('models.form.name')" prop="name">
           <el-input v-model="modelForm.name" :disabled="modelForm.id" />
         </el-form-item>
-        <el-form-item label="部署类型" prop="deployment_type">
+        <el-form-item :label="$t('models.form.deploymentType')" prop="deployment_type">
           <el-radio-group v-model="modelForm.deployment_type" :disabled="modelForm.id">
-            <el-radio label="cloud">云端模型</el-radio>
-            <el-radio label="local">本地模型</el-radio>
+            <el-radio label="cloud">{{ $t('models.deploymentType.cloudModel') }}</el-radio>
+            <el-radio label="local">{{ $t('models.deploymentType.localModel') }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="modelForm.deployment_type === 'local'" label="模型路径" prop="path">
+        <el-form-item v-if="modelForm.deployment_type === 'local'" :label="$t('models.form.path')" prop="path">
           <el-input v-model="modelForm.path"/>
         </el-form-item>
-        <el-form-item v-if="modelForm.deployment_type === 'cloud'" label="API地址" prop="api_base">
+        <el-form-item v-if="modelForm.deployment_type === 'cloud'" :label="$t('models.form.apiBase')" prop="api_base">
           <el-input v-model="modelForm.api_base"/>
         </el-form-item>
-        <el-form-item v-if="modelForm.deployment_type === 'cloud'" label="API密钥" prop="api_key">
+        <el-form-item v-if="modelForm.deployment_type === 'cloud'" :label="$t('models.form.apiKey')" prop="api_key">
           <el-input v-model="modelForm.api_key" type="password" show-password/>
         </el-form-item>
         <template v-if="activeTab === 'llm'">
-          <el-form-item label="温度" prop="temperature">
+          <el-form-item :label="$t('models.form.temperature')" prop="temperature">
             <el-slider v-model="modelForm.temperature" :min="0" :max="2" :step="0.1"/>
           </el-form-item>
-          <el-form-item label="最大Token" prop="max_tokens">
+          <el-form-item :label="$t('models.form.maxTokens')" prop="max_tokens">
             <el-input-number v-model="modelForm.max_tokens" :min="0" :step="100"/>
           </el-form-item>
         </template>
         <template v-else>
-          <el-form-item label="向量维度" prop="dimension">
+          <el-form-item :label="$t('models.form.dimension')" prop="dimension">
             <el-input-number v-model="modelForm.dimension" :min="1" :step="64" :disabled="modelForm.id"/>
           </el-form-item>
         </template>
-        <el-form-item label="描述" prop="description">
+        <el-form-item :label="$t('models.form.description')" prop="description">
           <el-input v-model="modelForm.description" type="textarea" :rows="3"/>
         </el-form-item>
-        <el-form-item label="状态" prop="is_active">
+        <el-form-item :label="$t('models.form.status')" prop="is_active">
           <el-switch v-model="modelForm.is_active"/>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
         <el-button type="primary" @click="handleSubmit" :loading="formSubmitting">
-          确定
+          {{ $t('common.confirm') }}
         </el-button>
       </template>
     </el-dialog>
@@ -219,7 +215,10 @@
 import {createLLMModelReq, deleteLLMModelReq, llmModelsReq, updateLLMModelReq} from '@/api/models'
 import {Plus} from '@element-plus/icons-vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {onMounted, reactive, ref} from 'vue'
+import {onMounted, reactive, ref, watch} from 'vue'
+import {useI18n} from '@/hooks/use-i18n'
+
+const i18n = useI18n()
 
 // 状态变量
 const activeTab = ref('llm')
@@ -250,25 +249,20 @@ const modelForm = reactive({
 // 统一的表单验证规则
 const modelRules = {
   name: [
-    {required: true, message: '请输入模型名称', trigger: 'blur'},
-    {min: 2, max: 100, message: '长度在 2 到 100 个字符', trigger: 'blur'}
+    {required: true, message: i18n.t('models.rules.name.required'), trigger: 'blur'},
+    {min: 2, max: 100, message: i18n.t('models.rules.name.length'), trigger: 'blur'}
   ],
   deployment_type: [
-    {required: true, message: '请选择部署类型', trigger: 'change'}
+    {required: true, message: i18n.t('models.rules.deploymentType'), trigger: 'change'}
   ],
   path: [
-    {required: true, message: '请输入模型路径', trigger: 'blur'}
+    {required: true, message: i18n.t('models.rules.path'), trigger: 'blur'}
   ],
   api_base: [
-    {required: true, message: '请输入API地址', trigger: 'blur'}
+    {required: true, message: i18n.t('models.rules.apiBase'), trigger: 'blur'}
   ],
   dimension: [
-    {
-      required: true,
-      message: '请输入向量维度',
-      trigger: 'blur',
-      type: 'number'
-    }
+    {required: true, message: i18n.t('models.rules.dimension'), trigger: 'blur', type: 'number'}
   ]
 }
 
@@ -299,15 +293,15 @@ const handleEdit = (row) => {
 
 const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm('确定要删除该模型吗？', '提示', {
+    await ElMessageBox.confirm(i18n.t('models.message.deleteConfirm'), i18n.t('common.tip'), {
       type: 'warning'
     })
     await deleteLLMModelReq(row.id)
     await fetchModels()
-    ElMessage.success('删除成功')
+    ElMessage.success(i18n.t('models.message.deleteSuccess'))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error(error.message || '删除失败')
+      ElMessage.error(error.message || i18n.t('models.message.deleteError'))
     }
   }
 }
@@ -333,15 +327,15 @@ const handleSubmit = async () => {
       try {
         if (modelForm.id) {
           await updateLLMModelReq(modelForm)
-          ElMessage.success('更新成功')
+          ElMessage.success(i18n.t('models.message.updateSuccess'))
         } else {
           await createLLMModelReq(modelForm)
-          ElMessage.success('创建成功')
+          ElMessage.success(i18n.t('models.message.createSuccess'))
         }
         dialogVisible.value = false
         await fetchModels()
       } catch (error) {
-        ElMessage.error(error.message || (modelForm.id ? '更新失败' : '创建失败'))
+        ElMessage.error(error.message || i18n.t(modelForm.id ? 'models.message.updateError' : 'models.message.createError'))
       } finally {
         formSubmitting.value = false
       }
@@ -362,7 +356,9 @@ const fetchModels = async () => {
       embedModels.value = res.data.items
     }
   } catch (error) {
-    ElMessage.error(error.message || `获取${category === 'llm' ? 'LLM' : 'Embedding'}模型列表失败`)
+    ElMessage.error(error.message || i18n.t('models.message.fetchError', {
+      type: category === 'llm' ? 'LLM' : 'Embedding'
+    }))
   } finally {
     loading.value = false
   }

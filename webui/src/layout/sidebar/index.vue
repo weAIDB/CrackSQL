@@ -5,7 +5,7 @@
       <el-tooltip
           class="box-item"
           effect="dark"
-          content="改写新的SQL"
+          :content="$t('layout.sidebar.tooltip.newChat')"
           placement="right"
       >
         <div id="dashboard"
@@ -28,7 +28,7 @@
     </div>
 
     <div class="columnCC">
-      <el-popconfirm title="Are you sure you want to log out?" @confirm="onExitClick">
+      <el-popconfirm :title="$t('layout.sidebar.tooltip.logoutConfirm')" @confirm="onExitClick">
         <template #reference>
           <div class="columnCC"
                style="margin-bottom: 10px; cursor: pointer; background: RGBA(232, 231, 230, 1.00); padding: 2px; border-radius: 8px"
@@ -51,7 +51,7 @@
       <el-tooltip
           class="box-item"
           effect="dark"
-          content="我们非常期待您的反馈！"
+          :content="$t('layout.sidebar.tooltip.feedback')"
           placement="right"
       >
         <div class="columnCC"
@@ -78,7 +78,7 @@
       <el-tooltip
           class="box-item"
           effect="dark"
-          content="前往Github，给我们一个Star吧！鼓励是前进的动力，我们一定会做的更好的！🎉🎉🎉"
+          :content="$t('layout.sidebar.tooltip.github')"
           placement="right"
       >
         <div class="columnCC"
@@ -94,7 +94,7 @@
       <el-tooltip
           class="box-item"
           effect="dark"
-          content="切换中英文"
+          :content="$t('layout.sidebar.tooltip.language')"
           placement="right"
       >
         <div class="columnCC"
@@ -123,7 +123,7 @@
       <el-tooltip
           class="box-item"
           effect="dark"
-          content="切换主题"
+          :content="$t('layout.sidebar.tooltip.theme')"
           placement="right"
       >
         <div class="columnCC" style="margin-bottom: 15px; cursor: pointer" @click="onThemeClick">

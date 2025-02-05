@@ -2,79 +2,57 @@
 <template>
   <el-dialog
       v-model="dialogVisible"
-      title="创建知识库"
+      :title="$t('knowledge.create.title')"
       width="80%"
+      :close-on-click-modal="false"
       @close="handleClose"
   >
     <el-form
         ref="formRef"
-        size="default"
         :model="form"
         :rules="rules"
-        label-width="160px"
-        class="knowledge-form"
+        class="demo-ruleForm"
+        status-icon
     >
-      <el-form-item label="知识库名称" prop="kb_name">
-        <el-input v-model="form.kb_name" placeholder="请输入知识库名称">
-          <template #prefix>
-            <el-icon><TakeawayBox /></el-icon>
-          </template>
-        </el-input>
+      <el-form-item :label="$t('knowledge.create.form.name')" prop="kb_name">
+        <el-input
+            v-model="form.kb_name"
+            :placeholder="$t('knowledge.create.form.namePlaceholder')"
+        />
       </el-form-item>
-
-      <el-form-item label="知识库描述" prop="kb_info">
+      <el-form-item :label="$t('knowledge.create.form.description')" prop="kb_info">
         <el-input
             v-model="form.kb_info"
             type="textarea"
-            :rows="3"
-            placeholder="请输入知识库描述"
+            :placeholder="$t('knowledge.create.form.descriptionPlaceholder')"
         />
       </el-form-item>
-
-      <el-form-item label="关联的数据库类型" prop="db_type">
-        <el-radio-group v-model="form.db_type">
-          <el-radio
-              v-for="item in dbTypes"
-              :key="item.value"
-              :label="item.value"
-              size="default"
-              border
-          >
-          {{ item.name }}
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
-
-      <el-divider>
-        <el-icon><Setting /></el-icon>
-        <span class="ml-2">模型配置</span>
-      </el-divider>
-
-      <el-form-item label="向量模型" prop="embedding_model_name">
+      <el-form-item :label="$t('knowledge.create.form.embeddingModel')" prop="embedding_model_name">
         <el-select
             v-model="form.embedding_model_name"
-            placeholder="请选择向量模型"
-            class="w-full"
+            class="m-2"
+            :placeholder="$t('knowledge.create.form.embeddingModelPlaceholder')"
+            style="width: 100%"
         >
           <el-option
-              v-for="model in embedModels"
-              :key="model.name"
-              :label="model.name"
-              :value="model.name"
+              v-for="item in embeddingModelList"
+              :key="item.name"
+              :label="item.name"
+              :value="item.name"
           >
-            <div style="font-size: 14px;">
-              {{ model.name }} / {{ model.dimension }} dim
+            <div class="rowSC" style="width: 100%">
+              <span>{{ item.name }}</span>
+              <span style="color: #999999">{{ $t('knowledge.create.form.dimension') }}: {{ item.dimension }}</span>
             </div>
           </el-option>
         </el-select>
       </el-form-item>
     </el-form>
-
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="loading">
-          创建
+        <el-button @click="handleClose">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="onSubmit" :loading="loading">
+          {{ $t('knowledge.create.submit') }}
         </el-button>
       </span>
     </template>
@@ -82,17 +60,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { ElMessage } from 'element-plus'
-import {
-  TakeawayBox,
-  Setting,
-  Connection
-} from '@element-plus/icons-vue'
-import { createKnowledgeBaseReq } from '@/api/knowledge'
-import { embeddingModelsReq } from '@/api/models'
-import { databaseTypesReq } from '@/api/database'
-import type { DatabaseTypeOption } from '@/types/database'
+import {ref, watch} from 'vue'
+import type {FormInstance, FormRules} from 'element-plus'
+import {ElMessage} from 'element-plus'
+import {embeddingModelsReq} from '@/api/models'
+import {createKnowledgeBaseReq} from '@/api/knowledge'
+import {useI18n} from '@/hooks/use-i18n'
+
+const i18n = useI18n()
 
 const props = defineProps({
   visible: {
@@ -103,34 +78,42 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'created'])
 
-const dialogVisible = computed({
-  get: () => props.visible,
-  set: (val) => emit('update:visible', val)
-})
-
-const formRef = ref()
-const embedModels = ref([])
+const dialogVisible = ref(false)
 const loading = ref(false)
-const dbTypes = ref<DatabaseTypeOption[]>([])
+const formRef = ref<FormInstance>()
+const embeddingModelList = ref([])
 
-const form = reactive({
+const form = ref({
   kb_name: '',
   kb_info: '',
-  embedding_model_name: '',
-  db_type: ''
+  embedding_model_name: ''
 })
 
-const rules = {
+const rules = ref<FormRules>({
   kb_name: [
-    { required: true, message: '请输入知识库名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+    {required: true, message: i18n.t('knowledge.create.rules.nameRequired'), trigger: 'blur'},
+    {min: 2, max: 50, message: i18n.t('knowledge.create.rules.nameLength'), trigger: 'blur'}
   ],
   embedding_model_name: [
-    { required: true, message: '请选择向量模型', trigger: 'change' }
-  ],
-  db_type: [
-    { required: true, message: '请选择数据库类型', trigger: 'change' }
+    {required: true, message: i18n.t('knowledge.create.rules.embeddingRequired'), trigger: 'change'}
   ]
+})
+
+watch(() => props.visible, (val) => {
+  dialogVisible.value = val
+})
+
+watch(() => dialogVisible.value, (val) => {
+  emit('update:visible', val)
+})
+
+const getEmbeddingModelList = async () => {
+  try {
+    const res = await embeddingModelsReq()
+    embeddingModelList.value = res.data.items
+  } catch (error) {
+    ElMessage.error(i18n.t('knowledge.create.fetchError'))
+  }
 }
 
 const handleClose = () => {
@@ -138,19 +121,22 @@ const handleClose = () => {
   formRef.value?.resetFields()
 }
 
-const handleSubmit = async () => {
+const onSubmit = async () => {
   if (!formRef.value) return
-
   await formRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true
       try {
-        await createKnowledgeBaseReq(form.kb_name, form.kb_info, form.embedding_model_name, form.db_type)
-        ElMessage.success('创建成功')
-        emit('created')
+        await createKnowledgeBaseReq(
+          form.value.kb_name,
+          form.value.kb_info,
+          form.value.embedding_model_name
+        )
+        ElMessage.success(i18n.t('knowledge.create.success'))
         handleClose()
+        emit('created')
       } catch (error) {
-        ElMessage.error(error.message || '创建失败')
+        ElMessage.error(i18n.t('knowledge.create.error'))
       } finally {
         loading.value = false
       }
@@ -158,29 +144,7 @@ const handleSubmit = async () => {
   })
 }
 
-const fetchModels = async () => {
-  try {
-    const res = await embeddingModelsReq()
-    embedModels.value = res.data.items
-  } catch (error) {
-    ElMessage.error(error.message || '获取模型列表失败')
-  }
-}
-
-const getDbTypes = async () => {
-  try {
-    const res = await databaseTypesReq()
-    dbTypes.value = res.data.types
-  } catch (error) {
-    console.error('获取数据库类型失败:', error)
-    ElMessage.error('获取数据库类型失败')
-  }
-}
-
-onMounted(() => {
-  fetchModels()
-  getDbTypes()
-})
+getEmbeddingModelList()
 </script>
 
 <style scoped>

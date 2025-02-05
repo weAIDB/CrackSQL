@@ -4,14 +4,14 @@
     <div class="header-section">
       <div class="header-content">
         <div class="title-area" id="welcome">
-          <h1>SQL方言转换助手</h1>
-          <p>让跨数据库迁移变得简单高效</p>
+          <h1>{{ $t('dashboard.title') }}</h1>
+          <p>{{ $t('dashboard.subtitle') }}</p>
         </div>
         <a id="github" href="https://github.com/your-repo" target="_blank" class="github-link">
           <el-icon>
             <Link/>
           </el-icon>
-          在 GitHub 上查看项目
+          {{ $t('dashboard.github') }}
         </a>
       </div>
     </div>
@@ -24,25 +24,22 @@
           <el-icon class="feature-icon">
             <Connection/>
           </el-icon>
-          <h3>多数据库支持</h3>
-          <p>支持MySQL、PostgreSQL、Oracle等主流数据库。提供SQL语法解析和转换支持，
-            能够处理复杂查询、存储过程等多种SQL语句。</p>
+          <h3>{{ $t('dashboard.features.database.title') }}</h3>
+          <p>{{ $t('dashboard.features.database.desc') }}</p>
         </div>
         <div class="feature-card">
           <el-icon class="feature-icon">
             <Monitor/>
           </el-icon>
-          <h3>智能转换</h3>
-          <p>采用AI技术智能分析SQL语句结构，自动处理不同数据库间的语法差异。
-            支持批量转换，提升迁移效率。</p>
+          <h3>{{ $t('dashboard.features.conversion.title') }}</h3>
+          <p>{{ $t('dashboard.features.conversion.desc') }}</p>
         </div>
         <div class="feature-card">
           <el-icon class="feature-icon">
             <Document/>
           </el-icon>
-          <h3>执行计划验证</h3>
-          <p>自动对比转换前后的SQL执行计划，确保性能一致性。
-            内置优化策略，针对不同数据库特性进行优化。</p>
+          <h3>{{ $t('dashboard.features.validation.title') }}</h3>
+          <p>{{ $t('dashboard.features.validation.desc') }}</p>
         </div>
       </div>
 
@@ -51,11 +48,12 @@
         <!-- 数据库选择区域 -->
         <div class="database-selector">
           <div id="source-db" class="source-db" style="width: 30%!important;">
-            <label>来源数据库</label>
+            <label>{{ $t('dashboard.operation.sourceDb.label') }}</label>
             <el-select
                 v-model="originalDB"
                 class="db-select"
                 size="large"
+                :placeholder="$t('dashboard.operation.sourceDb.placeholder')"
             >
               <el-option
                   v-for="item in databaseOptions"
@@ -67,18 +65,19 @@
           </div>
 
           <div id="target-db" class="target-db" style="width: 70%">
-            <label>目标数据库</label>
+            <label>{{ $t('dashboard.operation.targetDb.label') }}</label>
             <el-select
                 v-model="targetDB"
                 class="db-select"
                 size="large"
+                :placeholder="$t('dashboard.operation.targetDb.placeholder')"
                 popper-class="target-db-dropdown"
             >
               <template #header>
                 <div class="db-select-header">
                   <el-input
                       v-model="searchKeyword"
-                      placeholder="搜索数据库名称"
+                      :placeholder="$t('dashboard.operation.targetDb.search')"
                       :prefix-icon="Search"
                       size="default"
                       @keyup.enter="handleSearch"
@@ -88,7 +87,7 @@
                       size="default"
                       @click="showAddDatabaseDialog"
                   >
-                    添加配置
+                    {{ $t('dashboard.operation.targetDb.add') }}
                   </el-button>
                 </div>
               </template>
@@ -114,7 +113,7 @@
               v-model="userInput"
               type="textarea"
               rows="auto"
-              placeholder="请输入需要转换的SQL语句..."
+              :placeholder="$t('dashboard.operation.sql.placeholder')"
           />
           <el-button
               id="convert-btn"
@@ -124,7 +123,7 @@
               @click="onSendClick"
               style="margin: 20px 0"
           >
-            开始转换
+            {{ $t('dashboard.operation.convert') }}
           </el-button>
         </div>
       </div>
@@ -133,15 +132,19 @@
     <!-- 添加数据库配置对话框 -->
     <el-dialog
         v-model="addDatabaseDialogVisible"
-        title="添加数据库配置"
+        :title="$t('dashboard.dialog.add.title')"
         width="800px"
         destroy-on-close
     >
       <DatabaseConfigForm ref="databaseConfigFormRef" :initial-data="editForm"/>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="addDatabaseDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="onSaveClick">保存</el-button>
+          <el-button @click="addDatabaseDialogVisible = false">
+            {{ $t('dashboard.dialog.add.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="onSaveClick">
+            {{ $t('dashboard.dialog.add.confirm') }}
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -157,6 +160,9 @@ import {Connection, Document, Link, Monitor, Search} from '@element-plus/icons-v
 import {ElMessage} from "element-plus";
 import {computed, onMounted, reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
+
+const i18n = useI18n()
 
 // 数据库类型选项
 const databaseOptions = ["MySql", "PostgreSQL", "Oracle"]
@@ -170,13 +176,13 @@ const sendBtnDisabled = computed(() => {
 
 const sendBtnDisabledText = computed(() => {
   if (userInput.value === '') {
-    return "请输入要改写的SQL语句"
+    return i18n.t('dashboard.operation.validation.noSql')
   }
   if (originalDB.value === '') {
-    return "请选择来源数据库"
+    return i18n.t('dashboard.operation.validation.noSource')
   }
   if (targetDB.value === '') {
-    return "请选择目标数据库"
+    return i18n.t('dashboard.operation.validation.noTarget')
   }
 })
 

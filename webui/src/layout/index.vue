@@ -13,19 +13,19 @@
           placement="bottom"
           target="#welcome"
           title="🎉🎉🎉欢迎使用方言改写🎉🎉🎉"
-          description="本项目专注于不同数据库之间的语句转换，旨在为开发者提供便捷的工具，帮助他们轻松应对因数据库差异而产生的语句适配难题。"
+          :description="$t('tour.welcome.desc')"
       />
       <el-tour-step
           placement="bottom"
           target="#github"
-          title="可以在 GitHub 上 Star 并关注我们"
-          description="本项目已开源并托管在 GitHub 平台，欢迎各位开发者前往查看源代码、参与贡献以及获取最新版本。"
+          :title="$t('tour.github.title')"
+          :description="$t('tour.github.desc')"
       />
       <el-tour-step
           placement="right"
           target="#dashboard"
-          title="创建新的改写"
-          description="在这里可以创建新的SQL改写"
+          :title="$t('tour.dashboard.title')"
+          :description="$t('tour.dashboard.desc')"
       />
       <el-tour-step
           placement="right"

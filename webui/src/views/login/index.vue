@@ -4,18 +4,18 @@
       <div class="title-container">
         <h3 class="title text-center">{{ settings.title }}</h3>
       </div>
-      <el-form-item prop="username" :rules="formRules.isNotNull('usename不能为空')">
+      <el-form-item prop="username" :rules="formRules.isNotNull($t('login.rules.username'))">
         <div class="rowSC">
           <span class="svg-container">
             <svg-icon icon-class="user" />
           </span>
-          <el-input v-model="subForm.username" placeholder="用户名" />
-          <!--占位-->
-          <div class="show-pwd" />
+          <el-input 
+              v-model="subForm.username" 
+              :placeholder="$t('login.form.usernamePlaceholder')" 
+          />
         </div>
       </el-form-item>
-      <!--<el-form-item prop="password" :rules="formRules.passwordValid">-->
-      <el-form-item prop="password" :rules="formRules.isNotNull('密码不能为空')">
+      <el-form-item prop="password" :rules="formRules.isNotNull($t('login.rules.password'))">
         <div class="rowSC flex-1">
           <span class="svg-container">
             <svg-icon icon-class="password" />
@@ -26,7 +26,7 @@
               v-model="subForm.password"
               :type="passwordType"
               name="password"
-              placeholder="password"
+              :placeholder="$t('login.form.passwordPlaceholder')"
               @keyup.enter="handleLogin"
           />
           <span class="show-pwd" @click="showPwd">
@@ -35,33 +35,41 @@
         </div>
       </el-form-item>
       <div class="tip-message">{{ tipMessage }}</div>
-      <el-button :loading="subLoading" type="primary" class="login-btn" size="default" @click.prevent="handleLogin">
-        Login
+      <el-button 
+          :loading="subLoading" 
+          type="primary" 
+          class="login-btn" 
+          size="default" 
+          @click.prevent="handleLogin"
+      >
+        {{ $t('login.button') }}
       </el-button>
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBasicStore } from '@/store/basic'
 import { elMessage, useElement } from '@/hooks/use-element'
 import { loginReq } from '@/api/user'
+import { useI18n } from '@/hooks/use-i18n'
 
-/* listen router change and set the query  */
+const i18n = useI18n()
 const { settings } = useBasicStore()
-//element valid
 const formRules = useElement().formRules
-//form
+
 const subForm = reactive({
   username: '',
   password: ''
 })
+
 const state = reactive({
   otherQuery: {},
   redirect: undefined
 })
+
 const route = useRoute()
 const getOtherQuery = (query) => {
   return Object.keys(query).reduce((acc, cur) => {
@@ -71,6 +79,7 @@ const getOtherQuery = (query) => {
     return acc
   }, {})
 }
+
 watch(
     () => route.query,
     (query) => {
@@ -82,13 +91,8 @@ watch(
     { immediate: true }
 )
 
-/*
- *  login relative
- * */
 const subLoading = ref(false)
-//tip message
 const tipMessage = ref('')
-//sub form
 const refLoginForm = ref(null)
 const handleLogin = () => {
   refLoginForm.value.validate((valid) => {
@@ -96,27 +100,26 @@ const handleLogin = () => {
     if (valid) loginFunc()
   })
 }
+
 const router = useRouter()
 const basicStore = useBasicStore()
 
 const loginFunc = () => {
   loginReq(subForm)
       .then(({ data }) => {
-        elMessage('登录成功')
+        elMessage(i18n.t('login.success'))
         basicStore.setToken(data?.access_token)
         basicStore.setUserInfo({userInfo: {username: data?.username}})
         router.push('/')
       })
       .catch((err) => {
-        tipMessage.value = err?.msg
+        tipMessage.value = err?.msg || i18n.t('login.error')
       })
       .finally(() => {
         subLoading.value = false
       })
 }
-/*
- *  password show or hidden
- * */
+
 const passwordType = ref('password')
 const refPassword = ref(null)
 const showPwd = () => {

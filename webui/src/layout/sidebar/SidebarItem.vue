@@ -5,7 +5,7 @@
         <el-tooltip
             class="box-item"
             effect="dark"
-            :content="langTitle(onlyOneChild.meta?.tooltip)"
+            :content="$t(onlyOneChild.meta?.tooltip)"
             placement="right"
         >
           <div
@@ -23,12 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import {langTitle} from '@/hooks/use-common'
-import {isExternal} from '@/hooks/use-layout'
 import {resolve} from 'path-browserify'
 import {computed, ref} from 'vue'
 import type {RouteRawConfig} from '~/basic'
+import {isExternal} from '@/hooks/use-layout'
 import Link from './Link.vue'
+import { useI18n } from '@/hooks/use-i18n'
 
 const props = defineProps({
   //每一个router Item
@@ -47,6 +47,8 @@ const props = defineProps({
     default: ''
   }
 })
+
+const i18n = useI18n()
 
 //显示sidebarItem 的情况
 const onlyOneChild = ref()

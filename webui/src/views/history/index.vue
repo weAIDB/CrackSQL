@@ -2,11 +2,11 @@
   <div class="history-container">
     <!-- 标题区域 -->
     <div class="header-section">
-      <h2>改写历史</h2>
+      <h2>{{ $t('history.title') }}</h2>
       <el-input
           v-if="historyList.length > 0"
           v-model="searchKeyword"
-          placeholder="搜索SQL语句"
+          :placeholder="$t('history.search.placeholder')"
           style="width: 300px"
           @keyup.enter="handleSearch"
       >
@@ -20,19 +20,21 @@
 
     <!-- 历史记录列表 -->
     <div v-if="historyList.length === 0" class="empty-state">
-      <el-empty description="暂无改写记录">
+      <el-empty :description="$t('history.empty.title')">
         <template #image>
           <el-icon :size="60" color="#909399"><Document /></el-icon>
         </template>
         <template #description>
-          <p>还没有任何SQL改写记录</p>
+          <p>{{ $t('history.empty.description') }}</p>
           <template v-if="searchKeyword">
-            <p class="sub-text">没有找到匹配的改写记录</p>
-            <el-button @click="clearSearch">清除搜索</el-button>
+            <p class="sub-text">{{ $t('history.empty.noResults') }}</p>
+            <el-button @click="clearSearch">{{ $t('history.search.clear') }}</el-button>
           </template>
           <template v-else>
-            <p class="sub-text">前往首页开始您的第一次SQL改写</p>
-            <el-button type="primary" @click="router.push('/')">开始改写</el-button>
+            <p class="sub-text">{{ $t('history.empty.subText') }}</p>
+            <el-button type="primary" @click="router.push('/')">
+              {{ $t('history.empty.button') }}
+            </el-button>
           </template>
         </template>
       </el-empty>
@@ -44,12 +46,16 @@
             <span class="time">{{ formatDate(item.created_at) }}</span>
             <span class="db-type">{{ item.source_db_type }} → {{ item.target_db_type }}</span>
             <span class="target-info">
-                 {{ `${item.target_db_user}@${item.target_db_host}:${item.target_db_port}/${item.target_db_database}` }}
-               </span>
+              {{ `${item.target_db_user}@${item.target_db_host}:${item.target_db_port}/${item.target_db_database}` }}
+            </span>
           </div>
           <div class="right-info">
-            <el-tag :type="getStatusType(item.status)" class="status-tag">{{ item.status }}</el-tag>
-            <el-button type="primary" link @click="showDetail(item)">详情</el-button>
+            <el-tag :type="getStatusType(item.status)" class="status-tag">
+              {{ $t(`history.status.${item.status.toLowerCase()}`) }}
+            </el-tag>
+            <el-button type="primary" link @click="showDetail(item)">
+              {{ $t('history.list.detail') }}
+            </el-button>
           </div>
         </div>
         <div class="sql-preview">
@@ -90,8 +96,10 @@ import {rewriteListReq} from '@/api/rewrite.js'
 import type {RewriteHistory} from '@/types/database'
 import {Search, Document} from '@element-plus/icons-vue'
 import {onMounted, ref} from 'vue'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
+import {useI18n} from '@/hooks/use-i18n'
 
+const i18n = useI18n()
 const historyList = ref<RewriteHistory[]>([])
 const total = ref(0)
 const currentPage = ref(1)

@@ -9,7 +9,7 @@
         </div>
         <div v-else class="rowSC">
           <el-button icon="ArrowLeftBold" type="primary" plain size="default" @click="currentStep--">
-            上一步
+            {{ $t('knowledge.import.prevStep') }}
           </el-button>
         </div>
       </div>
@@ -17,9 +17,9 @@
 
     <!-- 步骤条 -->
     <el-steps :active="currentStep" finish-status="success" class="steps" align-center>
-      <el-step title="选择文件" />
-      <el-step title="数据处理" />
-      <el-step title="添加任务队列" />
+      <el-step :title="$t('knowledge.detail.steps.selectFile')" />
+      <el-step :title="$t('knowledge.detail.steps.process')" />
+      <el-step :title="$t('knowledge.detail.steps.addQueue')" />
     </el-steps>
 
     <!-- 文件上传区域 -->
@@ -42,21 +42,21 @@
           <el-icon class="upload-icon">
             <Upload />
           </el-icon>
-          <div class="upload-text">点击或拖动JSON文件到此处</div>
+          <div class="upload-text">{{ $t('knowledge.import.upload.text') }}</div>
           <div class="upload-tip">
-            仅支持JSON格式文件，文件内容需要是数组格式
+            {{ $t('knowledge.import.upload.tip') }}
             <br />
-            最多支持 15 个文件
+            {{ $t('knowledge.import.upload.limit') }}
           </div>
         </el-upload>
 
         <!-- 文件解析进度 -->
         <div v-if="fileList.length > 0" class="file-list">
           <div class="file-list-header">
-            <div class="file-name">文件名</div>
-            <div class="file-progress">解析进度</div>
-            <div class="file-count">数据条数</div>
-            <div class="file-action">操作</div>
+            <div class="file-name">{{ $t('knowledge.import.fileList.name') }}</div>
+            <div class="file-progress">{{ $t('knowledge.import.fileList.progress') }}</div>
+            <div class="file-count">{{ $t('knowledge.import.fileList.count') }}</div>
+            <div class="file-action">{{ $t('knowledge.import.fileList.action') }}</div>
           </div>
           <div v-for="(file, index) in fileList" :key="index" class="file-item">
             <div class="file-name">
@@ -69,10 +69,12 @@
               <el-progress :percentage="file.parseProgress || 0" :status="file.parseStatus" />
             </div>
             <div class="file-count">
-              {{ file.itemCount || 0 }} 条
+              {{ file.itemCount || 0 }} {{ $t('knowledge.import.fileList.items') }}
             </div>
             <div class="file-action">
-              <el-button type="danger" link @click="handleRemoveFile(index)">删除</el-button>
+              <el-button type="danger" link @click="handleRemoveFile(index)">
+                {{ $t('knowledge.import.fileList.delete') }}
+              </el-button>
             </div>
           </div>
         </div>
@@ -82,7 +84,9 @@
       <div v-if="currentStep === 2">
         <div v-if="jsonItems.length > 0" class="json-preview">
           <div class="preview-header">
-            <span class="title">数据预览与编辑 ({{ jsonItems.length }} 条)</span>
+            <span class="title">
+              {{ $t('knowledge.import.preview.title') }} ({{ jsonItems.length }} {{ $t('knowledge.import.preview.count') }})
+            </span>
           </div>
           
           <div class="cards-container">
@@ -97,24 +101,24 @@
                   <span class="operator">{{ item.Operator }}</span>
                   <div class="actions">
                     <el-button type="primary" link @click="handleEdit(index)">
-                      编辑
+                      {{ $t('knowledge.import.card.edit') }}
                     </el-button>
                     <el-button type="danger" link @click="handleDeleteItem(index)">
-                      删除
+                      {{ $t('knowledge.import.card.delete') }}
                     </el-button>
                   </div>
                 </div>
                 <div class="card-body">
                   <div class="info-item">
-                    <div class="label">描述：</div>
+                    <div class="label">{{ $t('knowledge.import.card.description') }}</div>
                     <div class="description">{{ item.Description }}</div>
                   </div>
                   <div class="info-item">
-                    <div class="label">语法树：</div>
+                    <div class="label">{{ $t('knowledge.import.card.tree') }}</div>
                     <div class="tree">{{ item.Tree }}</div>
                   </div>
                   <div class="info-item">
-                    <div class="label">详细信息：</div>
+                    <div class="label">{{ $t('knowledge.import.card.detail') }}</div>
                     <div class="detail">{{ item.Detail }}</div>
                   </div>
                 </div>
@@ -131,7 +135,9 @@
             <el-icon style="font-size: 48px; color: var(--el-color-success); margin-right: 10px">
               <CircleCheckFilled />
             </el-icon>
-            <span style="font-size: 16px">数据已经添加任务队列，{{ countdown }}秒后将自动跳转回列表页。</span>
+            <span style="font-size: 16px">
+              {{ $t('knowledge.import.message.addQueue', { countdown }) }}
+            </span>
           </div>
         </div>
       </div>
@@ -153,32 +159,32 @@
     <!-- 编辑对话框 -->
     <el-dialog
       v-model="editDialogVisible"
-      title="编辑数据"
+      :title="$t('knowledge.import.dialog.edit.title')"
       width="80%"
       :close-on-click-modal="false"
     >
       <el-form v-if="currentEditItem" label-width="100px" class="edit-form">
-        <el-form-item label="操作符">
+        <el-form-item :label="$t('knowledge.import.dialog.edit.operator')">
           <el-input v-model="currentEditItem.Operator" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item :label="$t('knowledge.import.dialog.edit.description')">
           <el-input
             v-model="currentEditItem.Description"
             type="textarea"
             :rows="3"
           />
         </el-form-item>
-        <el-form-item label="链接">
+        <el-form-item :label="$t('knowledge.import.dialog.edit.link')">
           <el-input v-model="currentEditItem.Link" />
         </el-form-item>
-        <el-form-item label="语法树">
+        <el-form-item :label="$t('knowledge.import.dialog.edit.tree')">
           <el-input
             v-model="currentEditItem.Tree"
             type="textarea"
             :rows="3"
           />
         </el-form-item>
-        <el-form-item label="详细信息">
+        <el-form-item :label="$t('knowledge.import.dialog.edit.detail')">
           <el-input
             v-model="currentEditItem.Detail"
             type="textarea"
@@ -188,9 +194,11 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button @click="editDialogVisible = false">
+            {{ $t('knowledge.import.dialog.edit.cancel') }}
+          </el-button>
           <el-button type="primary" @click="handleSaveEdit">
-            确认
+            {{ $t('knowledge.import.dialog.edit.confirm') }}
           </el-button>
         </div>
       </template>
@@ -199,16 +207,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Upload, CircleCheckFilled, Document } from '@element-plus/icons-vue'
 import { addKnowledgeBaseItemsReq } from '@/api/knowledge'
 import { fa } from 'element-plus/es/locale'
+import { useI18n } from '@/hooks/use-i18n'
 
 const router = useRouter()
 const route = useRoute()
 const uploadRef = ref()
+const i18n = useI18n()
 
 interface JsonItem {
   Operator: string
@@ -248,19 +258,19 @@ const canProceed = computed(() => {
 const getButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return '下一步'
+      return i18n.t('knowledge.import.button.next')
     case 2:
-      return '开始上传'
+      return i18n.t('knowledge.import.button.upload')
     case 3:
-      return '完成'
+      return i18n.t('knowledge.import.button.complete')
     default:
-      return '下一步'
+      return i18n.t('knowledge.import.button.next')
   }
 })
 
 // 处理文件数量超出限制
 const handleExceed = () => {
-  ElMessage.warning('最多只能上传15个文件')
+  ElMessage.warning(i18n.t('knowledge.import.upload.exceed'))
 }
 
 // 处理文件移除前的操作

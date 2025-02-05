@@ -24,11 +24,10 @@
     <div style="position:relative;top:-6px">
       <div v-show="visible" class="triangle" :style="{left: left + 'px'}"/>
       <ul v-show="visible" :style="{ left: left + 'px', top: top + 'px' }" class="contextmenu">
-
-        <li @click="refreshSelectedTag(selectedTag)">{{ langTitle('Refresh') }}</li>
-        <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">{{ langTitle('Close') }}</li>
-        <li @click="closeOthersTags">{{ langTitle('Close Others') }}</li>
-        <li @click="closeAllTags(selectedTag)">{{ langTitle('Close All') }}</li>
+        <li @click="refreshSelectedTag(selectedTag)">{{ $t('layout.tagsView.refresh') }}</li>
+        <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">{{ $t('layout.tagsView.close') }}</li>
+        <li @click="closeOthersTags">{{ $t('layout.tagsView.closeOthers') }}</li>
+        <li @click="closeAllTags(selectedTag)">{{ $t('layout.tagsView.closeAll') }}</li>
       </ul>
     </div>
 
