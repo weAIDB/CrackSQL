@@ -13,6 +13,8 @@
         :rules="rules"
         size="large"
         class="demo-ruleForm"
+        label-width="auto"
+        label-position="right"
         status-icon
     >
       <el-form-item :label="$t('knowledge.create.form.databaseType')" prop="db_type">

@@ -137,7 +137,7 @@
               width="80%"
               :close-on-click-modal="false"
             >
-              <el-form v-if="currentEditItem" label-width="100px" class="edit-form">
+              <el-form v-if="currentEditItem" label-width="auto" label-position="right" class="edit-form">
                 <el-form-item :label="$t('knowledge.detail.form.operator')">
                   <el-input v-model="currentEditItem.Operator" />
                 </el-form-item>
@@ -289,7 +289,7 @@
         :element-loading-text="$t('knowledge.detail.dialog.add.loading')"
         element-loading-background="rgba(255, 255, 255, 0.7)"
       >
-        <el-form v-if="newItem" label-width="100px" class="edit-form">
+        <el-form v-if="newItem" label-width="auto" label-position="right" class="edit-form">
           <el-form-item :label="$t('knowledge.detail.form.operator')">
             <el-input v-model="newItem.Operator" />
           </el-form-item>

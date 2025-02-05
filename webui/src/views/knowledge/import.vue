@@ -163,7 +163,7 @@
       width="80%"
       :close-on-click-modal="false"
     >
-      <el-form v-if="currentEditItem" label-width="100px" class="edit-form">
+      <el-form v-if="currentEditItem" label-width="auto" label-position="right" class="edit-form">
         <el-form-item :label="$t('knowledge.import.dialog.edit.operator')">
           <el-input v-model="currentEditItem.Operator" />
         </el-form-item>

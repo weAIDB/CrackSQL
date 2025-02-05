@@ -161,7 +161,7 @@
     </el-tabs>
     <!-- LLM模型表单对话框 -->
     <el-dialog v-model="dialogVisible" :title="modelForm.id ? $t('models.dialog.edit') : $t('models.dialog.add')" width="80%">
-      <el-form ref="formRef" size="default" :model="modelForm" :rules="modelRules">
+      <el-form ref="formRef" size="default" :model="modelForm" :rules="modelRules" label-width="auto" label-position="right">
         <el-form-item :label="$t('models.form.name')" prop="name">
           <el-input v-model="modelForm.name" :disabled="modelForm.id" />
         </el-form-item>

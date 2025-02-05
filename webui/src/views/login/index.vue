@@ -1,6 +1,6 @@
 <template>
   <div class="login-container columnCC">
-    <el-form ref="refLoginForm" class="login-form" :model="subForm" :rules="formRules">
+    <el-form ref="refLoginForm" class="login-form" label-width="auto" label-position="right" :model="subForm" :rules="formRules">
       <div class="title-container">
         <h3 class="title text-center">{{ settings.title }}</h3>
       </div>

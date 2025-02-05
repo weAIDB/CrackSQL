@@ -4,7 +4,8 @@
       :model="form"
       :rules="rules"
       size="large"
-      label-width="120px"
+      label-width="auto"
+      label-position="right"
       class="demo-ruleForm"
       status-icon
   >
