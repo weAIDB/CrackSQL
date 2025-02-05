@@ -5,27 +5,28 @@
         <el-button icon="ArrowLeftBold" type="primary" plain circle size="large" @click="routerBack()"/>
         <div class="columnSS" style="margin-left: 10px; width: 100%">
           <span style="font-weight: bold; font-size: 22px; margin-bottom: 5px">{{ $route.query.kb_name }}</span>
-          <span style="font-size: 12px; color: #666666">Data Count: {{ totalCount }}</span>
+          <span style="font-size: 12px; color: #666666">{{ $t('knowledge.detail.dataCount') }}: {{ totalCount }}</span>
         </div>
       </div>
       <div class="rowEC" style="width: 100%; flex-shrink: 1;">
         <div v-if="activeIndex === 'dataset'" class="rowBC">
           <div class="upload-container" @click="onOpenUpdateDialog">
-            <span>导入JSON文件</span>
+            <span>{{ $t('knowledge.import.json') }}</span>
           </div>
           <div class="upload-container" style="margin-left: 10px;" @click="showAddItemDialog">
-            <span>添加单条数据</span>
+            <span>{{ $t('knowledge.import.single') }}</span>
           </div>
         </div>
         <div v-else-if="activeIndex === 'search'" class="rowBC" style="width: 100%">
           <el-input
-              v-model="searchValue" placeholder="请输入搜索内容" size="large"
+              v-model="searchValue" 
+              :placeholder="$t('knowledge.import.search.placeholder')" 
+              size="large"
               style="width: 100%; margin: 0 20px" />
           <el-button size="default" :loading="searching" type="primary" @click="onSearchClick">
-            搜索
+            {{ $t('knowledge.import.search.button') }}
           </el-button>
         </div>
-
       </div>
     </div>
     <el-container style="height: calc(100% - 100px)">
@@ -37,20 +38,20 @@
               <el-icon>
                 <Document/>
               </el-icon>
-              <span>数据集</span>
+              <span>{{ $t('knowledge.detail.menu.dataset') }}</span>
             </div>
             <div :class="`rowSC menu-item ${activeIndex === 'search' ? ' active' : ''}`" @click="onMenuClick('search')">
               <el-icon>
                 <Search/>
               </el-icon>
-              <span>搜索测试</span>
+              <span>{{ $t('knowledge.detail.menu.search') }}</span>
             </div>
             <div :class="`rowSC menu-item ${activeIndex === 'setting' ? ' active' : ''}`"
                  @click="onMenuClick('setting')">
               <el-icon>
                 <Setting/>
               </el-icon>
-              <span>配置</span>
+              <span>{{ $t('knowledge.detail.menu.setting') }}</span>
             </div>
           </div>
         </div>
@@ -74,14 +75,11 @@
                         size="small" 
                         class="status-tag"
                       >
-                        {{ getStatusText(item.status) }}
+                        {{ $t(`knowledge.detail.status.${item.status}`) }}
                       </el-tag>
                       <div class="actions" v-if="item.status === 'completed' || item.status === 'failed'">
-                        <!-- <el-button type="primary" link @click="handleEdit(index)">
-                          编辑
-                        </el-button> -->
                         <el-button type="danger" link @click="handleDeleteItem(index)">
-                          删除
+                          {{ $t('knowledge.detail.button.delete') }}
                         </el-button>
                       </div>
                     </div>
@@ -102,7 +100,7 @@
                           @click="handleRetry(item)"
                           class="retry-button"
                         >
-                          重新处理
+                          {{ $t('knowledge.detail.button.retry') }}
                         </el-button>
                       </template>
                     </el-alert>
@@ -116,15 +114,15 @@
 
                   <div class="card-body">
                     <div class="info-item">
-                      <div class="label">描述：</div>
+                      <div class="label">{{ $t('knowledge.detail.card.description') }}</div>
                       <div class="description">{{ item.content?.Description }}</div>
                     </div>
                     <div class="info-item">
-                      <div class="label">语法树：</div>
+                      <div class="label">{{ $t('knowledge.detail.card.tree') }}</div>
                       <div class="tree">{{ item.content?.Tree }}</div>
                     </div>
                     <div class="info-item">
-                      <div class="label">详细信息：</div>
+                      <div class="label">{{ $t('knowledge.detail.card.detail') }}</div>
                       <div class="detail">{{ item.content?.Detail }}</div>
                     </div>
                   </div>
@@ -135,32 +133,32 @@
             <!-- 编辑对话框 -->
             <el-dialog
               v-model="editDialogVisible"
-              title="编辑数据"
+              :title="$t('knowledge.detail.dialog.edit.title')"
               width="80%"
               :close-on-click-modal="false"
             >
               <el-form v-if="currentEditItem" label-width="100px" class="edit-form">
-                <el-form-item label="操作符">
+                <el-form-item :label="$t('knowledge.detail.form.operator')">
                   <el-input v-model="currentEditItem.Operator" />
                 </el-form-item>
-                <el-form-item label="描述">
+                <el-form-item :label="$t('knowledge.detail.form.description')">
                   <el-input
                     v-model="currentEditItem.Description"
                     type="textarea"
                     :rows="3"
                   />
                 </el-form-item>
-                <el-form-item label="链接">
+                <el-form-item :label="$t('knowledge.detail.form.link')">
                   <el-input v-model="currentEditItem.Link" />
                 </el-form-item>
-                <el-form-item label="语法树">
+                <el-form-item :label="$t('knowledge.detail.form.tree')">
                   <el-input
                     v-model="currentEditItem.Tree"
                     type="textarea"
                     :rows="3"
                   />
                 </el-form-item>
-                <el-form-item label="详细信息">
+                <el-form-item :label="$t('knowledge.detail.form.detail')">
                   <el-input
                     v-model="currentEditItem.Detail"
                     type="textarea"
@@ -170,9 +168,11 @@
               </el-form>
               <template #footer>
                 <div class="dialog-footer">
-                  <el-button @click="editDialogVisible = false">取消</el-button>
+                  <el-button @click="editDialogVisible = false">
+                    {{ $t('knowledge.detail.dialog.edit.cancel') }}
+                  </el-button>
                   <el-button type="primary" @click="handleSaveEdit">
-                    确认
+                    {{ $t('knowledge.detail.dialog.edit.confirm') }}
                   </el-button>
                 </div>
               </template>
@@ -181,14 +181,18 @@
         </div>
         <div v-if="activeIndex === 'search'">
           <el-table :data="searchResult" :loading="searching" style="width: 100%; border-radius: 10px;" height="calc(100vh - 140px)">
-            <el-table-column label="搜索结果展示（近似值评分为百分制，分数越高，相关性越高，100最高。）">
+            <el-table-column :label="$t('knowledge.detail.search.title')">
               <template #default="scope">
                 <div class="search-result-item">
                   <div class="document-info rowSC">
                     <el-tag size="small" style="margin-right: 10px">
-                      <span style="font-weight: bold; font-size: 16px">结果 {{ scope.$index + 1 }}</span>
+                      <span style="font-weight: bold; font-size: 16px">
+                        {{ $t('knowledge.detail.search.result') }} {{ scope.$index + 1 }}
+                      </span>
                       #
-                      <span style="font-weight: bold; font-size: 16px">评分：{{ scope.row.score }}</span>
+                      <span style="font-weight: bold; font-size: 16px">
+                        {{ $t('knowledge.detail.search.score') }}{{ scope.row.score }}
+                      </span>
                     </el-tag>
                     <span class="document-title">{{ scope.row.document?.title }}</span>
                   </div>
@@ -198,10 +202,10 @@
                       <el-descriptions-item v-for="(value, key) in scope.row.meta_info" :key="key" :label="key">
                         {{ value }}
                       </el-descriptions-item>
-                      <el-descriptions-item label="文档格式">
+                      <el-descriptions-item :label="$t('knowledge.detail.search.docFormat')">
                         {{ scope.row.document?.type }}
                       </el-descriptions-item>
-                      <el-descriptions-item label="文本分割序号">
+                      <el-descriptions-item :label="$t('knowledge.detail.search.splitIndex')">
                         {{ scope.row.chunk_index + 1 }}
                       </el-descriptions-item>
                     </el-descriptions>
@@ -214,29 +218,37 @@
         <div v-if="activeIndex === 'setting'" style="width: 100%; height: 100%; background: white; padding: 20px; border-radius: 10px;">
           <div class="relative columnSS" style="width: 100%">
             <div class="rowSC" style="width: 100%;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">名称</span>
+              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+                {{ $t('knowledge.detail.form.name') }}
+              </span>
               <span style="color: #333333;">{{ editForm.kb_name }}</span>
             </div>
 
             <div class="rowSC" style="width: 100%; margin-top: 20px;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">介绍</span>
+              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+                {{ $t('knowledge.detail.form.description') }}
+              </span>
               <el-input v-model="editForm.kb_info" disabled :rows="2" type="textarea"/>
             </div>
 
             <div class="rowSC" style="width: 100%; margin-top: 20px;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">向量模型</span>
+              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+                {{ $t('knowledge.detail.form.embeddingModel') }}
+              </span>
               <span style="color: #333333;">{{ editForm.embedding_model_name }}</span>
             </div>
 
-            <!-- 添加数据库类型显示 -->
             <div class="rowSC" style="width: 100%; margin-top: 20px;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">数据库类型</span>
+              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+                {{ $t('knowledge.detail.form.databaseType') }}
+              </span>
               <span style="color: #333333;">{{ editForm.db_type }}</span>
             </div>
 
             <div class="rowSC" style="margin-top: 20px">
-              <!--              <el-button size="default" type="primary" @click="onHandleSaveClick">Save</el-button>-->
-              <el-button :icon="Delete" size="small" @click="onHandleDeleteClick"> 删除</el-button>
+              <el-button :icon="Delete" size="small" @click="onHandleDeleteClick">
+                {{ $t('knowledge.detail.button.delete') }}
+              </el-button>
             </div>
           </div>
         </div>
@@ -244,7 +256,7 @@
     </el-container>
     <el-dialog
         v-model="chunksDialogVisible"
-        :title="chunksDialogTitle"
+        :title="$t('knowledge.detail.chunks.title')"
         width="80%"
         top="3vh"
         style="height: 92vh"
@@ -252,9 +264,10 @@
       <el-collapse v-if="currentChunks" v-loading="chunksLoading" style="height: calc(92vh - 80px); overflow-y: scroll">
         <el-collapse-item v-for="(chunk, index) in currentChunks" :key="index" title="">
           <template #title>
-            <el-tag size="small" style="margin-right: 10px">分块: {{ chunk.content_info.content_index + 1 }}</el-tag>
-            <span
-                style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+            <el-tag size="small" style="margin-right: 10px">
+              {{ $t('knowledge.detail.chunks.block') }}: {{ chunk.content_info.content_index + 1 }}
+            </el-tag>
+            <span style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
               {{ chunk.chunk_content }}
             </span>
           </template>
@@ -267,37 +280,37 @@
     <!-- 添加新知识对话框 -->
     <el-dialog
       v-model="addItemDialogVisible"
-      title="添加新知识"
+      :title="$t('knowledge.detail.dialog.add.title')"
       width="80%"
       :close-on-click-modal="false"
     >
       <div
         v-loading="addingItem"
-        element-loading-text="正在添加..."
+        :element-loading-text="$t('knowledge.detail.dialog.add.loading')"
         element-loading-background="rgba(255, 255, 255, 0.7)"
       >
         <el-form v-if="newItem" label-width="100px" class="edit-form">
-          <el-form-item label="操作符">
+          <el-form-item :label="$t('knowledge.detail.form.operator')">
             <el-input v-model="newItem.Operator" />
           </el-form-item>
-          <el-form-item label="描述">
+          <el-form-item :label="$t('knowledge.detail.form.description')">
             <el-input
               v-model="newItem.Description"
               type="textarea"
               :rows="3"
             />
           </el-form-item>
-          <el-form-item label="链接">
+          <el-form-item :label="$t('knowledge.detail.form.link')">
             <el-input v-model="newItem.Link" />
           </el-form-item>
-          <el-form-item label="语法树">
+          <el-form-item :label="$t('knowledge.detail.form.tree')">
             <el-input
               v-model="newItem.Tree"
               type="textarea"
               :rows="3"
             />
           </el-form-item>
-          <el-form-item label="详细信息">
+          <el-form-item :label="$t('knowledge.detail.form.detail')">
             <el-input
               v-model="newItem.Detail"
               type="textarea"
@@ -308,9 +321,11 @@
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="addItemDialogVisible = false" :disabled="addingItem">取消</el-button>
+          <el-button @click="addItemDialogVisible = false" :disabled="addingItem">
+            {{ $t('knowledge.detail.dialog.add.cancel') }}
+          </el-button>
           <el-button type="primary" @click="handleAddItem" :loading="addingItem">
-            确认
+            {{ $t('knowledge.detail.dialog.add.confirm') }}
           </el-button>
         </div>
       </template>
@@ -326,6 +341,7 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import type {Ref} from 'vue'
 import {onMounted, reactive, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
+import { useI18n } from '@/hooks/use-i18n'
 
 const basicStore = useBasicStore()
 const router = useRouter()
@@ -373,6 +389,8 @@ const newItem = ref({
   Tree: '',
   Detail: ''
 })
+
+const i18n = useI18n()
 
 watch(() => activeIndex.value,
     (newValue, oldValue) => {
@@ -443,10 +461,10 @@ const getKnowledgeBaseDetail = () => {
       editForm.embedding_model_name = res.data.embedding_model ? res.data.embedding_model.name : ''
       editForm.db_type = res.data.db_type
     } else {
-      ElMessage.error(res.msg || '获取知识库详情失败')
+      ElMessage.error(res.msg || i18n.t('knowledge.detail.error.getDetail'))
     }
   }).catch(err => {
-    ElMessage.error(err.message || '获取知识库详情失败')
+    ElMessage.error(err.message || i18n.t('knowledge.detail.error.getDetail'))
   })
 }
 
@@ -474,41 +492,37 @@ const onSearchClick = () => {
   searchResult.value = []
   searching.value = true
   knowledgeSearchDocsReq(route.query.kb_name, searchValue.value)
-      .then(res => {
-        if (res.code === 0) {
-          searchResult.value = res.data
-        } else {
-          ElMessage.error(res.msg || '搜索失败')
-        }
-      })
-      .catch(err => {
-        ElMessage.error(err.message || '搜索失败')
-      })
-      .finally(() => {
-        searching.value = false
-      })
+    .then(res => {
+      if (res.code === 0) {
+        searchResult.value = res.data
+      } else {
+        ElMessage.error(res.msg || i18n.t('knowledge.detail.error.search'))
+      }
+    })
+    .catch(err => {
+      ElMessage.error(err.message || i18n.t('knowledge.detail.error.search'))
+    })
+    .finally(() => {
+      searching.value = false
+    })
 }
 
 const onHandleDeleteClick = () => {
   ElMessageBox.confirm(
-      '删除知识库将同时删除所有文档和向量数据，此操作不可恢复，是否继续？',
-      '删除知识库',
-      {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
+    i18n.t('knowledge.detail.message.deleteKbConfirm'),
+    i18n.t('knowledge.detail.message.deleteKbTitle'),
+    {
+      confirmButtonText: i18n.t('common.confirm'),
+      cancelButtonText: i18n.t('common.cancel'),
+      type: 'warning',
+    }
   )
-      .then(() => {
-        knowledgeBaseDeleteReq(route.query.kb_name).then(() => {
-          ElMessage({
-            type: 'success',
-            message: 'Delete completed',
-          })
-          routerBack()
-        })
-      }).catch(() => {
-  })
+  .then(() => {
+    knowledgeBaseDeleteReq(route.query.kb_name).then(() => {
+      ElMessage.success(i18n.t('knowledge.detail.message.deleteKbSuccess'))
+      routerBack()
+    })
+  }).catch(() => {})
 }
 
 const onMenuClick = (index) => {
@@ -572,10 +586,10 @@ const formatTime = (time: string) => {
 const handleRetry = async (item: any) => {
   try {
     await retryProcessItemReq(item.id)
-    ElMessage.success('已重新提交处理')
-    getItems() // 刷新列表
+    ElMessage.success(i18n.t('knowledge.detail.message.retrySuccess'))
+    getItems()
   } catch (error) {
-    ElMessage.error('重试失败')
+    ElMessage.error(i18n.t('knowledge.detail.message.retryError'))
   }
 }
 
@@ -591,17 +605,17 @@ const onOpenUpdateDialog = () => {
 
 const handleRetryDocument = async (row) => {
   const res = await vectorizeDocumentReq(
-      row.id,
-      row.process_type,
-      row.chunk_size,
-      row.separator,
-      row.ai_summary,
-      row.ai_qa,
-      row.strengthen_model_name,
-      row.splitter_model_name
+    row.id,
+    row.process_type,
+    row.chunk_size,
+    row.separator,
+    row.ai_summary,
+    row.ai_qa,
+    row.strengthen_model_name,
+    row.splitter_model_name
   )
   if (res.code !== 0) {
-    ElMessage.error(`处理文件失败: ${res.msg}`)
+    ElMessage.error(i18n.t('knowledge.detail.error.processFile', { msg: res.msg }))
     return
   }
   getDocuments()
@@ -632,13 +646,12 @@ const handleEdit = (index: number) => {
 const handleSaveEdit = async () => {
   if (currentEditItem.value && currentEditIndex.value !== -1) {
     try {
-      // 这里需要添加更新知识库项目的API调用
       await updateKnowledgeBaseItemReq(currentEditItem.value)
       itemList.value[currentEditIndex.value] = { ...currentEditItem.value }
-      ElMessage.success('更新成功')
+      ElMessage.success(i18n.t('knowledge.detail.message.updateSuccess'))
       editDialogVisible.value = false
     } catch (error) {
-      ElMessage.error('更新失败')
+      ElMessage.error(i18n.t('knowledge.detail.message.updateError'))
     }
   }
 }
@@ -647,22 +660,21 @@ const handleSaveEdit = async () => {
 const handleDeleteItem = async (index: number) => {
   try {
     await ElMessageBox.confirm(
-      '确定要删除这条数据吗？',
-      '警告',
+      i18n.t('knowledge.detail.dialog.delete.confirmMessage'),
+      i18n.t('knowledge.detail.dialog.delete.title'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: i18n.t('common.confirm'),
+        cancelButtonText: i18n.t('common.cancel'),
         type: 'warning',
       }
     )
     
-    // 这里需要添加删除知识库项目的API调用
     await deleteKnowledgeBaseItemsReq(route.query.kb_name, [itemList.value[index].id])
     itemList.value.splice(index, 1)
-    ElMessage.success('删除成功')
+    ElMessage.success(i18n.t('knowledge.detail.dialog.delete.success'))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      ElMessage.error(i18n.t('knowledge.detail.dialog.delete.error'))
     }
   }
 }
@@ -689,9 +701,9 @@ const handleAddItem = async () => {
       getItems()
       addingItem.value = false
     }, 1000)
-    ElMessage.success('添加成功')
+    ElMessage.success(i18n.t('knowledge.detail.message.addSuccess'))
   } catch (error: any) {
-    ElMessage.error(error.message || '添加失败')
+    ElMessage.error(error.message || i18n.t('knowledge.detail.message.addError'))
     addingItem.value = false
   }
 }

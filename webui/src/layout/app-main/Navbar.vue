@@ -12,7 +12,7 @@
       <breadcrumb class="breadcrumb-container" />
     </div>
     <!--导航标题-->
-    <div v-if="settings.showNavbarTitle" class="heardCenterTitle">{{ settings.title }}</div>
+    <div v-if="settings.showNavbarTitle" class="heardCenterTitle">{{ $t('layout.title') }}</div>
     <!-- 下拉操作菜单 -->
     <div v-if="settings.ShowDropDown" class="right-menu rowSC">
       <el-dropdown trigger="click" size="medium">
@@ -23,13 +23,13 @@
         <template #dropdown>
           <el-dropdown-menu>
             <router-link to="/">
-              <el-dropdown-item>{{ langTitle('Home') }}</el-dropdown-item>
+              <el-dropdown-item>{{ $t('layout.navbar.home') }}</el-dropdown-item>
             </router-link>
             <a target="_blank" href="https://github.com/jzfai/vue3-admin-template">
-              <el-dropdown-item>{{ langTitle('Github') }}</el-dropdown-item>
+              <el-dropdown-item>{{ $t('layout.navbar.github') }}</el-dropdown-item>
             </a>
             <!--<el-dropdown-item>修改密码</el-dropdown-item>-->
-            <el-dropdown-item divided @click="loginOut">{{ langTitle('login out') }}</el-dropdown-item>
+            <el-dropdown-item divided @click="loginOut">{{ $t('layout.navbar.loginOut') }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -48,6 +48,7 @@ import { elMessage } from '@/hooks/use-element'
 import { useBasicStore } from '@/store/basic'
 import { langTitle } from '@/hooks/use-common'
 import {loginOutReq} from "@/api/user";
+import { useI18n } from 'vue-i18n'
 
 const basicStore = useBasicStore()
 const { settings, sidebar, setToggleSideBar } = basicStore
@@ -56,9 +57,10 @@ const toggleSideBar = () => {
 }
 //退出登录
 const router = useRouter()
+const i18n = useI18n()
 const loginOut = () => {
   loginOutReq().then(()=>{
-    elMessage('退出登录成功')
+    elMessage(i18n.t('layout.navbar.logoutSuccess'))
     router.push(`/login?redirect=/`)
     nextTick(() => {
       resetState()

@@ -2,7 +2,7 @@
 <template>
   <div class="columnSC" style="width: 100%">
     <div class="rowBC" style="padding: 20px; width: 100%">
-      <div style="font-size: 24px; color: #333333">知识库列表</div>
+      <div style="font-size: 24px; color: #333333">{{ $t('knowledge.title') }}</div>
       <el-button
           ref="addKnowledgeRef"
           size="default"
@@ -11,7 +11,7 @@
           @click="onCreateKnowledgeClick"
       >
         <el-icon><Plus /></el-icon>
-        创建知识库
+        {{ $t('knowledge.create.button') }}
       </el-button>
     </div>
 
@@ -54,8 +54,8 @@
         v-model="tourOpen"
         :mask="{ color: 'rgba(0, 0, 0, .3)' }"
     >
-      <el-tour-step :target="addKnowledgeRef?.$el" title="创建知识库">
-        <div>点击这里创建一个新的知识库</div>
+      <el-tour-step :target="addKnowledgeRef?.$el" :title="$t('knowledge.create.tour.title')">
+        <div>{{ $t('knowledge.create.tour.desc') }}</div>
       </el-tour-step>
     </el-tour>
   </div>
@@ -67,7 +67,9 @@ import { useRouter } from 'vue-router'
 import { Plus, TakeawayBox, ArrowRight } from '@element-plus/icons-vue'
 import CreateKnowledgeBase from '@/components/CreateKnowledgeBase.vue'
 import { knowledgeListReq } from '@/api/knowledge'
+import { useI18n } from '@/hooks/use-i18n'
 
+const i18n = useI18n()
 const router = useRouter()
 const knowledgeList = ref([])
 const dialogCreateFormVisible = ref(false)

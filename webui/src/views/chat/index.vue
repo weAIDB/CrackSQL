@@ -1,14 +1,16 @@
 <template>
   <div v-if="!historyDetail" class="empty-state">
-    <el-empty description="暂无改写记录">
+    <el-empty :description="$t('chat.empty.title')">
       <template #image>
         <el-icon :size="60" color="#909399"><ChatDotSquare /></el-icon>
       </template>
       <template #description>
-        <p>还没有任何SQL改写记录</p>
-        <p class="sub-text">前往首页开始您的第一次SQL改写</p>
+        <p>{{ $t('chat.empty.description') }}</p>
+        <p class="sub-text">{{ $t('chat.empty.subText') }}</p>
       </template>
-      <el-button type="primary" @click="router.push('/')">开始改写</el-button>
+      <el-button type="primary" @click="router.push('/')">
+        {{ $t('chat.empty.button') }}
+      </el-button>
     </el-empty>
   </div>
   <div v-else class="relative columnSC detail-container">
@@ -16,7 +18,9 @@
     <div class="header">
       <div class="header-item rowBC" style="width: 100%; height: 35px">
         <div class="rowSC">
-          <span style="margin-right: 10px; font-weight: bold; color: #333333">{{ historyDetail.source_db_type }}</span>
+          <span style="margin-right: 10px; font-weight: bold; color: #333333">
+            {{ historyDetail.source_db_type }}
+          </span>
           <svg
               class="icon"
               viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
@@ -29,11 +33,13 @@
                 d="M375.296 887.296c-21.504 0-42.496-11.264-54.272-30.72-14.848-24.576-10.752-56.32 9.216-76.8L583.68 527.36 330.752 274.944c-20.48-20.48-24.576-52.224-9.216-76.8 14.848-24.576 44.544-36.352 72.192-27.648l524.288 296.96c26.624 8.192 44.544 32.256 44.544 59.904 0 27.648-17.92 52.224-44.544 59.904l-524.288 296.96c-6.144 2.048-12.288 3.072-18.432 3.072z"
                 fill="#4C91E5"/>
           </svg>
-          <span style="margin-left: 10px; font-weight: bold; color: #333333">{{ historyDetail.target_db_type }}</span>
+          <span style="margin-left: 10px; font-weight: bold; color: #333333">
+            {{ historyDetail.target_db_type }}
+          </span>
         </div>
         <div class="rowSC">
           <el-tag :type="getStatusType(historyDetail.status)" style="margin-right: 20px">
-            {{ historyDetail.status }}
+            {{ $t(`chat.status.${historyDetail.status.toLowerCase()}`) }}
           </el-tag>
           <div style="color: #666666; font-size: 14px;">
             {{ formatDate(historyDetail.created_at) }}
@@ -51,18 +57,20 @@
             content: formatUserMessage(historyDetail),
             time: historyDetail.created_at,
             loading: false
-      }"/>
+          }"
+      />
 
       <!-- 改写过程 -->
       <chat-item
           v-for="process in historyDetail.processes"
           :key="process.id"
           :message="{
-                  role: process.role || 'assistant',
-                  content: process.step_content,
-                  time: process.created_at,
-                  loading: false
-                }"/>
+            role: process.role || 'assistant',
+            content: process.step_content,
+            time: process.created_at,
+            loading: false
+          }"
+      />
     </div>
   </div>
 </template>
@@ -74,9 +82,11 @@ import type {RewriteHistory} from '@/types/database'
 import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {formatDate, formatUserMessage, getStatusType} from '@/utils/rewrite'
+import {useI18n} from '@/hooks/use-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const i18n = useI18n()
 
 const historyDetail = ref<RewriteHistory | null>(null)
 const messagesScrollDiv = ref<HTMLElement | null>(null)

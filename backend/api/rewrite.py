@@ -43,7 +43,7 @@ def detail_api():
     try:
         result = RewriteService.get_history_by_id(history_id)
         if not result:
-            res.update(code=ResponseCode.NotFound, msg="历史记录不存在")
+            res.update(code=ResponseCode.NoResourceFound, msg="历史记录不存在")
             return res.data
             
         res.update(data=result)

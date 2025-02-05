@@ -38,7 +38,12 @@ export const constantRoutes = [
         path: '/chat',
         name: 'Chat',
         component: () => import('@/views/chat/index.vue'),
-        meta: {title: 'Chat', elSvgIcon: 'ChatDotSquare', affix: true, tooltip: "查看最近一次改写"}
+        meta: {
+          title: 'menu.chat', 
+          elSvgIcon: 'ChatDotSquare', 
+          affix: true, 
+          tooltip: 'menu.tooltip.chat'
+        }
       }
     ]
   },
@@ -50,13 +55,21 @@ export const constantRoutes = [
         path: '',
         name: 'History',
         component: () => import('@/views/history/index.vue'),
-        meta: {title: 'History', elSvgIcon: 'Clock', tooltip: "查看改写历史"}
+        meta: {
+          title: 'menu.history', 
+          elSvgIcon: 'Clock', 
+          tooltip: 'menu.tooltip.history'
+        }
       },
       {
         path: ':id',
         name: 'HistoryDetail',
         component: () => import('@/views/history/detail.vue'),
-        meta: {title: 'History', elSvgIcon: 'Collection', activeMenu: '/history'}
+        meta: {
+          title: 'menu.history', 
+          elSvgIcon: 'Collection', 
+          activeMenu: '/history'
+        }
       }
     ]
   },
@@ -68,20 +81,31 @@ export const constantRoutes = [
         path: '',
         name: 'Knowledge',
         component: () => import('@/views/knowledge/index.vue'),
-        meta: { title: 'Knowledge', elSvgIcon: 'Collection', tooltip: "查看知识库"}
+        meta: { 
+          title: 'menu.knowledge', 
+          elSvgIcon: 'Collection', 
+          tooltip: 'menu.tooltip.knowledge'
+        }
       },
       {
         path: 'detail',
         name: 'KnowledgeDetail',
         component: () => import('@/views/knowledge/detail.vue'),
-        meta: { title: 'Knowledge', elSvgIcon: 'Collection', activeMenu: '/knowledge'},
+        meta: { 
+          title: 'menu.knowledge', 
+          elSvgIcon: 'Collection', 
+          activeMenu: '/knowledge'
+        },
         hidden: true,
       },
       {
         path: 'detail/import',
         name: 'KnowledgeDetailImport',
         component: () => import('@/views/knowledge/import.vue'),
-        meta: { title: 'Knowledge', elSvgIcon: 'Collection'},
+        meta: { 
+          title: 'menu.knowledge', 
+          elSvgIcon: 'Collection'
+        },
         hidden: true,
       },
     ]
@@ -94,8 +118,12 @@ export const constantRoutes = [
         path: '/database',
         name: 'Database',
         component: () => import('@/views/database/index.vue'),
-        //using el svg icon, the elSvgIcon first when at the same time using elSvgIcon and icon
-        meta: {title: 'Database', elSvgIcon: 'Coin', affix: true, tooltip: "进行数据库配置"}
+        meta: {
+          title: 'menu.database', 
+          elSvgIcon: 'Coin', 
+          affix: true, 
+          tooltip: 'menu.tooltip.database'
+        }
       }
     ]
   },
@@ -107,7 +135,11 @@ export const constantRoutes = [
         path: '',
         name: 'ModelManagement',
         component: () => import('@/views/models/index.vue'),
-        meta: { title: '模型管理', elSvgIcon: 'Connection', tooltip: "进行模型配置"}
+        meta: { 
+          title: 'menu.models', 
+          elSvgIcon: 'Connection', 
+          tooltip: 'menu.tooltip.models'
+        }
       }
     ]
   },

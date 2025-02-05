@@ -1,6 +1,6 @@
 <template>
   <div v-if="!historyDetail" v-loading="!historyDetail" class="rowCC" style="height: 100%; width: 100%;">
-    加载中
+    {{ $t('history.list.loading') }}
   </div>
   <div v-else class="relative columnSC detail-container">
     <!-- 头部信息 -->
@@ -24,7 +24,7 @@
         </div>
         <div class="rowSC">
           <el-tag :type="getStatusType(historyDetail.status)" style="margin-right: 20px">
-            {{ historyDetail.status }}
+            {{ $t(`history.status.${historyDetail.status.toLowerCase()}`) }}
           </el-tag>
           <div style="color: #666666; font-size: 14px;">
             {{ formatDate(historyDetail.created_at) }}
@@ -65,9 +65,11 @@ import type {RewriteHistory} from '@/types/database'
 import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {formatDate, formatUserMessage, getStatusType} from '@/utils/rewrite'
+import {useI18n} from '@/hooks/use-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const i18n = useI18n()
 
 const historyDetail = ref<RewriteHistory | null>(null)
 const messagesScrollDiv = ref<HTMLElement | null>(null)
