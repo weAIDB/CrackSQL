@@ -133,7 +133,7 @@
     <el-dialog
         v-model="addDatabaseDialogVisible"
         :title="$t('dashboard.dialog.add.title')"
-        width="800px"
+        width="80%"
         destroy-on-close
     >
       <DatabaseConfigForm ref="databaseConfigFormRef" :initial-data="editForm"/>
