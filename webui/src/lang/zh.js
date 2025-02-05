@@ -352,12 +352,15 @@ export default {
         descriptionPlaceholder: '请输入描述',
         embeddingModel: '向量模型',
         embeddingModelPlaceholder: '请选择向量模型',
-        dimension: '维度'
+        dimension: '维度',
+        databaseType: '数据库类型',
+        databaseTypePlaceholder: '请选择数据库类型'
       },
       rules: {
         nameRequired: '请输入知识库名称',
         nameLength: '长度应为2-50个字符',
-        embeddingRequired: '请选择向量模型'
+        embeddingRequired: '请选择向量模型',
+        databaseTypeRequired: '请选择数据库类型'
       },
       tour: {
         title: '创建知识库',
@@ -392,6 +395,15 @@ export default {
         action: '操作',
         delete: '删除'
       },
+      card: {
+        title: '数据预览',
+        count: '条',
+        edit: '编辑',
+        delete: '删除',
+        description: '描述',
+        tree: '语法树',
+        detail: '详细信息'
+      },
       process: {
         title: '数据处理配置',
         splitMethod: '分割方法',
@@ -400,11 +412,12 @@ export default {
         aiSplit: 'AI分割',
         aiSplitTip: '使用AI进行智能文档分割，会消耗AI令牌。'
       },
-      buttons: {
+      button: {
         processData: '处理数据',
         addToQueue: '添加到队列',
         complete: '完成',
-        next: '下一步'
+        next: '下一步',
+        upload: '上传'
       },
       preview: {
         title: '数据预览与编辑',

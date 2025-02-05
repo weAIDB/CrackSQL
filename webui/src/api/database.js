@@ -47,3 +47,12 @@ export const deleteDatabaseReq = (id) => {
     method: 'post'
   })
 }
+
+
+// 获取支持的数据库类型列表
+export const supportDatabaseReq = () => {
+  return axiosReq({
+    url: 'api/database_config/support',
+    method: 'get'
+  })
+}

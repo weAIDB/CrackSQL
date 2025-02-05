@@ -11,9 +11,18 @@
         ref="formRef"
         :model="form"
         :rules="rules"
+        size="large"
         class="demo-ruleForm"
         status-icon
     >
+      <el-form-item :label="$t('knowledge.create.form.databaseType')" prop="db_type">
+        <el-radio-group v-model="form.db_type">
+          <el-radio v-for="item in databaseOptions" :key="item.value" :label="item.value">
+            {{ item.name }}
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
+
       <el-form-item :label="$t('knowledge.create.form.name')" prop="kb_name">
         <el-input
             v-model="form.kb_name"
@@ -40,9 +49,9 @@
               :label="item.name"
               :value="item.name"
           >
-            <div class="rowSC" style="width: 100%">
+            <div class="rowSC" style="width: 100%; line-height: 30px; height: 30px;">
               <span>{{ item.name }}</span>
-              <span style="color: #999999">{{ $t('knowledge.create.form.dimension') }}: {{ item.dimension }}</span>
+              <span style="color: #999999; margin-left: 10px;">{{ $t('knowledge.create.form.dimension') }}: {{ item.dimension }}</span>
             </div>
           </el-option>
         </el-select>
@@ -66,6 +75,7 @@ import {ElMessage} from 'element-plus'
 import {embeddingModelsReq} from '@/api/models'
 import {createKnowledgeBaseReq} from '@/api/knowledge'
 import {useI18n} from '@/hooks/use-i18n'
+import {supportDatabaseReq} from '@/api/database'
 
 const i18n = useI18n()
 
@@ -82,11 +92,13 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const embeddingModelList = ref([])
+const databaseOptions = ref([])
 
 const form = ref({
   kb_name: '',
   kb_info: '',
-  embedding_model_name: ''
+  embedding_model_name: '',
+  db_type: ''
 })
 
 const rules = ref<FormRules>({
@@ -96,11 +108,15 @@ const rules = ref<FormRules>({
   ],
   embedding_model_name: [
     {required: true, message: i18n.t('knowledge.create.rules.embeddingRequired'), trigger: 'change'}
+  ],
+  db_type: [
+    {required: true, message: i18n.t('knowledge.create.rules.databaseTypeRequired'), trigger: 'change'}
   ]
 })
 
 watch(() => props.visible, (val) => {
   dialogVisible.value = val
+  getSupportDatabaseOptions()
 })
 
 watch(() => dialogVisible.value, (val) => {
@@ -114,6 +130,12 @@ const getEmbeddingModelList = async () => {
   } catch (error) {
     ElMessage.error(i18n.t('knowledge.create.fetchError'))
   }
+}
+
+// 获取支持的数据库类型列表
+const getSupportDatabaseOptions = async () => {
+  const res = await supportDatabaseReq()
+  databaseOptions.value = res.data
 }
 
 const handleClose = () => {
@@ -130,7 +152,8 @@ const onSubmit = async () => {
         await createKnowledgeBaseReq(
           form.value.kb_name,
           form.value.kb_info,
-          form.value.embedding_model_name
+          form.value.embedding_model_name,
+          form.value.db_type
         )
         ElMessage.success(i18n.t('knowledge.create.success'))
         handleClose()

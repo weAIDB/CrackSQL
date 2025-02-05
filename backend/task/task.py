@@ -1,15 +1,13 @@
 import asyncio
-import json
-import tiktoken
 from config.logging_config import logger
 from models import KnowledgeBase, JSONContent
 from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
-import hashlib
 from config.db_config import db
 import uuid
+from typing import List
 
-def process_json_data(kb_name: str, json_items: list, user_id: int = None):
+def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
     """处理JSON数据"""
 
     async def _async_process_json_data():
@@ -24,73 +22,17 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                 if not kb.embedding_key:
                     raise ValueError(f"知识库未设置embedding_key: {kb_name}")
 
-                # 创建内容记录
-                contents = []
-                failed_contents = []  # 记录失败的内容
+                # 获取要处理的内容
+                contents = JSONContent.query.filter(
+                    JSONContent.user_id == user_id,
+                    JSONContent.knowledge_base_id == kb.id,
+                    JSONContent.id.in_(item_ids)
+                ).all()
 
-                for item in json_items:
-                    if not isinstance(item, dict):
-                        continue
-
-                        
-                    # 计算内容哈希
-                    content_str = json.dumps(item, sort_keys=True)
-                    content_hash = hashlib.sha256(content_str.encode('utf-8')).hexdigest()
-                    
-                    # 获取embedding文本
-                    embedding_text = item.get(kb.embedding_key)
-
-                    # 创建内容对象
-                    content = JSONContent(
-                        knowledge_base_id=kb.id,
-                        user_id=user_id,
-                        content=content_str,
-                        content_hash=content_hash,
-                        token_count=0,  # 初始化为0
-                        status="pending"  # 显式设置初始状态
-                    )
-                    
-                    # 检查embedding_text是否存在
-                    if embedding_text is None:
-                        content.status = "failed"
-                        content.error_msg = f"未找到embedding_key '{kb.embedding_key}' 对应的值"
-                        failed_contents.append(content)
-                        continue
-                        
-                    # 转换为字符串并检查是否为空
-                    embedding_text = str(embedding_text)
-                    if not embedding_text.strip():
-                        content.status = "failed"
-                        content.error_msg = f"embedding_key '{kb.embedding_key}' 对应的值为空"
-                        failed_contents.append(content)
-                        continue
-                    
-                    content.embedding_text = embedding_text
-                    content.token_count = len(tiktoken.get_encoding("cl100k_base").encode(embedding_text))
-                    contents.append(content)
-                    
-                # 保存所有内容（包括失败的）
-                all_contents = contents + failed_contents
-                if not all_contents:
+                if not contents:
                     return {
                         'status': False,
-                        'message': '没有找到有效的数据项'
-                    }
-                
-                try:
-                    # 使用add_all替代bulk_save_objects
-                    db.session.add_all(all_contents)
-                    db.session.commit()
-                    # commit会自动flush，此时contents中的对象已经有ID
-                except Exception as e:
-                    db.session.rollback()
-                    logger.error(f"保存内容记录失败: {str(e)}")
-                    raise
-
-                if not contents:  # 如果没有成功的内容
-                    return {
-                        'status': False,
-                        'message': f'处理完成，所有数据项处理失败: {len(failed_contents)}'
+                        'message': '没有找到需要处理的内容'
                     }
 
                 try:
@@ -102,12 +44,9 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                     )
                     
                     # 使用uuid生成唯一ID
-                    vector_ids = [
-                        str(uuid.uuid4())
-                        for c in contents
-                    ]
+                    vector_ids = [str(uuid.uuid4()) for _ in contents]
                     
-                    # 准备元数据，确保所有值都是基本类型
+                    # 准备元数据
                     metadatas = []
                     for c in contents:
                         metadata = {
@@ -118,12 +57,6 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                     
                     # 保存到Chroma
                     store = ChromaStore()
-
-                    print("==========metadatas==========:", metadatas)
-                    print("==========embedding_texts==========:", embedding_texts)
-                    print("==========embeddings==========:", embeddings)
-                    print("==========vector_ids==========:", vector_ids)
-
                     store.add_texts(
                         collection_id=kb.collection_id,
                         texts=embedding_texts,
@@ -132,17 +65,22 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                         metadatas=metadatas
                     )
                     
-                    # 更新状态 - 直接更新内存中的对象
+                    # 更新状态
                     for content, vector_id in zip(contents, vector_ids):
                         content.status = 'completed'
                         content.vector_id = vector_id
-                        print(f"执行成功，content_id: {content.id}")
                         
                     db.session.commit()
+
+                    return {
+                        'status': True,
+                        'message': f'处理完成，成功: {len(contents)} 条记录'
+                    }
+
                 except Exception as e:
                     db.session.rollback()
                     logger.error(f"向量化处理失败: {str(e)}")
-                    # 更新失败状态 - 直接更新内存中的对象
+                    # 更新失败状态
                     for content in contents:
                         content.status = 'failed'
                         content.error_msg = f"向量化处理失败: {str(e)}"
@@ -153,10 +91,6 @@ def process_json_data(kb_name: str, json_items: list, user_id: int = None):
                         'message': f'向量化处理失败: {str(e)}'
                     }
 
-                return {
-                    'status': True,
-                    'message': f'处理完成，成功: {len(contents)}, 失败: {len(failed_contents)}'
-                }
         except Exception as e:
             logger.error(f"处理JSON数据失败: {str(e)}")
             return {

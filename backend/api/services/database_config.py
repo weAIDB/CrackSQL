@@ -1,8 +1,14 @@
 from config.db_config import db
-from models import DatabaseConfig
+from models import DatabaseConfig, DatabaseType
 from config.cache import cache
 from api.utils.model_to_dict import query_to_dict
 from config.logging_config import logger
+
+
+@cache.memoize(timeout=864000, make_name="support_database_options")
+def get_support_database_options():
+    """获取支持的数据库类型列表"""
+    return DatabaseType.choices()
 
 
 @cache.memoize(timeout=864000, make_name="database_config_list")

@@ -14,7 +14,9 @@ from api.services.knowledge import (
     delete_knowledge_base,
     search_knowledge_base,
     upload_json_file,
-    delete_kb_items, get_json_items
+    delete_kb_items,
+    get_json_items,
+    add_kb_items
 )
 from task.task import process_json_data
 
@@ -240,22 +242,9 @@ def add_items():
         if not isinstance(items, list):
             items = [items]
 
-                # 调用向量化任务
-        job_id = f"vectorize_items_{kb_name}"
-        scheduler.add_job(
-            func=process_json_data,  # 使用同步包装函数
-            args=[kb_name, items, user_id],
-            trigger='date',
-            run_date=datetime.datetime.now(),
-            id=job_id,
-            replace_existing=True,
-            misfire_grace_time=3600,
-            coalesce=True
-        )
-        res.update(data={
-            "status": True,
-            "job_id": job_id
-        })
+        # 调用添加方法
+        result = add_kb_items(kb_name, items, user_id)
+        res.update(data=result)
         return res.data
         
     except Exception as e:
@@ -285,6 +274,51 @@ def delete_items():
                 
         result = delete_kb_items(kb_name, item_ids)
         res.update(data=result)
+        return res.data
+        
+    except Exception as e:
+        res.update(code=ResponseCode.Fail, msg=str(e))
+        return res.data
+
+
+@route(bp, '/vectorize_items', methods=['POST'])
+@login_required
+def vectorize_items():
+    """向量化知识库条目"""
+    res = ResMsg()
+    try:
+        data = request.get_json()
+        kb_name = data.get('kb_name')
+        item_ids = data.get('item_ids')  # 可选参数
+        user_id = session.get('user_id')
+        
+        if not kb_name:
+            res.update(code=ResponseCode.InvalidParameter, msg="缺少知识库名称")
+            return res.data
+            
+        # 验证item_ids格式(如果提供)
+        if item_ids is not None:
+            if not isinstance(item_ids, list) or not all(isinstance(id, int) for id in item_ids):
+                res.update(code=ResponseCode.InvalidParameter, msg="item_ids必须是整数ID列表")
+                return res.data
+
+        # 调用向量化任务
+        job_id = f"vectorize_items_{kb_name}"
+        scheduler.add_job(
+            func=process_json_data,
+            args=[kb_name, item_ids, user_id],  # 添加user_id参数
+            trigger='date',
+            run_date=datetime.datetime.now(),
+            id=job_id,
+            replace_existing=True,
+            misfire_grace_time=3600,
+            coalesce=True
+        )
+        
+        res.update(data={
+            "status": True,
+            "job_id": job_id
+        })
         return res.data
         
     except Exception as e:

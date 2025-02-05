@@ -9,6 +9,8 @@ from flask import current_app
 import time
 from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
+import hashlib
+import tiktoken
 
 
 def get_knowledge_base_list() -> List[Dict]:
@@ -259,6 +261,83 @@ def secure_filename_with_unicode(filename: str) -> str:
         name = str(int(time.time()))
         
     return name + ext
+
+
+def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
+    """添加知识库条目(不包含向量化)"""
+    try:
+        # 获取知识库
+        kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
+        if not kb:
+            raise ValueError(f"知识库不存在: {kb_name}")
+
+        if not kb.embedding_key:
+            raise ValueError(f"知识库未设置embedding_key: {kb_name}")
+
+        # 创建内容记录
+        contents = []
+
+        for item in items:
+            # 验证数据格式
+            if not isinstance(item, dict):
+                raise ValueError("数据项必须是字典类型")
+                
+            # 获取并验证embedding文本
+            embedding_text = item.get(kb.embedding_key)
+            if embedding_text is None:
+                raise ValueError(f"未找到embedding_key '{kb.embedding_key}' 对应的值")
+                
+            # 转换为字符串并检查是否为空
+            embedding_text = str(embedding_text)
+            if not embedding_text.strip():
+                raise ValueError(f"embedding_key '{kb.embedding_key}' 对应的值为空")
+            
+            # 计算内容哈希
+            content_str = json.dumps(item, sort_keys=True)
+            content_hash = hashlib.sha256(content_str.encode('utf-8')).hexdigest()
+            
+            # 创建内容对象
+            content = JSONContent(
+                knowledge_base_id=kb.id,
+                user_id=user_id,
+                content=content_str,
+                content_hash=content_hash,
+                embedding_text=embedding_text,
+                token_count=len(tiktoken.get_encoding("cl100k_base").encode(embedding_text)),
+                status="pending"  # 显式设置初始状态
+            )
+            contents.append(content)
+            
+        # 如果没有有效数据
+        if not contents:
+            return {
+                'status': False,
+                'message': '没有找到有效的数据项'
+            }
+        
+        try:
+            db.session.add_all(contents)
+            db.session.commit()
+            
+            return {
+                'status': True,
+                'message': f'成功添加 {len(contents)} 条记录',
+                'data': {
+                    'success_ids': [c.id for c in contents]
+                }
+            }
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"保存内容记录失败: {str(e)}")
+            raise
+
+    except Exception as e:
+        logger.error(f"添加知识库条目失败: {str(e)}")
+        return {
+            'status': False,
+            'message': f'添加失败: {str(e)}'
+        }
+
 
 def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
     """删除知识库条目

@@ -3,6 +3,7 @@
       ref="formRef"
       :model="form"
       :rules="rules"
+      size="large"
       label-width="120px"
       class="demo-ruleForm"
       status-icon
@@ -40,19 +41,11 @@
       />
     </el-form-item>
     <el-form-item :label="$t('database.form.type')" prop="db_type">
-      <el-select
-          v-model="form.db_type"
-          class="m-2"
-          :placeholder="$t('database.form.typePlaceholder')"
-          style="width: 100%"
-      >
-        <el-option
-            v-for="item in dbTypes"
-            :key="item.value"
-            :label="$t(`database.form.types.${item.value}`)"
-            :value="item.value"
-        />
-      </el-select>
+      <el-radio-group v-model="form.db_type">
+        <el-radio v-for="item in dbTypes" :key="item.value" :label="item.value">
+          {{ item.name }}
+        </el-radio>
+      </el-radio-group>
     </el-form-item>
     <el-form-item :label="$t('database.form.description')" prop="description">
       <el-input
@@ -68,6 +61,7 @@
 import {ref, onMounted} from 'vue'
 import type {FormInstance, FormRules} from 'element-plus'
 import {useI18n} from '@/hooks/use-i18n'
+import {supportDatabaseReq} from '@/api/database'
 
 const i18n = useI18n()
 
@@ -89,10 +83,7 @@ const form = ref({
   description: ''
 })
 
-const dbTypes = [
-  {value: 'mysql', label: 'MySQL'},
-  {value: 'oracle', label: 'Oracle'}
-]
+const dbTypes = ref([])
 
 const rules = ref<FormRules>({
   host: [{required: true, message: i18n.t('database.rules.host'), trigger: 'blur'}],
@@ -115,7 +106,15 @@ defineExpose({
 
 onMounted(() => {
   Object.assign(form.value, props.initialData)
+  getSupportDatabaseOptions()
 })
+
+// 获取支持的数据库类型列表
+const getSupportDatabaseOptions = async () => {
+  const res = await supportDatabaseReq()
+  dbTypes.value = res.data
+}
+
 </script>
 
 <style scoped>
