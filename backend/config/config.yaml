@@ -1,6 +1,7 @@
 COMMON: &common #标识
   DEBUG: False
   SECRET_KEY: "fHoNCXiQeSCqGcZ*"
+
   # 页码设置
   DEFAULT_PAGE_INDEX: 1
   DEFAULT_PAGE_SIZE: 10
@@ -8,10 +9,10 @@ COMMON: &common #标识
   # 文件配置
   UPLOAD_FOLDER: './sources/'
 
-  # 数据库连接
+  # 业务数据库连接
   SQLALCHEMY_DATABASE_URI: 'sqlite:///info.db'
   SQLALCHEMY_TRACK_MODIFICATIONS: False
-  SQLALCHEMY_ECHO: True
+  SQLALCHEMY_ECHO: False
   SQLALCHEMY_POOL_RECYCLE: 8
   # 日志配置文件路径
   LOGGING_CONFIG_PATH: ./config/logging.yaml

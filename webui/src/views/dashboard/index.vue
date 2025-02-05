@@ -57,9 +57,9 @@
             >
               <el-option
                   v-for="item in databaseOptions"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value"
               />
             </el-select>
           </div>
@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts" name="Index">
-import {createDatabaseReq, databaseListReq} from '@/api/database'
+import {createDatabaseReq, databaseListReq, supportDatabaseReq} from '@/api/database'
 import {createRewriteReq} from '@/api/rewrite.js'
 import DatabaseConfigForm from '@/components/DatabaseConfigForm.vue';
 import type {DatabaseConfig} from "@/types/database";
@@ -165,7 +165,7 @@ import {useI18n} from 'vue-i18n'
 const i18n = useI18n()
 
 // 数据库类型选项
-const databaseOptions = ["MySql", "PostgreSQL", "Oracle"]
+const databaseOptions = ref([])
 
 const userInput = ref('')
 const databaseConfigFormRef = ref()
@@ -184,6 +184,7 @@ const sendBtnDisabledText = computed(() => {
   if (targetDB.value === '') {
     return i18n.t('dashboard.operation.validation.noTarget')
   }
+  return ''
 })
 
 const router = useRouter()
@@ -228,9 +229,17 @@ const getDatabaseList = async () => {
   }
 }
 
+// 获取支持的数据库类型列表
+const getSupportDatabaseOptions = async () => {
+  const res = await supportDatabaseReq()
+  databaseOptions.value = res.data
+}
+
 onMounted(() => {
   // 获取数据库配置列表
   getDatabaseList()
+  // 获取支持的数据库类型列表
+  getSupportDatabaseOptions()
 });
 
 const onSendClick = async () => {

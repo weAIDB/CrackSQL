@@ -369,12 +369,15 @@ export default {
         descriptionPlaceholder: 'Please enter description',
         embeddingModel: 'Embedding Model',
         embeddingModelPlaceholder: 'Please select embedding model',
-        dimension: 'Dimension'
+        dimension: 'Dimension',
+        databaseType: 'Database Type',
+        databaseTypePlaceholder: 'Please select database type'
       },
       rules: {
         nameRequired: 'Please enter knowledge base name',
         nameLength: 'Length should be 2 to 50 characters',
-        embeddingRequired: 'Please select embedding model'
+        embeddingRequired: 'Please select embedding model',
+        databaseTypeRequired: 'Please select database type'
       }
     },
     import: {
@@ -387,7 +390,8 @@ export default {
       button: {
         next: 'Next',
         upload: 'Upload',
-        complete: 'Complete'
+        complete: 'Complete',
+        process: 'Process'
       },
       prevStep: 'Previous',
       nextStep: 'Next',

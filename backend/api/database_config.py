@@ -5,11 +5,18 @@ from api.utils.util import route
 from api.services.database_config import (
     database_config_list, get_database_config,
     insert_database_config, update_database_config,
-    delete_database_config
+    delete_database_config, get_support_database_options
 )
-from models import DatabaseType
 
 bp = Blueprint("database_config", __name__, url_prefix='/api/database_config')
+
+
+@route(bp, '/support', methods=["GET"])
+def support_api():
+    """获取支持的数据库类型列表"""
+    res = ResMsg()
+    res.update(data=get_support_database_options())
+    return res.data
 
 
 @route(bp, '/list', methods=["POST"])

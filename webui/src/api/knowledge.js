@@ -80,3 +80,12 @@ export const deleteKnowledgeBaseItemsReq = (kbName, itemIds) => {
         method: 'post'
     })
 }
+
+export const vectorizeKnowledgeBaseItemsReq = (kbName, itemIds) => {
+    return axiosReq({
+        url: '/api/knowledge_base/vectorize_items',
+        data: {kb_name: kbName, item_ids: itemIds},
+        method: 'post',
+        reqLoading: false
+    })
+}

@@ -211,7 +211,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Upload, CircleCheckFilled, Document } from '@element-plus/icons-vue'
-import { addKnowledgeBaseItemsReq } from '@/api/knowledge'
+import { addKnowledgeBaseItemsReq, vectorizeKnowledgeBaseItemsReq } from '@/api/knowledge'
 import { fa } from 'element-plus/es/locale'
 import { useI18n } from '@/hooks/use-i18n'
 
@@ -383,19 +383,26 @@ const handleUpload = async () => {
 
   try {
     uploading.value = true
-    await addKnowledgeBaseItemsReq(route.query.kb_name as string, jsonItems.value)
-    ElMessage.success('上传成功')
-    currentStep.value = 3
-    
-    // 倒计时后返回
-    const timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer)
-        router.back()
+    const res = await addKnowledgeBaseItemsReq(route.query.kb_name as string, jsonItems.value)
+    if (res.data.status === true) {
+      const itemIds = res.data.data.success_ids || []
+      const vectorizeRes = await vectorizeKnowledgeBaseItemsReq(route.query.kb_name as string, itemIds)
+      if (vectorizeRes.data.status === true) {
+        currentStep.value = 3
+        // 倒计时后返回
+        const timer = setInterval(() => {
+          countdown.value--
+          if (countdown.value <= 0) {
+            clearInterval(timer)
+            router.back()
+          }
+        }, 1000)
+      } else {
+        ElMessage.error(vectorizeRes.data.message || '向量化失败')
       }
-    }, 1000)
-    
+    } else {
+      ElMessage.error(res.data.message || '上传失败')
+    }
   } catch (error: any) {
     ElMessage.error(error.message || '上传失败')
   } finally {
