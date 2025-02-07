@@ -7,6 +7,7 @@ from api.services.database_config import (
     insert_database_config, update_database_config,
     delete_database_config, get_support_database_options
 )
+from models import DatabaseType
 
 bp = Blueprint("database_config", __name__, url_prefix='/api/database_config')
 

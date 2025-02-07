@@ -376,3 +376,8 @@ backend/local_models
 backend/migrations
 webui/node_modules
 webui/dist
+*.venv
+*.cursor
+*.cursorrules
+*.vscode
+*.idea

@@ -5,7 +5,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from flask import current_app
-from config.db_config import db
+from config.db_config import db, db_session_manager
 from models import LLMModel
 import logging
 
@@ -132,6 +132,7 @@ embedding_manager = EmbeddingManager()
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(3))
+@db_session_manager
 async def get_embeddings(text: Union[str, List[str]], model_name: str) -> np.ndarray:
     """
     获取文本的embedding向量
@@ -142,10 +143,6 @@ async def get_embeddings(text: Union[str, List[str]], model_name: str) -> np.nda
         numpy.ndarray: 向量或向量列表
     """
     try:
-        # 确保在应用上下文中运行
-        if not current_app:
-            with db.app.app_context():
-                return await _get_embeddings_with_context(text, model_name)
         return await _get_embeddings_with_context(text, model_name)
     except Exception as e:
         logger.error(f"获取Embedding失败: {str(e)}")

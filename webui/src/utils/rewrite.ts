@@ -9,11 +9,11 @@ export const formatUserMessage = (history: RewriteHistory) => {
   return userTemplate
       .replace('[originalDB]', history.source_db_type)
       .replace('[sql]', history.original_sql)
-      .replace('[type]', history.target_db_type)
-      .replace('[user]', history.target_db_user)
-      .replace('[host]', history.target_db_host)
-      .replace('[port]', history.target_db_port)
-      .replace('[database]', history.target_db_database)
+      .replace('[type]', history.target_db.db_type)
+      .replace('[user]', history.target_db.username)
+      .replace('[host]', history.target_db.host)
+      .replace('[port]', history.target_db.port)
+      .replace('[database]', history.target_db.database)
 }
 
 // 获取状态标签类型

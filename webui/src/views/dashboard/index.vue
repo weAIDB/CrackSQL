@@ -47,7 +47,7 @@
       <div class="operation-panel">
         <!-- 数据库选择区域 -->
         <div class="database-selector">
-          <div id="source-db" class="source-db" style="width: 30%!important;">
+          <div id="source-db" class="source-db" style="width: 30%!important; min-width: 100px;">
             <label>{{ $t('dashboard.operation.sourceDb.label') }}</label>
             <el-select
                 v-model="originalDB"
@@ -106,6 +106,58 @@
           </div>
         </div>
 
+        <!-- 知识库选择区域 -->
+        <div class="knowledge-selector">
+          <div id="source-kb" class="source-kb" style="width: 30%!important; min-width: 100px;">
+            <label>{{ $t('dashboard.operation.sourceKb.label') }}</label>
+            <el-select
+                v-model="originalKb"
+                class="db-select"
+                size="large"
+                :placeholder="$t('dashboard.operation.sourceKb.placeholder')"
+            >
+              <el-option
+                  v-for="item in knowledgeBaseOptions"
+                  :key="item.id"
+                  :label="item.kb_name"
+                  :value="item.id"
+              />
+            </el-select>
+          </div>
+          <div id="target-kb" class="target-kb" style="width: 30%!important; min-width: 100px;">
+            <label>{{ $t('dashboard.operation.targetKb.label') }}</label>
+            <el-select
+                v-model="targetKb"
+                class="db-select"
+                size="large"
+                :placeholder="$t('dashboard.operation.targetKb.placeholder')"
+            >
+              <el-option
+                  v-for="item in knowledgeBaseOptions"
+                  :key="item.id"
+                  :label="item.kb_name"
+                  :value="item.id"
+              />
+            </el-select>
+          </div>
+          <div id="llm-model" class="llm-model" style="width: 30%!important; min-width: 100px;">
+            <label>{{ $t('dashboard.operation.llmModel.label') }}</label>
+            <el-select
+                v-model="llmModel"
+                class="db-select"
+                size="large"
+                :placeholder="$t('dashboard.operation.llmModel.placeholder')"
+            >
+              <el-option
+                  v-for="item in llmModelOptions"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+              />
+            </el-select>
+          </div>
+        </div>
+
         <!-- SQL输入区域 -->
         <div class="sql-input">
           <el-input
@@ -154,8 +206,10 @@
 <script setup lang="ts" name="Index">
 import {createDatabaseReq, databaseListReq, supportDatabaseReq} from '@/api/database'
 import {createRewriteReq} from '@/api/rewrite.js'
+import {knowledgeListReq} from '@/api/knowledge'
 import DatabaseConfigForm from '@/components/DatabaseConfigForm.vue';
 import type {DatabaseConfig} from "@/types/database";
+import {llmModelsReq} from '@/api/models'
 import {Connection, Document, Link, Monitor, Search} from '@element-plus/icons-vue'
 import {ElMessage} from "element-plus";
 import {computed, onMounted, reactive, ref} from 'vue'
@@ -166,6 +220,8 @@ const i18n = useI18n()
 
 // 数据库类型选项
 const databaseOptions = ref([])
+const knowledgeBaseOptions = ref([])
+const llmModelOptions = ref([])
 
 const userInput = ref('')
 const databaseConfigFormRef = ref()
@@ -190,7 +246,10 @@ const sendBtnDisabledText = computed(() => {
 const router = useRouter()
 
 const originalDB = ref("Oracle")
+const originalKb = ref("")
 const targetDB = ref("")
+const targetKb = ref("")
+const llmModel = ref("")
 const targetDBList = ref<DatabaseConfig[]>([])
 const total = ref(0)
 
@@ -229,10 +288,32 @@ const getDatabaseList = async () => {
   }
 }
 
+// 获取知识库列表
+const getKnowledgeList = async () => {
+  try {
+    const res = await knowledgeListReq()
+    knowledgeBaseOptions.value = res.data
+  } catch (error) {
+    console.error('获取知识库列表失败:', error)
+  }
+}
+
 // 获取支持的数据库类型列表
 const getSupportDatabaseOptions = async () => {
   const res = await supportDatabaseReq()
   databaseOptions.value = res.data
+}
+
+
+const fetchModels = async () => {
+  try {
+    const res = await llmModelsReq({category: 'llm'})
+    llmModelOptions.value = res.data.items
+  } catch (error) {
+    ElMessage.error(error.message || i18n.t('models.message.fetchError', {
+      type: 'LLM'
+    }))
+  }
 }
 
 onMounted(() => {
@@ -240,6 +321,10 @@ onMounted(() => {
   getDatabaseList()
   // 获取支持的数据库类型列表
   getSupportDatabaseOptions()
+  // 获取知识库列表
+  getKnowledgeList()
+  // 获取LLM模型列表
+  fetchModels()
 });
 
 const onSendClick = async () => {
@@ -253,13 +338,10 @@ const onSendClick = async () => {
     // 构造创建改写历史的参数
     const data = {
       source_db_type: originalDB.value,
+      source_kb_id: originalKb.value,
+      target_kb_id: targetKb.value,
       original_sql: userInput.value,
-      target_db_type: targetConfig.db_type,
-      target_db_user: targetConfig.username,
-      target_db_host: targetConfig.host,
-      target_db_port: targetConfig.port,
-      target_db_password: targetConfig.password,
-      target_db_database: targetConfig.database,
+      llm_model_name: 'gpt-4o-mini',
       target_db_id: targetConfig.id
     }
 
@@ -439,6 +521,23 @@ const onSaveClick = async () => {
 
     .db-select {
       width: 100%;
+    }
+  }
+}
+
+.knowledge-selector {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  .source-kb,
+  .target-kb,
+  .llm-model{
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
     }
   }
 }

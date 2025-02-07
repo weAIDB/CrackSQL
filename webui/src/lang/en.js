@@ -46,11 +46,23 @@ export default {
       submit: 'Start Analysis',
       sourceDb: {
         label: 'Source Database',
-        placeholder: 'Select source database'
+        placeholder: 'Please select'
+      },
+      sourceKb: {
+        label: 'Knowledge Base Associated with Source Database',
+        placeholder: 'Please select'
+      },
+      targetKb: {
+        label: 'Knowledge Base Associated with Target Database',
+        placeholder: 'Please select'
+      },
+      llmModel: {
+        label: 'LLM Model',
+        placeholder: 'Please select'
       },
       targetDb: {
         label: 'Target Database',
-        placeholder: 'Select target database',
+        placeholder: 'Please select',
         search: 'Search database name',
         add: 'Add Configuration'
       },

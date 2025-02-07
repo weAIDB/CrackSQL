@@ -1,6 +1,5 @@
 from config.db_config import db
 from models import UserLoginMethod, User
-from api.utils.model_to_dict import query_to_dict
 from config.logging_config import logger
 
 

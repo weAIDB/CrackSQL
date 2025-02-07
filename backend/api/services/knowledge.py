@@ -281,17 +281,16 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
             # 验证数据格式
             if not isinstance(item, dict):
                 raise ValueError("数据项必须是字典类型")
+            # 验证是否有Description和Detail
+            if 'Description' not in item.keys() or 'Detail' not in item.keys():
+                raise ValueError("数据项必须包含Description和Detail字段")
+
                 
             # 获取并验证embedding文本
-            embedding_text = item.get(kb.embedding_key)
+            embedding_text = f"{item.get('Description')} {item.get('Detail')}"
             if embedding_text is None:
-                raise ValueError(f"未找到embedding_key '{kb.embedding_key}' 对应的值")
+                raise ValueError(f"未找到embedding文本")
                 
-            # 转换为字符串并检查是否为空
-            embedding_text = str(embedding_text)
-            if not embedding_text.strip():
-                raise ValueError(f"embedding_key '{kb.embedding_key}' 对应的值为空")
-            
             # 计算内容哈希
             content_str = json.dumps(item, sort_keys=True)
             content_hash = hashlib.sha256(content_str.encode('utf-8')).hexdigest()

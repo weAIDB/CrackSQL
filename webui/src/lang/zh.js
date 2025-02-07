@@ -45,12 +45,24 @@ export default {
       input: '请输入您的问题',
       submit: '开始分析',
       sourceDb: {
-        label: '来源数据库',
-        placeholder: '请选择来源数据库'
+        label: '原句所在数据库',
+        placeholder: '请选择'
+      },
+      sourceKb: {
+        label: '原句所在数据库关联的知识库',
+        placeholder: '请选择'
+      },
+      targetKb: {
+        label: '语句要转到的数据库关联的知识库',
+        placeholder: '请选择'
+      },
+      llmModel: {
+        label: 'LLM模型',
+        placeholder: '请选择'
       },
       targetDb: {
-        label: '目标数据库',
-        placeholder: '请选择目标数据库',
+        label: '语句要转到该数据库',
+        placeholder: '请选择',
         search: '搜索数据库名称',
         add: '添加配置'
       },

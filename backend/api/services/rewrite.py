@@ -1,6 +1,5 @@
-from models import RewriteHistory, RewriteProcess, RewriteStatus
-from api.utils.model_to_dict import query_to_dict
-from config.db_config import db
+from models import RewriteHistory, RewriteProcess, RewriteStatus, DatabaseConfig
+from config.db_config import db, db_session_manager
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
@@ -50,23 +49,24 @@ class RewriteService:
                 engine.dispose()
 
     @staticmethod
-    def create_history(source_db_type: str, original_sql: str,
-                      target_db_type: str, target_db_user: str,
-                      target_db_host: str, target_db_port: str,
-                      target_db_database: str, target_db_password: str,
-                      target_db_id: int) -> dict:
+    def create_history(source_db_type: str, original_sql: str, source_kb_id: int, target_kb_id: int, target_db_id: int, llm_model_name: str) -> dict:
         """创建改写历史"""
         
         # 验证目标数据库连接
         try:
-            RewriteService.test_database_connection(
-                target_db_type,
-                target_db_user,
-                target_db_password,
-                target_db_host,
-                target_db_port,
-                target_db_database
-            )
+
+            target_db = DatabaseConfig.query.get(target_db_id)
+            if not target_db:
+                raise ValueError(f"目标数据库不存在: {target_db_id}")
+
+            # RewriteService.test_database_connection(
+            #     target_db.db_type,
+            #     target_db.username,
+            #     target_db.password,
+            #     target_db.host,
+            #     target_db.port,
+            #     target_db.database
+            # )
         except ValueError as e:
             raise ValueError(f"目标数据库连接测试失败: {str(e)}")
 
@@ -74,12 +74,10 @@ class RewriteService:
         history = RewriteHistory(
             source_db_type=source_db_type,
             original_sql=original_sql,
-            target_db_type=target_db_type,
-            target_db_user=target_db_user,
-            target_db_host=target_db_host,
-            target_db_port=target_db_port,
-            target_db_database=target_db_database,
+            original_kb_id=source_kb_id,
+            target_kb_id=target_kb_id,
             target_db_id=target_db_id,
+            llm_model_name=llm_model_name,
             status=RewriteStatus.PROCESSING
         )
 
@@ -87,32 +85,80 @@ class RewriteService:
         db.session.commit()
         db.session.refresh(history)
 
-        return query_to_dict(history)
+        return {"id": history.id}
+
+    @staticmethod
+    def _convert_history_to_dict(history):
+        """将 RewriteHistory 对象转换为字典"""
+        if not history:
+            return None
+            
+        history_dict = {
+            'id': history.id,
+            'source_db_type': history.source_db_type,
+            'original_sql': history.original_sql,
+            'original_kb': {
+                'id': history.original_kb.id,
+                'name': history.original_kb.kb_name,
+            },
+            'target_kb': {
+                'id': history.target_kb.id,
+                'name': history.target_kb.kb_name
+            },
+            'target_db': {
+                'id': history.target_db.id,
+                'database': history.target_db.database,
+                'host': history.target_db.host,
+                'port': history.target_db.port,
+                'username': history.target_db.username,
+                'db_type': history.target_db.db_type
+            },
+            'llm_model_name': history.llm_model_name,
+            'status': history.status,
+            'created_at': history.created_at,
+            'updated_at': history.updated_at,
+            'error_message': history.error_message,
+            'rewritten_sql': history.rewritten_sql
+        }
+        
+        # 获取关联的processes
+        processes = RewriteProcess.query \
+            .filter_by(history_id=history.id) \
+            .all()
+            
+        history_dict['processes'] = [{
+            'id': process.id,
+            'history_id': process.history_id,
+            'step_name': process.step_name,
+            'step_content': process.step_content,
+            'intermediate_sql': process.intermediate_sql,
+            'is_success': process.is_success,
+            'error_message': process.error_message,
+            'role': process.role,
+            'created_at': process.created_at,
+            'updated_at': process.updated_at
+        } for process in processes]
+        
+        return history_dict
 
     @staticmethod
     def get_history_list(offset, limit, keyword=None):
-        query = RewriteHistory.query
 
         if keyword:
-            query = query.filter(RewriteHistory.original_sql.like(f'%{keyword}%'))
+            query = RewriteHistory.query.filter(RewriteHistory.original_sql.like(f'%{keyword}%'))
+        else:
+            query = RewriteHistory.query
 
         total = query.count()
         histories = query.order_by(RewriteHistory.created_at.desc()) \
             .offset(offset) \
             .limit(limit) \
             .all()
-        # 转换为字典并添加processes信息
-        result = []
-        for history in histories:
-            history_dict = query_to_dict(history)
-            # 获取关联的processes
-            processes = RewriteProcess.query \
-                .filter_by(history_id=history.id) \
-                .order_by(RewriteProcess.created_at.desc()) \
-                .all()
-            history_dict['processes'] = [query_to_dict(process) for process in processes]
-            result.append(history_dict)
-
+        
+        print(histories)
+            
+        result = [RewriteService._convert_history_to_dict(history) for history in histories]
+        
         return {
             'total': total,
             'data': result
@@ -121,36 +167,15 @@ class RewriteService:
     @staticmethod
     def get_history_by_id(history_id):
         history = RewriteHistory.query.filter_by(id=history_id).first()
-        if not history:
-            return None
-
-        history_dict = query_to_dict(history)
-        # 获取关联的processes
-        processes = RewriteProcess.query \
-            .filter_by(history_id=history.id) \
-            .order_by(RewriteProcess.created_at.desc()) \
-            .all()
-        history_dict['processes'] = [query_to_dict(process) for process in processes]
-
-        return history_dict
+        return RewriteService._convert_history_to_dict(history)
 
     @staticmethod
     def get_latest_history():
         history = RewriteHistory.query.order_by(RewriteHistory.created_at.desc()).first()
-        if not history:
-            return None
-
-        history_dict = query_to_dict(history)
-        # 获取关联的processes
-        processes = RewriteProcess.query \
-            .filter_by(history_id=history.id) \
-            .order_by(RewriteProcess.created_at.desc()) \
-            .all()
-        history_dict['processes'] = [query_to_dict(process) for process in processes]
-
-        return history_dict
+        return RewriteService._convert_history_to_dict(history)
 
     @staticmethod
+    @db_session_manager
     def add_rewrite_process(
         history_id: int,
         content: str,
@@ -160,88 +185,82 @@ class RewriteService:
         is_success: bool = True,
         error: str = None
     ) -> RewriteProcess:
-        """添加改写过程记录
-        
-        Args:
-            history_id: 改写历史ID
-            content: 过程内容
-            step_name: 步骤名称,如果不提供则自动生成
-            sql: SQL语句(如果有)
-            role: 角色(assistant/user/system)
-            is_success: 是否成功
-            error: 错误信息
-        """
-        try:
-            process = RewriteProcess(
-                history_id=history_id,
-                step_name=step_name,
-                step_content=content,
-                intermediate_sql=sql,
-                role=role,
-                is_success=is_success,
-                error_message=error
-            )
-            db.session.add(process)
-            db.session.commit()
-            return process
-            
-        except Exception as e:
-            logger.error(f"添加改写过程失败: {str(e)}")
-            db.session.rollback()
-            raise
+        """添加改写过程记录"""
+        process = RewriteProcess(
+            history_id=history_id,
+            step_name=step_name,
+            step_content=content,
+            intermediate_sql=sql,
+            role=role,
+            is_success=is_success,
+            error_message=error
+        )
+        db.session.add(process)
+        return process
 
     @staticmethod
+    @db_session_manager
     def update_rewrite_status(
         history_id: int,
         status: RewriteStatus,
         sql: str = None,
         error: str = None
     ):
-        """更新改写状态
+        """更新改写状态"""
+        history = db.session.query(RewriteHistory).get(history_id)
+        if not history:
+            raise ValueError(f"改写历史不存在: {history_id}")
         
-        Args:
-            history_id: 改写历史ID
-            status: 新状态
-            sql: 改写后的SQL(如果有)
-            error: 错误信息(如果有)
-        """
-        try:
-            history = RewriteHistory.query.get(history_id)
-            if not history:
-                raise ValueError(f"改写历史不存在: {history_id}")
-            
-            history.status = status
-            if sql:
-                history.rewritten_sql = sql
-            if error:
-                history.error_message = error
-                
-            db.session.commit()
-            
-        except Exception as e:
-            logger.error(f"更新改写状态失败: {str(e)}")
-            db.session.rollback()
-            raise
+        history.status = status
+        if sql:
+            history.rewritten_sql = sql
+        if error:
+            history.error_message = error
 
     @staticmethod
-    async def process_rewrite_task(history_id: int):
+    @db_session_manager
+    def process_rewrite_task(history_id: int):
         """处理SQL改写任务"""
         try:
-            history = RewriteHistory.query.get(history_id)
+            history = db.session.query(RewriteHistory).get(history_id)
             if not history:
                 raise ValueError(f"改写历史不存在: {history_id}")
+            
 
             # TODO:调用改写逻辑
-            # 异步调用改写的逻辑
+            rewritten_sql = "SELECT * FROM test"  # 临时测试用
+            
+            # 添加改写结果记录
+            RewriteService.add_rewrite_process(
+                history_id=history_id,
+                content="SQL改写完成",
+                step_name="改写结果",
+                sql=rewritten_sql,
+                role='assistant',
+                is_success=True
+            )
 
-            # 以下为改写过程中添加记录和修改改写状态的语句
-
-            # 添加中间记录
-            # RewriteService.add_rewrite_process(history_id=history_id, content=history.original_sql, step_name="原始SQL", role='assistant', sql="", is_success=True)
-
-            # 更新改写状态
-            #RewriteService.update_rewrite_status(history_id=history_id, status=RewriteStatus.SUCCESS, sql='sql')
+            # 更新改写状态为成功
+            RewriteService.update_rewrite_status(
+                history_id=history_id, 
+                status=RewriteStatus.SUCCESS, 
+                sql=rewritten_sql
+            )
 
         except Exception as e:
             logger.error(f"处理改写任务失败: {str(e)}")
+            # 添加错误记录和更新状态
+            RewriteService.add_rewrite_process(
+                history_id=history_id,
+                content=str(e),
+                step_name="错误信息",
+                role='system',
+                is_success=False,
+                error=str(e)
+            )
+            RewriteService.update_rewrite_status(
+                history_id=history_id,
+                status=RewriteStatus.FAILED,
+                error=str(e)
+            )
             raise

@@ -1,7 +1,6 @@
 from config.db_config import db
 from models import DatabaseConfig, DatabaseType
 from config.cache import cache
-from api.utils.model_to_dict import query_to_dict
 from config.logging_config import logger
 
 
@@ -20,10 +19,19 @@ def database_config_list(limit: int, offset: int, keyword: str = None):
             query = query.filter(DatabaseConfig.database.contains(keyword))
         total = query.count()
         configs = query.order_by(DatabaseConfig.created_at.desc()).limit(limit).offset(offset).all()
-
+        
         return {
             'total': total,
-            'data': query_to_dict(configs) if configs else []
+            'data': [{
+                'id': config.id,
+                'database': config.database,
+                'host': config.host,
+                'port': config.port,
+                'username': config.username,
+                'password': config.password,
+                'db_type': config.db_type,
+                'description': config.description
+            } for config in configs] if configs else []
         }
     except Exception as e:
         logger.error(f"database_config_list error: {e}")
@@ -35,7 +43,16 @@ def get_database_config(id: int):
     """获取单个数据库配置"""
     try:
         config = DatabaseConfig.query.get(id)
-        return {'data': query_to_dict(config)} if config else None
+        return {'data': {
+            'id': config.id,
+            'database': config.database,
+            'host': config.host,
+            'port': config.port,
+            'username': config.username,
+            'password': config.password,
+            'db_type': config.db_type,
+            'description': config.description
+        }} if config else None
     except Exception as e:
         logger.error(f"get_database_config error: {e}")
         return None
