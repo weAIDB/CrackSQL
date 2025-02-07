@@ -44,9 +44,9 @@
         <div class="item-header">
           <div class="left-info">
             <span class="time">{{ formatDate(item.created_at) }}</span>
-            <span class="db-type">{{ item.source_db_type }} → {{ item.target_db_type }}</span>
+            <span class="db-type">{{ item.source_db_type }} → {{ item.target_db.db_type }}</span>
             <span class="target-info">
-              {{ `${item.target_db_user}@${item.target_db_host}:${item.target_db_port}/${item.target_db_database}` }}
+              {{ `${item.target_db.username}@${item.target_db.host}:${item.target_db.port}/${item.target_db.database}` }}
             </span>
           </div>
           <div class="right-info">

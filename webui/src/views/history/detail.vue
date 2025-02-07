@@ -20,7 +20,7 @@
                 d="M375.296 887.296c-21.504 0-42.496-11.264-54.272-30.72-14.848-24.576-10.752-56.32 9.216-76.8L583.68 527.36 330.752 274.944c-20.48-20.48-24.576-52.224-9.216-76.8 14.848-24.576 44.544-36.352 72.192-27.648l524.288 296.96c26.624 8.192 44.544 32.256 44.544 59.904 0 27.648-17.92 52.224-44.544 59.904l-524.288 296.96c-6.144 2.048-12.288 3.072-18.432 3.072z"
                 fill="#4C91E5"/>
           </svg>
-          <span style="margin-left: 10px; font-weight: bold; color: #333333">{{ historyDetail.target_db_type }}</span>
+          <span style="margin-left: 10px; font-weight: bold; color: #333333">{{ historyDetail.target_db.db_type }}</span>
         </div>
         <div class="rowSC">
           <el-tag :type="getStatusType(historyDetail.status)" style="margin-right: 20px">

@@ -3,7 +3,7 @@ from api.utils.code import ResponseCode
 from api.utils.response import ResMsg
 from api.utils.util import route
 from api.services.rewrite import RewriteService
-import asyncio
+from api.utils.scheduler import scheduler
 
 bp = Blueprint('rewrite', __name__, url_prefix='/api/rewrite')
 
@@ -18,7 +18,7 @@ def list_api():
     keyword = obj.get('keyword', None)
     
     try:
-        result = RewriteService.get_history_list(offset + 1, limit, keyword)
+        result = RewriteService.get_history_list(offset, limit, keyword)
         res.update(data={
             'total': result['total'],
             'data': result['data']
@@ -81,18 +81,21 @@ def create_api():
         result = RewriteService.create_history(
             source_db_type=obj['source_db_type'],
             original_sql=obj['original_sql'],
-            target_db_type=obj['target_db_type'],
-            target_db_user=obj['target_db_user'],
-            target_db_host=obj['target_db_host'],
-            target_db_port=obj['target_db_port'],
-            target_db_password=obj['target_db_password'],
-            target_db_database=obj['target_db_database'],
-            target_db_id=obj['target_db_id']
+            source_kb_id=obj['source_kb_id'],
+            target_kb_id=obj['target_kb_id'],
+            target_db_id=obj['target_db_id'],
+            llm_model_name=obj['llm_model_name']
         )
         
-        # 异步启动改写任务
-        history_id = result['id']
-        asyncio.create_task(RewriteService.process_rewrite_task(history_id))
+        # 使用scheduler添加任务，移除asyncio.create_task调用
+        scheduler.add_job(
+            func=RewriteService.process_rewrite_task,
+            args=[result['id']],
+            id=f'rewrite_task_{result["id"]}',
+            trigger='date',
+            misfire_grace_time=None,
+            max_instances=1
+        )
         
         res.update(data=result)
     except Exception as e:

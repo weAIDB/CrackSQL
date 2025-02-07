@@ -34,7 +34,7 @@
                 fill="#4C91E5"/>
           </svg>
           <span style="margin-left: 10px; font-weight: bold; color: #333333">
-            {{ historyDetail.target_db_type }}
+            {{ historyDetail.target_db.db_type }}
           </span>
         </div>
         <div class="rowSC">

@@ -2,11 +2,12 @@ from typing import Optional
 from models import LLMModel
 from .base import BaseLLM
 from .implementations import LocalLLM, CloudLLM
-
+from config.db_config import db_session_manager
 class LLMFactory:
     """LLM工厂类"""
     
     @staticmethod
+    @db_session_manager
     def get_llm(model_name: str) -> Optional[BaseLLM]:
         """获取LLM实例"""
         # 获取模型配置
