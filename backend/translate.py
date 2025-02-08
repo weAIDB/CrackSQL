@@ -1005,3 +1005,25 @@ def model_judge(translator, src_dialect, tgt_dialect, root_node,
         piece = find_piece(all_pieces, node)
 
     return piece, assist_info, answer_raw
+
+
+
+def add_process(out_type, history_id, content, step_name, sql, role, is_success, error):
+    
+    if out_type == "file":
+        # 添加到文件
+
+        pass
+    elif out_type == "db":
+        # 添加到数据库 
+        # 添加改写结果记录
+        RewriteService.add_rewrite_process(
+            history_id=history_id,
+            content="SQL改写完成",
+            step_name="改写结果",
+            sql=rewritten_sql,
+            role='assistant',
+            is_success=True
+        )
+
+        pass
