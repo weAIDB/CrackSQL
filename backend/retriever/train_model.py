@@ -21,9 +21,9 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 import sys
 sys.path.append("/data/xxxx/index/sql_convertor/LLM4DB")
 
-from CrackSQL.utils import tools
-from CrackSQL.retriever.retriever_dataset import CrossLingualDataset
-from CrackSQL.retriever.retrieval_model import CodeDescEmbedding, ContrastiveLossV2
+from utils import tools
+from retriever.retriever_dataset import CrossLingualDataset
+from retriever.retrieval_model import CodeDescEmbedding, ContrastiveLossV2
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

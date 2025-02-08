@@ -16,8 +16,8 @@ from tqdm import tqdm
 import sys
 sys.path.append("..")
 
-from CrackSQL.translate import init_model, local_rewrite, direct_rewrite, direct_desc_rewrite
-from CrackSQL.utils.tools import get_proj_root_path, load_config
+from translate import init_model, local_rewrite, direct_rewrite, direct_desc_rewrite
+from utils.tools import get_proj_root_path, load_config
 
 config = load_config()
 seg_on = config['seg_on']

@@ -1,10 +1,10 @@
 import os.path
 
-from CrackSQL.preprocessor.query_simplifier.load_process import load_json_keywords
-from CrackSQL.preprocessor.query_simplifier.locate import locate_by_segment
-from CrackSQL.preprocessor.query_simplifier.tree_matcher import *
-from CrackSQL.utils.db_connector import sql_execute
-from CrackSQL.utils.tools import *
+from preprocessor.query_simplifier.load_process import load_json_keywords
+from preprocessor.query_simplifier.locate import locate_by_segment
+from preprocessor.query_simplifier.tree_matcher import *
+from utils.db_connector import sql_execute
+from utils.tools import *
 
 config = load_config()
 dbg = config['dbg']

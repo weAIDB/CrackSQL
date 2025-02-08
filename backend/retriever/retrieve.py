@@ -24,8 +24,8 @@ from llama_index.retrievers.bm25 import BM25Retriever
 import sys
 sys.path.append(".")
 
-from CrackSQL.retriever.vector_db import VectorDB
-from CrackSQL.retriever.retrieval_model import RetrievalModel, MultiEmbedding, CodeDescEmbedding, HuggingBackboneV2
+from retriever.vector_db import VectorDB
+from retriever.retrieval_model import RetrievalModel, MultiEmbedding, CodeDescEmbedding, HuggingBackboneV2
 
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # "-1"

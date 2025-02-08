@@ -11,9 +11,9 @@ import traceback
 
 import sqlglot
 
-from CrackSQL.translator.llm_translator import LLMTranslator
-from CrackSQL.translator.tool_prompt import USER_PROMPT_FUNC_EXAMPLE, USER_PROMPT_FUNC_NAME, USER_PROMPT_FUNC_COM
-from CrackSQL.utils.tools import load_config, parse_llm_answer
+from translator.llm_translator import LLMTranslator
+from translator.tool_prompt import USER_PROMPT_FUNC_EXAMPLE, USER_PROMPT_FUNC_NAME, USER_PROMPT_FUNC_COM
+from utils.tools import load_config, parse_llm_answer
 
 map_rep = {
     'postgres': 'PostgreSQL 14.7',

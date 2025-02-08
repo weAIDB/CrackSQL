@@ -1,8 +1,8 @@
 import re
 from typing import List
 
-from CrackSQL.preprocessor.TreeParser.antlr_tree.antlr_tree_node import *
-from CrackSQL.utils.tools import self_split, split2wordlist
+from preprocessor.TreeParser.antlr_tree.antlr_tree_node import *
+from utils.tools import self_split, split2wordlist
 
 
 def is_terminal_word(g4_str: str):

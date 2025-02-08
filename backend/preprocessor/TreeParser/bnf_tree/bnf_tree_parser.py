@@ -1,7 +1,7 @@
 from typing import List
 
-from CrackSQL.preprocessor.TreeParser.bnf_tree.bnf_tree_node import *
-from CrackSQL.utils.tools import self_split, split2wordlist
+from preprocessor.TreeParser.bnf_tree.bnf_tree_node import *
+from utils.tools import self_split, split2wordlist
 
 
 def parse_bnf(terms: List, node: BnfRuleNode, index: int, index_end: int) -> int:

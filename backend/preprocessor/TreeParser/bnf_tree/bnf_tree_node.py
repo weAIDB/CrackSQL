@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List
 
-from CrackSQL.utils.tools import only_lower_underscore
+from utils.tools import only_lower_underscore
 
 
 class NodeType(Enum):

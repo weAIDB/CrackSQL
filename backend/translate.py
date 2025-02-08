@@ -4,7 +4,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 from llama_index.core.node_parser import SimpleFileNodeParser
 from llama_index.retrievers.bm25 import BM25Retriever
 
-from CrackSQL.retriever.dump_data import pre_db_docs
+from retriever.dump_data import pre_db_docs
 
 import torch
 from tqdm import tqdm
@@ -20,23 +20,23 @@ from datetime import datetime
 
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from CrackSQL.preprocessor.antlr_parser.parse_tree import parse_tree
-from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode, lift_node
-from CrackSQL.preprocessor.query_simplifier.rewrite import get_all_piece, reformat, \
+from preprocessor.antlr_parser.parse_tree import parse_tree
+from preprocessor.query_simplifier.Tree import TreeNode, lift_node
+from preprocessor.query_simplifier.rewrite import get_all_piece, reformat, \
     get_masked_slices, try_mark_tree_node, parse_llm_answer, get_all_tgt_used_piece
-from CrackSQL.preprocessor.query_simplifier.locate import locate_node_piece, replace_piece, get_func_name, \
+from preprocessor.query_simplifier.locate import locate_node_piece, replace_piece, get_func_name, \
     find_piece
-from CrackSQL.preprocessor.query_simplifier.normalize import normalize
-from CrackSQL.preprocessor.query_simplifier.type_mask import mask_type_node
+from preprocessor.query_simplifier.normalize import normalize
+from preprocessor.query_simplifier.type_mask import mask_type_node
 
-from CrackSQL.retriever.retrieval_model import RetrievalModel, CodeDescEmbedding
-from CrackSQL.retriever.vector_db import VectorDB
-from CrackSQL.translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
+from retriever.retrieval_model import RetrievalModel, CodeDescEmbedding
+from retriever.vector_db import VectorDB
+from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
     SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_MASK, USER_PROMPT_MASK, USER_ADVICE_MASK, \
     SYSTEM_PROMPT_RET, USER_PROMPT_RET, SYSTEM_PROMPT_DIR, USER_PROMPT_DIR, EXAMPLE_PROMPT
-from CrackSQL.translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
-from CrackSQL.translator.llm_translator import LLMTranslator
-from CrackSQL.utils.tools import get_proj_root_path, load_config, extract_json, parse_llm_answer_v2
+from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
+from translator.llm_translator import LLMTranslator
+from utils.tools import get_proj_root_path, load_config, extract_json, parse_llm_answer_v2
 
 chunk_size = 100
 build_in_function_map = {}
