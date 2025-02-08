@@ -20,12 +20,17 @@
 - 🎯 **高精度转换**: 基于三层转换架构，确保转换结果的准确性
 - 🌟 **多种使用方式**: 支持命令行、Python API和Web界面三种使用方式
 
+
 ### 技术特点
 - **功能导向的语法处理**: 将SQL语句分解为特定功能的语法元素
 - **基于模型的语法匹配**: 采用创新的跨方言嵌入模型进行转换
 - **局部到全局的转换策略**: 灵活处理复杂SQL转换场景
 
-## 📊 性能对比
+### Features
+- 支持多种数据库方言的转换
+
+
+## 📊 性能展示
 
 | 方言对 | 准确率 | 平均转换时间 |
 |-------|--------|------------|
@@ -33,15 +38,13 @@
 | MySQL → Oracle | 93% | 0.6s |
 | Oracle → SQLite | 91% | 0.4s |
 
-## 📈 对比其他工具
-
-TODO：添加对比其他工具的图表
 
 <span id="-demo"></span>
 ## 🖥️ 功能演示
 
 TODO: 添加界面预览图
 ![Web界面预览](./docs/images/web-preview.png)
+
 
 <span id="-quickstart"></span>
 ## 🚀 快速开始
@@ -96,6 +99,7 @@ python script/convert.py --source postgresql --target mysql "SELECT * FROM users
 ```
 
 
+
 <span id="-doc2knowledge"></span>
 ## 📎 自定义知识和工具
 TODO: 添加自定义知识和工具
@@ -121,12 +125,4 @@ TODO: 添加常见问题
 ## 📝 开源协议
 TODO: 添加开源协议
 本项目采用 MIT 协议 - 详见 [LICENSE](LICENSE) 文件
-
-
-## 🙏 致谢
-感谢以下开源项目：
-
-- [SQLGlot](https://github.com/tobymao/sqlglot)
-- [jOOQ](https://github.com/jOOQ/jOOQ)
-- [SQLines](https://www.sqlines.com/home)
 
