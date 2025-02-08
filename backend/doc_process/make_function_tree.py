@@ -1,8 +1,8 @@
 import json
 import os.path
 
-from CrackSQL.preprocessor.antlr_parser.parse_tree import parse_tree
-from CrackSQL.utils.tools import get_proj_root_path
+from preprocessor.antlr_parser.parse_tree import parse_tree
+from utils.tools import get_proj_root_path
 
 
 def mark_mysql_tree(tree_rep: str, func_name: str):

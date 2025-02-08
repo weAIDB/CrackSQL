@@ -1,8 +1,8 @@
 from antlr4 import *
 from antlr4.CommonTokenStream import CommonTokenStream
 
-from CrackSQL.preprocessor.antlr_parser.pg_parser.LexerDispatchingErrorListener import LexerDispatchingErrorListener
-from CrackSQL.preprocessor.antlr_parser.pg_parser.ParserDispatchingErrorListener import ParserDispatchingErrorListener
+from preprocessor.antlr_parser.pg_parser.LexerDispatchingErrorListener import LexerDispatchingErrorListener
+from preprocessor.antlr_parser.pg_parser.ParserDispatchingErrorListener import ParserDispatchingErrorListener
 from PostgreSQLLexer import PostgreSQLLexer
 from PostgreSQLParser import PostgreSQLParser
 

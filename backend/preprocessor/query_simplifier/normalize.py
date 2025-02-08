@@ -7,8 +7,8 @@
 import json
 from typing import List
 
-from CrackSQL.preprocessor.antlr_parser.parse_tree import parse_tree
-from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode
+from preprocessor.antlr_parser.parse_tree import parse_tree
+from preprocessor.query_simplifier.Tree import TreeNode
 
 
 def remove_as_mysql(root_node: TreeNode):

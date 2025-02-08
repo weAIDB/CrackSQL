@@ -1,11 +1,11 @@
 import json
 from typing import Dict
 
-from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode
-from CrackSQL.preprocessor.TreeParser.antlr_tree.antlr_tree_parser import parse_antlr
-from CrackSQL.utils.tools import *
-from CrackSQL.preprocessor.TreeParser.antlr_tree.antlr_tree_node import *
-from CrackSQL.preprocessor.antlr_parser.parse_tree import parse_tree
+from preprocessor.query_simplifier.Tree import TreeNode
+from preprocessor.TreeParser.antlr_tree.antlr_tree_parser import parse_antlr
+from utils.tools import *
+from preprocessor.TreeParser.antlr_tree.antlr_tree_node import *
+from preprocessor.antlr_parser.parse_tree import parse_tree
 
 """
 Used to generate a syntax tree for a given keyword

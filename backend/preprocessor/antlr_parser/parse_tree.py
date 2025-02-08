@@ -3,17 +3,17 @@ import sys
 from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener
 
-from CrackSQL.preprocessor.antlr_parser.pg_parser.PostgreSQLParser import PostgreSQLParser
-from CrackSQL.preprocessor.antlr_parser.pg_parser.PostgreSQLLexer import PostgreSQLLexer
+from preprocessor.antlr_parser.pg_parser.PostgreSQLParser import PostgreSQLParser
+from preprocessor.antlr_parser.pg_parser.PostgreSQLLexer import PostgreSQLLexer
 
-from CrackSQL.preprocessor.antlr_parser.mysql_parser.MySqlParser import MySqlParser
-from CrackSQL.preprocessor.antlr_parser.mysql_parser.MySqlLexer import MySqlLexer
+from preprocessor.antlr_parser.mysql_parser.MySqlParser import MySqlParser
+from preprocessor.antlr_parser.mysql_parser.MySqlLexer import MySqlLexer
 
-from CrackSQL.preprocessor.antlr_parser.sqlite_parser import SQLiteParser
-from CrackSQL.preprocessor.antlr_parser.sqlite_parser import SQLiteLexer
+from preprocessor.antlr_parser.sqlite_parser import SQLiteParser
+from preprocessor.antlr_parser.sqlite_parser import SQLiteLexer
 
-from CrackSQL.preprocessor.antlr_parser.oracle_parser.PlSqlParser import PlSqlParser
-from CrackSQL.preprocessor.antlr_parser.oracle_parser.PlSqlLexer import PlSqlLexer
+from preprocessor.antlr_parser.oracle_parser.PlSqlParser import PlSqlParser
+from preprocessor.antlr_parser.oracle_parser.PlSqlLexer import PlSqlLexer
 
 map_parser = ["pg", "mysql", "sqlite", "oracle"]
 

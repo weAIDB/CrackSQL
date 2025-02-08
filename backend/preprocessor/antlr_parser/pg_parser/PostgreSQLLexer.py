@@ -1,7 +1,7 @@
 # Generated from /data/Coding/LLM4DB/antlr_gram/pg/PostgreSQLLexer.g4 by ANTLR 4.13.1
 from antlr4 import *
 from io import StringIO
-from CrackSQL.preprocessor.antlr_parser.pg_parser.PostgreSQLLexerBase import *
+from preprocessor.antlr_parser.pg_parser.PostgreSQLLexerBase import *
 import sys
 if sys.version_info[1] > 5:
     from typing import TextIO

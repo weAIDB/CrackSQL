@@ -61,7 +61,7 @@ docker run -d -p 5173:5173 cracksql:latest
 #### 1. 克隆仓库
 ```bash
 # 
-git clone https://github.com/your-username/CrackSQL.git
+git clone https://github.com/your-username/git
 cd CrackSQL/backend
 # 安装依赖
 conda create -n CrackSQL python=3.10

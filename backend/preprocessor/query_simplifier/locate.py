@@ -10,10 +10,10 @@ import sqlglot
 import json
 from typing import List, Dict
 
-from CrackSQL.preprocessor.antlr_parser.parse_tree import parse_tree
-from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode
-from CrackSQL.utils.db_connector import sql_execute
-from CrackSQL.utils.tools import load_config, remove_all_space, print_err, get_proj_root_path, reformat_sql
+from preprocessor.antlr_parser.parse_tree import parse_tree
+from preprocessor.query_simplifier.Tree import TreeNode
+from utils.db_connector import sql_execute
+from utils.tools import load_config, remove_all_space, print_err, get_proj_root_path, reformat_sql
 
 pg_func_name = set()
 

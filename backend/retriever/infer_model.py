@@ -13,8 +13,8 @@ from tqdm import tqdm
 import torch
 from torch.utils.data import DataLoader
 
-from CrackSQL.retriever.retrieval_model import CodeDescEmbedding, ContrastiveLossV2, HuggingBackboneV2
-from CrackSQL.retriever.retriever_dataset import CrossLingualDataset
+from retriever.retrieval_model import CodeDescEmbedding, ContrastiveLossV2, HuggingBackboneV2
+from retriever.retriever_dataset import CrossLingualDataset
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

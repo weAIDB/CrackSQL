@@ -1,7 +1,7 @@
 from typing import Dict
 
-from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode
-from CrackSQL.preprocessor.query_simplifier.normalize import father_value_list_compare
+from preprocessor.query_simplifier.Tree import TreeNode
+from preprocessor.query_simplifier.normalize import father_value_list_compare
 
 
 def mask_column(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:

@@ -22,8 +22,8 @@ import sys
 
 sys.path.append("/data/xxxx/index/sql_convertor/LLM4DB")
 
-from CrackSQL.retriever.vector_db import VectorDB
-from CrackSQL.retriever.retrieval_model import RetrievalModel, MultiEmbedding, CodeDescEmbedding
+from retriever.vector_db import VectorDB
+from retriever.retrieval_model import RetrievalModel, MultiEmbedding, CodeDescEmbedding
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

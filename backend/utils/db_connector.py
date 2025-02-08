@@ -16,7 +16,7 @@ from psycopg2 import Error
 
 import cx_Oracle
 
-from CrackSQL.utils.tools import load_config
+from utils.tools import load_config
 
 mysql_conn_map = {}
 mysql_cursor_map = {}

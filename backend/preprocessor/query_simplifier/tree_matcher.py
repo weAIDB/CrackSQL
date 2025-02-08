@@ -1,9 +1,9 @@
 import os
 from glob import glob
 
-from CrackSQL.doc_process.make_tree import *
-from CrackSQL.preprocessor.query_simplifier.Tree import *
-from CrackSQL.preprocessor.antlr_parser.parse_tree import parse_tree
+from doc_process.make_tree import *
+from preprocessor.query_simplifier.Tree import *
+from preprocessor.antlr_parser.parse_tree import parse_tree
 
 dbg = (load_config())['dbg']
 

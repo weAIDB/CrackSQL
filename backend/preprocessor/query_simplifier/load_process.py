@@ -4,8 +4,8 @@ import sys
 from glob import glob
 from typing import List
 
-from CrackSQL.preprocessor.query_simplifier.Tree import TreeNode
-from CrackSQL.utils.tools import load_config
+from preprocessor.query_simplifier.Tree import TreeNode
+from utils.tools import load_config
 
 config = load_config()
 dbg = config['dbg']
