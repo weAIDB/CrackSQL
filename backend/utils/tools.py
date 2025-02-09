@@ -226,6 +226,7 @@ def split2wordlist(terms) -> List[str]:
             res.append(cur_str)
     return res
 
+
 def extract_json(bnf: str) -> List[str]:
     matches = re.findall(r'```json(.*?)```', bnf, re.DOTALL)
     return [match.strip() for match in matches]
@@ -415,3 +416,13 @@ def reformat_sql(ori_sql: str):
     for split_slice in res.strip().split():
         final_res = final_res + split_slice + " "
     return final_res.strip()
+
+
+def process_err_msg(msg):
+    msg = msg.replace("xxxx_BIRD.", "").replace("BIRD.", "").replace(
+        "pg_catalog.date_part(", "EXTRACT(").replace("Error while executing PostgreSQL query:", "").replace(
+        "You have an error in your SQL syntax; check the manual that corresponds "
+        "to your MySQL server version for the right syntax to use near",
+        "Some error occurs near")
+
+    return msg

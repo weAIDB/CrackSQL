@@ -15,7 +15,7 @@ from preprocessor.antlr_parser.sqlite_parser import SQLiteLexer
 from preprocessor.antlr_parser.oracle_parser.PlSqlParser import PlSqlParser
 from preprocessor.antlr_parser.oracle_parser.PlSqlLexer import PlSqlLexer
 
-map_parser = ["pg", "mysql", "sqlite", "oracle"]
+from CrackSQL.backend.utils.constants import map_parser
 
 
 class CustomErrorListener(ErrorListener):
