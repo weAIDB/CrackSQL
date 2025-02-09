@@ -170,7 +170,6 @@ def find_function(func_name, all_pieces, root_node, sql, location=None):
 
 def locate_node_piece(sql, src_dialect, tgt_dialect, all_pieces, root_node, db_name: str):
     flag, error_info = sql_execute(tgt_dialect, db_name, sql)
-    # print(sql, error_info)
     if flag:
         return None, "no execute error"
     else:

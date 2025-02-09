@@ -114,6 +114,19 @@ TODO: 添加常见问题
 👫 欢迎扫码加入微信群！
 
 
+## 📒 Citation
+Feel free to cite us (paper link) if you like this project.
+```
+@misc{zhou2023llm4diag,
+      title={D-Bot: Database Diagnosis System using Large Language Models}, 
+      author={Xuanhe Zhou, Guoliang Li, Zhaoyan Sun, Zhiyuan Liu, Weize Chen, Jianming Wu, Jiesi Liu, Ruohang Feng, Guoyang Zeng},
+      year={2023},
+      eprint={2312.01454},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB}
+}
+```
+
 <span id="-contributors"></span>
 ## 📧 贡献者
 <a href="https://github.com/TsinghuaDatabaseGroup/DB-GPT/network/dependencies">
