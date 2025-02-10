@@ -1,5 +1,7 @@
 # 👋 CrackSQL 是一个强大的SQL方言转换工具，支持在不同SQL方言之间进行精确转换(如PostgreSQL到MySQL)。提供命令行、Python API和Web界面三种使用方式。
 
+# 数据库 PG → MySQL
+
 <p align="center">
   <a href="#-demo">演示</a> •
   <a href="#-quickstart">快速开始</a> •
@@ -10,27 +12,21 @@
   <a href="#-license">开源协议</a> •  
 </p>
 
-
 [English](./README_EN.md) | 简体中文
 
 ## 📚 功能特性
 
-### 核心功能
-- 🚀 **多方言支持**: 支持PostgreSQL、MySQL、Oracle、SQLite等主流数据库方言的互转
+- 🚀 **多方言支持**: 支持PostgreSQL、MySQL、Oracle三种主流数据库方言的互转
 - 🎯 **高精度转换**: 基于三层转换架构，确保转换结果的准确性
-- 🌟 **多种使用方式**: 支持命令行、Python API和Web界面三种使用方式
+- 🌟 **多种使用方式**: 支持命令行和Web界面三种使用方式
 
-
-### 技术特点
 - **功能导向的语法处理**: 将SQL语句分解为特定功能的语法元素
 - **基于模型的语法匹配**: 采用创新的跨方言嵌入模型进行转换
 - **局部到全局的转换策略**: 灵活处理复杂SQL转换场景
 
-### Features
-- 支持多种数据库方言的转换
-
-
 ## 📊 性能展示
+
+等待时间提示
 
 | 方言对 | 准确率 | 平均转换时间 |
 |-------|--------|------------|
@@ -101,20 +97,28 @@ python script/convert.py --source postgresql --target mysql "SELECT * FROM users
 
 
 <span id="-doc2knowledge"></span>
-## 📎 自定义知识和工具
-TODO: 添加自定义知识和工具
+## 📎 功能扩展
+### 增加新语法
+补充
 
+### 增加新数据库
+从头开始
+
+### 微调向量模型
 
 <span id="-FAQ"></span>
 ## 🤔 常见问题
 TODO: 添加常见问题
 
+## TODO
+- Python API
 
 <span id="-community"></span>
 👫 欢迎扫码加入微信群！
 
 
-## 📒 Citation
+## 📒 引用
+论文
 Feel free to cite us (paper link) if you like this project.
 ```
 @misc{zhou2023llm4diag,
