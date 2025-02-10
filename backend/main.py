@@ -62,7 +62,6 @@ def main():
             tgt_sql = pair[tgt_dialect]
 
         try:
-            # trans_sql, resp_list = direct_rewrite(translator, src_sql, src_dialect, tgt_dialect)
             trans_sql, resp_list, used_pieces, lift_histories = local_rewrite(translator, retriever, vector_db,
                                                                               src_sql, src_dialect, tgt_dialect,
                                                                               db_name=db_name, top_k=top_k,
