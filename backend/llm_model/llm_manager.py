@@ -3,6 +3,8 @@ from .base import BaseLLM
 from .implementations import CloudLLM, LocalLLM
 from models import LLMModel
 import logging
+from config.db_config import db_session_manager
+
 
 logger = logging.getLogger(__name__)
 
@@ -13,20 +15,7 @@ class LLMManager:
     def __init__(self):
         self._models: Dict[str, BaseLLM] = {}
 
-    def init_models(self):
-        """初始化所有启用的模型"""
-        try:
-            # 获取所有启用的模型配置
-            model_configs = LLMModel.query.filter_by(is_active=True).all()
-
-            for config in model_configs:
-                self.load_model(config)
-
-        except Exception as e:
-            logger.error(f"初始化模型失败: {str(e)}")
-            raise
-
-    def load_model(self, config: LLMModel) -> Optional[BaseLLM]:
+    def load_model(self, model_config: Dict) -> Optional[BaseLLM]:
         """
         加载单个模型
         Args:
@@ -34,63 +23,66 @@ class LLMManager:
         Returns:
             Optional[BaseLLM]: 加载的模型实例
         """
-        try:
-            model_config = {
-                'name': config.name,
-                'deployment_type': config.deployment_type,
-                'category': config.category,
-                'temperature': config.temperature,
-                'max_tokens': config.max_tokens,
-                'model_path': config.path,
-                'api_base': config.api_base,
-                'api_key': config.api_key
-            }
-
+        try:                
             # 根据类型创建相应的模型实例
-            model_cls = CloudLLM if config.deployment_type == 'cloud' else LocalLLM
+            model_cls = CloudLLM if model_config['deployment_type'] == 'cloud' else LocalLLM
             model = model_cls(model_config)
 
             # 验证配置
             if not model.validate_config():
-                logger.error(f"模型配置无效: {config.name}")
+                logger.error(f"模型配置无效: {model_config['name']}")
                 return None
 
-            self._models[config.name] = model
-            logger.info(f"成功加载模型: {config.name}")
+            self._models[model_config['name']] = model
+            logger.info(f"成功加载模型: {model_config['name']}")
             return model
 
         except Exception as e:
-            logger.error(f"加载模型失败 {config.name}: {str(e)}")
+            logger.error(f"加载模型失败 {model_config['name']}: {str(e)}")
             return None
 
-    def get_model(self, name: str) -> Optional[BaseLLM]:
+    @db_session_manager
+    def get_model_config_from_db(self, name: str) -> Optional[Dict]:
+        """从数据库获取模型配置"""
+        config = LLMModel.query.filter_by(name=name).first()
+        if not config:
+            logger.error(f"模型配置不存在: {name}")
+            return None
+        if not config.is_active:
+            logger.error(f"模型未启用: {name}")
+            return None
+            
+        model_config = {
+            'name': config.name,
+            'deployment_type': config.deployment_type,
+            'category': config.category,
+            'temperature': config.temperature,
+            'max_tokens': config.max_tokens,
+            'model_path': config.path,
+            'api_base': config.api_base,
+            'api_key': config.api_key
+        }
+        return model_config
+
+    def get_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
         """获取模型实例"""
         if name not in self._models:
             # 懒加载：只在第一次使用时加载模型
-            config = LLMModel.query.filter_by(name=name).first()
-            if not config:
-                logger.error(f"模型配置不存在: {name}")
+            if config is None:
+                config = self.get_model_config_from_db(name)
+                if not config:
+                    logger.error(f"模型配置不存在: {name}")
                 return None
+            else:
+                # 检查配置参数是否全
+                if config.deployment_type == 'cloud' and (config.api_base is None or config.api_key is None):
+                    logger.error(f"模型配置参数不全: {config.name}")
+                    return None
+                elif config.deployment_type == 'local' and config.path is None:
+                    logger.error(f"模型配置参数不全: {config.name}")
+                    return None
             self.load_model(config)
         return self._models.get(name)
-
-    def reload_model(self, name: str) -> Optional[BaseLLM]:
-        """重新加载模型"""
-        try:
-            config = LLMModel.query.filter_by(name=name).first()
-            if not config:
-                logger.error(f"模型配置不存在: {name}")
-                return None
-
-            # 移除旧的模型实例
-            self._models.pop(name, None)
-
-            # 加载新的模型实例
-            return self.load_model(config)
-
-        except Exception as e:
-            logger.error(f"重新加载模型失败 {name}: {str(e)}")
-            return None
 
 
 # 全局LLM管理器实例
