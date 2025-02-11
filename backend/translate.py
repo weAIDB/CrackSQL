@@ -225,7 +225,7 @@ class Translate:
                 if now_sql in sql_ans_list:
                     return now_sql, model_ans_list, used_pieces, lift_histories
 
-                piece, assist_info, judge_raw = self.handle_syntactic_correct_piece(src_sql, now_sql, root_node,
+                piece, assist_info, judge_raw = self.handle_syntactic_correct_piece(self.src_sql, now_sql, root_node,
                                                                                     all_pieces, last_time_piece,
                                                                                     model_ans_list)
 
