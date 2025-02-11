@@ -8,6 +8,7 @@ KNOWLEDGE_FIELD_LIST = ['Argument Type', 'Argument Type(s)',
                         "Description", 'Example', 'Result',
                         'Example Query', 'Example Result', "Demo"]
 
+# TODO: 优化掉，用户自己填
 map_rep = {
     'pg': 'PostgreSQL 14.7',
     'mysql': "MySQL 8.4",

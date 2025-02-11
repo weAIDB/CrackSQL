@@ -150,9 +150,9 @@
             >
               <el-option
                   v-for="item in llmModelOptions"
-                  :key="item.id"
+                  :key="item.name"
                   :label="item.name"
-                  :value="item.id"
+                  :value="item.name"
               />
             </el-select>
           </div>
@@ -341,7 +341,7 @@ const onSendClick = async () => {
       source_kb_id: originalKb.value,
       target_kb_id: targetKb.value,
       original_sql: userInput.value,
-      llm_model_name: 'gpt-4o-mini',
+      llm_model_name: llmModel.value,
       target_db_id: targetConfig.id
     }
 

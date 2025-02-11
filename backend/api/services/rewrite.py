@@ -196,6 +196,7 @@ class RewriteService:
             error_message=error
         )
         db.session.add(process)
+        db.session.commit()
         return process
 
     @staticmethod
@@ -216,6 +217,7 @@ class RewriteService:
             history.rewritten_sql = sql
         if error:
             history.error_message = error
+        db.session.commit()
 
     @staticmethod
     @db_session_manager
@@ -226,10 +228,9 @@ class RewriteService:
             if not history:
                 raise ValueError(f"改写历史不存在: {history_id}")
             try:
-                from translate import local_translate
-
+                from translate import direct_rewrite
                 # 原始SQL，源数据库类型，源数据库知识库，目标数据库类型，目标数据库知识库，目标数据库Host，目标数据库Port，目标数据库User，目标数据库Password, LLm-Model-Name
-                local_translate(history.original_sql)
+                direct_rewrite(history.llm_model_name, history.original_sql, history.source_db_type.lower(), history.target_db.db_type.lower(), history_id, "db")
             except Exception as e:
                 # 更新改写状态为成功
                 RewriteService.update_rewrite_status(
@@ -238,27 +239,6 @@ class RewriteService:
                     error=str(e)
                 )
                 raise ValueError(f"SQL改写失败: {str(e)}")
-            
-            # # TODO:调用改写逻辑
-            # rewritten_sql = "SELECT * FROM test"  # 临时测试用
-            
-            # # 添加改写结果记录
-            # RewriteService.add_rewrite_process(
-            #     history_id=history_id,
-            #     content="SQL改写完成",
-            #     step_name="改写结果",
-            #     sql=rewritten_sql,
-            #     role='assistant',
-            #     is_success=True
-            # )
-
-            # # 更新改写状态为成功
-            # RewriteService.update_rewrite_status(
-            #     history_id=history_id, 
-            #     status=RewriteStatus.SUCCESS, 
-            #     sql=rewritten_sql
-            # )
-
         except Exception as e:
             logger.error(f"处理改写任务失败: {str(e)}")
             # 添加错误记录和更新状态

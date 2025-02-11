@@ -51,7 +51,7 @@ class LLMManager:
         if not config.is_active:
             logger.error(f"模型未启用: {name}")
             return None
-            
+
         model_config = {
             'name': config.name,
             'deployment_type': config.deployment_type,
@@ -62,26 +62,32 @@ class LLMManager:
             'api_base': config.api_base,
             'api_key': config.api_key
         }
+
         return model_config
 
     def get_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
-        """获取模型实例"""
+        """获取模型实例
+        Args:
+            name: 模型名称
+            config: 可选的模型配置字典
+        Returns:
+            Optional[BaseLLM]: 模型实例
+        """
         if name not in self._models:
-            # 懒加载：只在第一次使用时加载模型
             if config is None:
                 config = self.get_model_config_from_db(name)
                 if not config:
                     logger.error(f"模型配置不存在: {name}")
-                return None
+                    return None
             else:
-                # 检查配置参数是否全
-                if config.deployment_type == 'cloud' and (config.api_base is None or config.api_key is None):
-                    logger.error(f"模型配置参数不全: {config.name}")
+                # 使用字典访问方式
+                if config['deployment_type'] == 'cloud' and (config.get('api_base') is None or config.get('api_key') is None):
+                    logger.error(f"模型配置参数不全: {config['name']}")
                     return None
-                elif config.deployment_type == 'local' and config.path is None:
-                    logger.error(f"模型配置参数不全: {config.name}")
+                elif config['deployment_type'] == 'local' and config.get('path') is None:
+                    logger.error(f"模型配置参数不全: {config['name']}")
                     return None
-            self.load_model(config)
+            return self.load_model(config)
         return self._models.get(name)
 
 
