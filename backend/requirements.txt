@@ -26,3 +26,6 @@ sentence-transformers>=2.2.0  # 用于文本向量化
 numpy>=1.24.0  # 科学计算
 scikit-learn>=1.0.0  # 用于向量计算
 chromadb>=0.4.15  # Chroma向量数据库
+
+# SQL解析相关
+sqlglot==26.6.0

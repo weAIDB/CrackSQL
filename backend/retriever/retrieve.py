@@ -17,9 +17,8 @@ from sentence_transformers import SentenceTransformer
 # from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 
-from llama_index.core.node_parser import SimpleFileNodeParser
-from llama_index.retrievers.bm25 import BM25Retriever
 
 import sys
 sys.path.append(".")
@@ -63,24 +62,16 @@ def pre_short_docs(model_id, data_load, is_dict=False):
         data = json.load(rf)
 
     if "mysql_8.4_built-in-function" in data_load:
-        if model_id == "BM25":
-            from llama_index.core import Document
-            docs = [Document(text=f"{item['Description']}. {item['Detail']}",
-                             metadata={"Function": item["Name"],
-                                       "Link": item["Link"]}) for item in data]
+        if is_dict:
+            docs = [Document(page_content=f"{item['Name']}"
+                                            f"--separator--"
+                                            f"{item['Description']}. {item['Detail']}",
+                                metadata={"Function": item["Name"],
+                                        "Link": item["Link"]}) for item in data]
         else:
-            from langchain_core.documents import Document
-            if is_dict:
-                docs = [Document(page_content=f"{item['Name']}"
-                                              f"--separator--"
-                                              f"{item['Description']}. {item['Detail']}",
-                                 metadata={"Function": item["Name"],
-                                           "Link": item["Link"]}) for item in data]
-            else:
-                docs = [Document(page_content=f"{item['Description']}. {item['Detail']}",
-                                 metadata={"Function": item["Name"],
-                                           "Link": item["Link"]}) for item in data]
-
+            docs = [Document(page_content=f"{item['Description']}. {item['Detail']}",
+                                metadata={"Function": item["Name"],
+                                        "Link": item["Link"]}) for item in data]
         docs_raw = data
 
     elif "pg_14_built-in-function" in data_load:
@@ -94,41 +85,28 @@ def pre_short_docs(model_id, data_load, is_dict=False):
                 if len(row) != len(header):
                     continue
 
-                if model_id == "BM25":
-                    from llama_index.core import Document
-                    docs.append(Document(text=" ".join([f"{row[h]}" for h in header[1:]]),
-                                         metadata={header[0]: row[header[0]]}))
+                if is_dict:
+                    docs.append(Document(page_content=f"{row[header[0]]}"
+                                                        f"--separator--"
+                                                        f"{' '.join([row[h] for h in header[1:]])}",
+                                            metadata={header[0]: row[header[0]]}))
                 else:
-                    from langchain_core.documents import Document
-                    if is_dict:
-                        docs.append(Document(page_content=f"{row[header[0]]}"
-                                                          f"--separator--"
-                                                          f"{' '.join([row[h] for h in header[1:]])}",
-                                             metadata={header[0]: row[header[0]]}))
-                    else:
-                        docs.append(Document(page_content=" ".join([f"{row[h]}" for h in header[1:]]),
-                                             metadata={header[0]: row[header[0]]}))
+                    docs.append(Document(page_content=" ".join([f"{row[h]}" for h in header[1:]]),
+                                            metadata={header[0]: row[header[0]]}))
 
                 docs_raw.append(row)
 
     elif "oracle_11_built-in-function" in data_load:
-        if model_id == "BM25":
-            from llama_index.core import Document
-            docs = [Document(text=item["Description"],
-                             metadata={"Function": item["Name"],
-                                       "Link": item["Link"]}) for item in data]
+        if is_dict:
+            docs = [Document(page_content=f"{item['Name']}"
+                                            f"--separator--"
+                                            f"{item['Description']}",
+                                metadata={"Function": item["Name"],
+                                        "Link": item["Link"]}) for item in data]
         else:
-            from langchain_core.documents import Document
-            if is_dict:
-                docs = [Document(page_content=f"{item['Name']}"
-                                              f"--separator--"
-                                              f"{item['Description']}",
-                                 metadata={"Function": item["Name"],
-                                           "Link": item["Link"]}) for item in data]
-            else:
-                docs = [Document(page_content=item["Description"],
-                                 metadata={"Function": item["Name"],
-                                           "Link": item["Link"]}) for item in data]
+            docs = [Document(page_content=item["Description"],
+                                metadata={"Function": item["Name"],
+                                        "Link": item["Link"]}) for item in data]
 
         docs_raw = data
 
@@ -221,13 +199,8 @@ def main():
                     embed_func = HuggingFaceEmbeddings(model_name=model_dict[model],
                                                        model_kwargs=model_kwargs)
 
-            if db_id == "BM25":
-                vector_db = VectorDB(db_id, embed_func=BM25Retriever)
-                docs = SimpleFileNodeParser().get_nodes_from_documents(docs)
-                vector_db.load_vector(docs, top_k=top_k)
-            else:
-                vector_db = VectorDB(db_id, db_path, embed_func)
-                vector_db.load_vector(docs, batch_size=batch_size)
+            vector_db = VectorDB(db_id, db_path, embed_func)
+            vector_db.load_vector(docs, batch_size=batch_size)
                 # vector_db.db.get(include=["embeddings", "metadatas", "documents"])
 
             # 4. get results

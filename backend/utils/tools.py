@@ -320,14 +320,7 @@ def only_lower_under_score_digit(word: str):
     return True
 
 
-def parse_llm_answer(model_id, answer_raw, pattern):
-    if "gpt-" in model_id:
-        answer = answer_raw['choices'][0]['message']['content']
-    elif "llama" in model_id:
-        answer = answer_raw['content']
-    elif "qwen" in model_id:
-        answer = answer_raw['content']
-
+def parse_llm_answer(answer, pattern):
     try:
         match = re.search(pattern, answer, re.DOTALL)
         if match:
@@ -342,11 +335,9 @@ def parse_llm_answer(model_id, answer_raw, pattern):
                 "Answer": answer_extract,
                 "Reasoning": reasoning
             }
-            res = json_content_reflect["Answer"]
+            return json_content_reflect
         else:
-            res = "Answer not returned in the given format!"
-
-        return res
+            return None
     except Exception as e:
         traceback.print_exc()
         return str(e)
