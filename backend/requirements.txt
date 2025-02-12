@@ -29,3 +29,4 @@ chromadb>=0.4.15  # Chroma向量数据库
 
 # SQL解析相关
 sqlglot==26.6.0
+antlr4-python3-runtime==4.13.2

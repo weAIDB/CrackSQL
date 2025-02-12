@@ -228,9 +228,27 @@ class RewriteService:
             if not history:
                 raise ValueError(f"改写历史不存在: {history_id}")
             try:
-                from translate import direct_rewrite
+                from translate import Translate
                 # 原始SQL，源数据库类型，源数据库知识库，目标数据库类型，目标数据库知识库，目标数据库Host，目标数据库Port，目标数据库User，目标数据库Password, LLm-Model-Name
-                direct_rewrite(history.llm_model_name, history.original_sql, history.source_db_type.lower(), history.target_db.db_type.lower(), history_id, "db")
+                target_db = DatabaseConfig.query.get(history.target_db_id)
+                target_db_config = {
+                    "host": target_db.host,
+                    "port": target_db.port,
+                    "user": target_db.username,
+                    "password": target_db.password,
+                    "db_name": target_db.database
+                }
+                embedding_config = {
+                    "src_embedding_model_name": history.source_db_type.lower(),
+                    "tgt_embedding_model_name": history.target_db.db_type.lower()
+                }
+                vector_config = {
+                    "src_collection_id": history.original_kb.collection_id,
+                    "tgt_collection_id": history.target_kb.collection_id
+                }
+                
+                translate = Translate(model_name=history.llm_model_name, src_sql=history.original_sql, src_dialect=history.source_db_type.lower(), tgt_dialect=history.target_db.db_type.lower(), tgt_db_config=target_db_config, embedding_config=embedding_config, vector_config=vector_config, history_id=history_id, out_type="db", retrieval_on=True)
+                translate.load_rewrite()
             except Exception as e:
                 # 更新改写状态为成功
                 RewriteService.update_rewrite_status(

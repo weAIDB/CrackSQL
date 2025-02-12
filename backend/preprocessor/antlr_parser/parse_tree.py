@@ -9,13 +9,10 @@ from preprocessor.antlr_parser.pg_parser.PostgreSQLLexer import PostgreSQLLexer
 from preprocessor.antlr_parser.mysql_parser.MySqlParser import MySqlParser
 from preprocessor.antlr_parser.mysql_parser.MySqlLexer import MySqlLexer
 
-from preprocessor.antlr_parser.sqlite_parser import SQLiteParser
-from preprocessor.antlr_parser.sqlite_parser import SQLiteLexer
-
 from preprocessor.antlr_parser.oracle_parser.PlSqlParser import PlSqlParser
 from preprocessor.antlr_parser.oracle_parser.PlSqlLexer import PlSqlLexer
 
-from CrackSQL.backend.utils.constants import map_parser
+from utils.constants import map_parser
 
 
 class CustomErrorListener(ErrorListener):
@@ -28,8 +25,6 @@ def parse_tree(src_sql: str, dialect: str) -> (str, int, int, str):
         return parse_pg_tree(src_sql)
     elif dialect == 'mysql':
         return parse_mysql_tree(src_sql)
-    elif dialect == 'sqlite':
-        return parse_sqlite_tree(src_sql)
     elif dialect == 'oracle':
         return parse_oracle_tree(src_sql)
     else:
@@ -69,22 +64,6 @@ def parse_mysql_tree(src_sql: str):
         print(f"An error occurred: {e}", file=sys.stderr)
         raise e
 
-
-def parse_sqlite_tree(src_sql: str):
-    try:
-        input_stream = InputStream(src_sql)
-        lexer = SQLiteLexer(input_stream)
-        lexer.addErrorListener(CustomErrorListener())
-        stream = CommonTokenStream(lexer)
-        parser = SQLiteParser(stream)
-        parser.addErrorListener(CustomErrorListener())
-        tree = parser.parse()
-        return tree, None, None, None
-    except SelfParseError as e:
-        return None, e.line, e.column, e.msg
-    except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
-        raise e
 
 
 def parse_oracle_tree(src_sql: str):
