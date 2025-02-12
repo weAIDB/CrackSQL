@@ -61,29 +61,27 @@ docker run -d -p 5173:5173 cracksql:latest
 ```bash
 # 
 git clone https://github.com/your-username/git
+```
+
+#### 2. 可使用带前后端的应用
+```bash
+# 启动后端
 cd CrackSQL/backend
 # 安装依赖
 conda create -n CrackSQL python=3.10
 conda activate CrackSQL
 pip install -r requirements.txt
-
-```
-
-#### 2. 可使用带前后端的应用
-```bash
 # 可以启动后台服务
-sh run.sh
-# 停止后台服务
-sh stop.sh
-# 前端启动
+python app.py
+
+# 启动前端
 # 进入前端目录
 cd CrackSQL/webui
 # 安装依赖
 npm install
 # 启动开发服务器
 npm run dev
-
-访问 http://localhost:5173 即可使用Web界面
+访问 http://localhost:5003 即可使用Web界面
 ```
 
 #### 3. 命令行使用
