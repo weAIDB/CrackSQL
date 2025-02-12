@@ -74,7 +74,7 @@ pip install -r requirements.txt
 # 可以启动后台服务
 python app.py
 
-# 启动前端
+# 启动前端（需要安装nodejs，版本18.15.0+）
 # 进入前端目录
 cd CrackSQL/webui
 # 安装依赖
