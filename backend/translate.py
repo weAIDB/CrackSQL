@@ -8,7 +8,6 @@ import traceback
 import sqlglot
 from typing import Dict
 from datetime import datetime
-from models import RewriteStatus
 from utils.constants import KNOWLEDGE_FIELD_LIST, map_rep
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode, lift_node
@@ -107,8 +106,8 @@ class Translate:
                 - password: 密码
                 - db_name: 数据库名
             embedding_config: 嵌入模型配置,字典格式包含:
-                - src_model_name: 源方言嵌入模型名称
-                - tgt_model_name: 目标方言嵌入模型名称
+                - src_embedding_model_name: 源方言嵌入模型名称
+                - tgt_embedding_model_name: 目标方言嵌入模型名称
             vector_config: 向量数据库配置,字典格式包含:
                 - src_collection_id: 源方言向量集合ID
                 - tgt_collection_id: 目标方言向量集合ID
@@ -830,9 +829,31 @@ class Translate:
                 is_success=is_success,
                 error=error
             )
-            RewriteService.update_rewrite_status(
-                history_id=self.history_id,
-                status=RewriteStatus.SUCCESS if is_success else RewriteStatus.FAILED,
-                sql=sql,
-                error=error
-            )
+
+    def update_rewrite_status(self, status, sql, error):
+        """更新SQL重写状态
+        
+        该方法用于更新数据库中SQL重写任务的状态信息。
+        
+        Args:
+            status: 重写任务的状态
+                可能的值包括：
+                - 'success': 重写成功
+                - 'failed': 重写失败
+                - 'processing': 正在处理中
+            sql: 重写后的SQL语句或中间结果
+            error: 错误信息（如果有的话）
+        
+        Note:
+            该方法依赖于RewriteService服务类来实际执行数据库更新操作
+        """
+        # 导入RewriteService服务类
+        from api.services.rewrite import RewriteService
+        
+        # 调用服务类的更新方法
+        RewriteService.update_rewrite_status(
+            history_id=self.history_id,  # 历史记录ID
+            status=status,               # 重写状态
+            sql=sql,                     # SQL语句
+            error=error                  # 错误信息
+        )
