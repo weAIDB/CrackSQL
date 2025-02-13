@@ -4,7 +4,7 @@
 .Python
 [Bb]in
 [Ii]nclude
-[Ll]ib
+/[Ll]ib
 [Ll]ib64
 [Ll]ocal
 [Ss]cripts
@@ -380,3 +380,6 @@ webui/dist
 *.cursorrules
 *.vscode
 *.idea
+
+# Add this new rule
+!webui/src/lib
