@@ -54,7 +54,7 @@ def login():
 
 
 @route(bp, '/password/update', methods=["POST"])
-@login_required
+# @login_required
 def update_password():
     """
     更新密码
@@ -83,7 +83,7 @@ def update_password():
 
 
 @route(bp, '/refreshToken', methods=["GET"])
-@login_required
+# @login_required
 def refresh_token():
     """
     刷新token，获取新的数据获取token

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @route(bp, '/jobs', methods=["GET"])
-@login_required
+# @login_required
 def jobs():
     """
     获取所有的jobs

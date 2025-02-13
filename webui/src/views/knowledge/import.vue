@@ -26,10 +26,10 @@
     <div class="main-content">
       <!-- 第一步：选择文件 -->
       <div v-if="currentStep === 1">
-        <el-upload 
-          ref="uploadRef" 
-          class="upload-drop" 
-          drag 
+        <el-upload
+          ref="uploadRef"
+          class="upload-drop"
+          drag
           multiple
           :auto-upload="false"
           :show-file-list="false"
@@ -88,11 +88,11 @@
               {{ $t('knowledge.import.preview.title') }} ({{ jsonItems.length }} {{ $t('knowledge.import.preview.count') }})
             </span>
           </div>
-          
+
           <div class="cards-container">
-            <el-card 
-              v-for="(item, index) in jsonItems" 
-              :key="index" 
+            <el-card
+              v-for="(item, index) in jsonItems"
+              :key="index"
               class="item-card"
               shadow="hover"
             >
@@ -145,10 +145,10 @@
 
     <!-- 底部按钮 -->
     <div class="footer rowEC" style="width: 100%; margin-top: 20px;">
-      <el-button 
-        type="primary" 
-        size="default" 
-        :disabled="!canProceed" 
+      <el-button
+        type="primary"
+        size="default"
+        :disabled="!canProceed"
         @click="handleNextStep"
         :loading="uploading"
       >
@@ -207,12 +207,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Upload, CircleCheckFilled, Document } from '@element-plus/icons-vue'
 import { addKnowledgeBaseItemsReq, vectorizeKnowledgeBaseItemsReq } from '@/api/knowledge'
-import { fa } from 'element-plus/es/locale'
 import { useI18n } from '@/hooks/use-i18n'
 
 const router = useRouter()
@@ -291,7 +290,7 @@ const handleFileRemove = (file: any) => {
 // 处理文件选择
 const handleFileChange = async (file: UploadFile) => {
   if (!file) return
-  
+
   // 检查文件类型
   if (!file.name.endsWith('.json')) {
     ElMessage.error('请上传JSON格式文件')
@@ -320,7 +319,7 @@ const handleFileChange = async (file: UploadFile) => {
         ElMessage.error(`${file.name}: JSON文件内容必须是数组格式`)
         return
       }
-      
+
       // 验证数组项格式
       const validItems = content.map(item => ({
         Operator: item.Operator || '',
@@ -329,7 +328,7 @@ const handleFileChange = async (file: UploadFile) => {
         Tree: item.Tree || '',
         Detail: item.Detail || ''
       }))
-      
+
       // 更新文件列表
       fileList.value = fileList.value.map(f => f.name === file.name ? { ...f, parseProgress: 100, parseStatus: 'success', itemCount: validItems.length, items: validItems } : f)
 

@@ -25,7 +25,7 @@ def test():
 
 
 @route(bp, '/upload_file', methods=["POST"])
-@login_required
+# @login_required
 def upload_file():
     """
     文件上传接口
