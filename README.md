@@ -63,6 +63,7 @@ docker run -d -p 5173:5173 cracksql:latest
 git clone https://github.com/your-username/git
 ```
 
+
 #### 2. 可使用带前后端的应用
 ```bash
 # 启动后端
@@ -71,6 +72,12 @@ cd CrackSQL/backend
 conda create -n CrackSQL python=3.10
 conda activate CrackSQL
 pip install -r requirements.txt
+
+# 初始化数据库
+flask db init  初始化
+flask db migrate  生成版本文件
+flask db upgrade  同步到数据库
+
 # 可以启动后台服务
 python app.py
 
