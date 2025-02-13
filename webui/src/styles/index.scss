@@ -1,5 +1,5 @@
 //scss 语法糖包含常用的布局方式 flex column
-@import './scss-suger.scss';
+@use './scss-suger.scss';
 //重置 element-plus 样式
 @import './reset-elemenet-plus-style.scss';
 //动画文件

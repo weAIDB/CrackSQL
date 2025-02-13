@@ -24,7 +24,7 @@ from task.task import process_json_data
 bp = Blueprint("knowledge", __name__, url_prefix='/api/knowledge_base')
 
 @route(bp, '/list', methods=["GET"])
-@login_required
+# @login_required
 def list_knowledge_bases():
     """获取知识库列表"""
     res = ResMsg()
@@ -37,7 +37,7 @@ def list_knowledge_bases():
         return res.data
 
 @route(bp, '/detail', methods=["GET"])
-@login_required
+# @login_required
 def get_kb():
     """获取单个知识库信息"""
     res = ResMsg()
@@ -60,7 +60,7 @@ def get_kb():
         return res.data
 
 @route(bp, '/create', methods=["POST"])
-@login_required
+# @login_required
 def create_kb():
     """创建知识库"""
     res = ResMsg()
@@ -96,7 +96,7 @@ def create_kb():
         return res.data
 
 @route(bp, '/update', methods=["POST"])
-@login_required
+# @login_required
 def update_kb():
     """更新知识库"""
     res = ResMsg()
@@ -120,7 +120,7 @@ def update_kb():
         return res.data
 
 @route(bp, '/delete', methods=["POST"])
-@login_required
+# @login_required
 def delete_kb():
     """删除知识库"""
     res = ResMsg()
@@ -151,7 +151,7 @@ def delete_kb():
         return res.data
 
 @route(bp, '/search', methods=["POST"])
-@login_required
+# @login_required
 def search_kb():
     """搜索知识库"""
     res = ResMsg()
@@ -174,7 +174,7 @@ def search_kb():
         return res.data
 
 @route(bp, '/upload', methods=['POST'])
-@login_required
+# @login_required
 def upload_json():
     """上传JSON文件"""
     res = ResMsg()
@@ -201,7 +201,7 @@ def upload_json():
 
 
 @route(bp, '/items', methods=['GET'])
-@login_required
+# @login_required
 def get_items():
     """获取JSON记录"""
     res = ResMsg()
@@ -224,7 +224,7 @@ def get_items():
 
 
 @route(bp, '/add_items', methods=['POST'])
-@login_required
+# @login_required
 def add_items():
     """添加JSON记录(支持单条或批量)"""
     res = ResMsg()
@@ -253,7 +253,7 @@ def add_items():
 
 
 @route(bp, '/delete_items', methods=['POST'])
-@login_required
+# @login_required
 def delete_items():
     """删除知识库条目"""
     res = ResMsg()
@@ -282,7 +282,7 @@ def delete_items():
 
 
 @route(bp, '/vectorize_items', methods=['POST'])
-@login_required
+# @login_required
 def vectorize_items():
     """向量化知识库条目"""
     res = ResMsg()
