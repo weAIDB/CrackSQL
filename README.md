@@ -81,13 +81,14 @@ flask db upgrade  同步到数据库
 # 可以启动后台服务
 python app.py
 
-# 启动前端（需要安装nodejs，版本18.15.0+）
+# 启动前端（需要安装nodejs，版本20.11.1+）
 # 进入前端目录
 cd CrackSQL/webui
 # 安装依赖
-npm install
+yarn cache clean
+yarn install
 # 启动开发服务器
-npm run dev
+yarn dev
 访问 http://localhost:5003 即可使用Web界面
 ```
 
