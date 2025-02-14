@@ -5,12 +5,12 @@ from glob import glob
 from typing import List
 
 from preprocessor.query_simplifier.Tree import TreeNode
-from utils.tools import load_config
+# from utils.tools import load_config
 
-config = load_config()
-dbg = config['dbg']
-use_test = config['use_test']
-use_type = True
+# config = load_config()
+# dbg = config['dbg']
+# use_test = config['use_test']
+# use_type = True
 
 
 def load_json_keywords(dialect: str):
@@ -18,10 +18,7 @@ def load_json_keywords(dialect: str):
     retrieve_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(script_path))),
                                  'data', 'processed_document', dialect)
     try:
-        if use_test:
-            keyword_json_files = glob(os.path.join(retrieve_path, "*keyword_test.json"))
-        else:
-            keyword_json_files = glob(os.path.join(retrieve_path, "*keyword_ready.json"))
+        keyword_json_files = glob(os.path.join(retrieve_path, "*keyword_ready.json"))
         keywords_json = []
         for file_path in keyword_json_files:
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -37,14 +34,13 @@ def load_json_keywords(dialect: str):
     except Exception as e:
         raise e
 
-    if use_type:
-        try:
-            type_json_files = glob(os.path.join(retrieve_path, "*type_ready.json"))
-            for file_path in type_json_files:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    keywords_json = keywords_json + type_load_preprocess(json.loads(file.read()), dialect)
-        except Exception as e:
-            raise e
+    try:
+        type_json_files = glob(os.path.join(retrieve_path, "*type_ready.json"))
+        for file_path in type_json_files:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                keywords_json = keywords_json + type_load_preprocess(json.loads(file.read()), dialect)
+    except Exception as e:
+        raise e
             
     # replace all the str_rep in the keyword_json to be the TreeNode
     # Unified as Keyword, Description, Tree

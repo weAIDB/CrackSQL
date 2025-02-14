@@ -3,23 +3,25 @@ import os.path
 from preprocessor.query_simplifier.load_process import load_json_keywords
 from preprocessor.query_simplifier.locate import locate_by_segment
 from preprocessor.query_simplifier.tree_matcher import *
-from utils.db_connector import sql_execute
-from utils.tools import *
 
-config = load_config()
-dbg = config['dbg']
-use_test = config['use_test']
-reflect_on = config['reflect_on']
-slice_only = config['slice_only']
-mask_on = config['mask_on']
-locate_by_err = config['locate_by_err']
+from utils.tools import *
+from utils.db_connector import sql_execute
+
+
+# config = load_config()
+# dbg = config['dbg']
+# use_test = config['use_test']
+# reflect_on = config['reflect_on']
+# slice_only = config['slice_only']
+# mask_on = config['mask_on']
+# locate_by_err = config['locate_by_err']
 
 rewrite_keyword_map = {}
 rewrite_function_map = {}
 
 rewrite_pieces = []
 
-model = 'gpt-4o'
+# model = 'gpt-4o'
 
 
 def function_rewrite(node: TreeNode, src_dialect: str):

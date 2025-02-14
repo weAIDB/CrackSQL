@@ -47,7 +47,7 @@ banned_none_key_word = {
     }
 }
 
-dbg = (load_config())['dbg']
+# dbg = (load_config())['dbg']
 
 un_reach = -200
 
@@ -99,10 +99,10 @@ def make_trees_up_to_down(keywords: str, src: str, dialect: str):
             paths[nodes[i].value] = paths[nodes[i].value][k - 1:]
             paths[nodes[i].value][len(paths[nodes[i].value]) - 1] = rep2keyword[
                 paths[nodes[i].value][len(paths[nodes[i].value]) - 1]]
-    if dbg:
-        print('public_route:' + str(public_route))
-        for key, value in paths.items():
-            print(str(key) + " route:" + str(value))
+    # if dbg:
+    #     print('public_route:' + str(public_route))
+    #     for key, value in paths.items():
+    #         print(str(key) + " route:" + str(value))
     return focus_keywords, public_route, paths, rep2keyword, keyword2rep, grammar_rule_name
 
 
