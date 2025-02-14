@@ -12,13 +12,14 @@ from typing import List, Dict
 
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode
+from utils.constants import oracle_locate_open
 from utils.db_connector import sql_execute
 from utils.tools import load_config, remove_all_space, print_err, get_proj_root_path, reformat_sql
 
 pg_func_name = set()
 
-config = load_config()
-oracle_locate_open = config['oracle_locate_open']
+# config = load_config()
+# oracle_locate_open = config['oracle_locate_open']
 
 
 def load_pg_func_name():
@@ -168,8 +169,8 @@ def find_function(func_name, all_pieces, root_node, sql, location=None):
         return res_piece
 
 
-def locate_node_piece(sql, src_dialect, tgt_dialect, all_pieces, root_node, db_name: str):
-    flag, error_info = sql_execute(tgt_dialect, db_name, sql)
+def locate_node_piece(sql, tgt_dialect, all_pieces, root_node, tgt_db_config):
+    flag, error_info = sql_execute(tgt_dialect, tgt_db_config, sql)
     if flag:
         return None, "no execute error"
     else:

@@ -39,16 +39,16 @@ def detail_api():
     res = ResMsg()
     obj = request.get_json(force=True)
     config_id = obj.get('id')
-    
+
     if not config_id:
         res.update(code=ResponseCode.InvalidParameter, msg="配置ID不能为空")
         return res.data
-        
+
     data = get_database_config(id=config_id)
     if not data:
         res.update(code=ResponseCode.Fail, msg="配置不存在")
         return res.data
-        
+
     res.update(data=data)
     return res.data
 
@@ -66,19 +66,19 @@ def create_api():
     """创建数据库配置"""
     res = ResMsg()
     obj = request.get_json(force=True)
-    
+
     # 必填字段验证
     required_fields = ['host', 'port', 'database', 'username', 'password', 'db_type']
     for field in required_fields:
         if not obj.get(field):
             res.update(code=ResponseCode.InvalidParameter, msg=f"{field}不能为空")
             return res.data
-    
+
     # 验证数据库类型是否有效
     if obj['db_type'] not in [t.value for t in DatabaseType]:
         res.update(code=ResponseCode.InvalidParameter, msg="无效的数据库类型")
         return res.data
-    
+
     result = insert_database_config(
         host=obj['host'],
         port=int(obj['port']),
@@ -88,11 +88,11 @@ def create_api():
         db_type=obj['db_type'],
         description=obj.get('description')
     )
-    
+
     if not result:
         res.update(code=ResponseCode.Fail, msg="创建失败")
         return res.data
-        
+
     res.update(data=result)
     return res.data
 
@@ -102,25 +102,25 @@ def update_api():
     """更新数据库配置"""
     res = ResMsg()
     obj = request.get_json(force=True)
-    
+
     # 验证ID
     config_id = obj.get('id')
     if not config_id:
         res.update(code=ResponseCode.InvalidParameter, msg="配置ID不能为空")
         return res.data
-    
+
     # 必填字段验证
     required_fields = ['host', 'port', 'database', 'username', 'password', 'db_type']
     for field in required_fields:
         if not obj.get(field):
             res.update(code=ResponseCode.InvalidParameter, msg=f"{field}不能为空")
             return res.data
-    
+
     # 验证数据库类型是否有效
     if obj['db_type'] not in [t.value for t in DatabaseType]:
         res.update(code=ResponseCode.InvalidParameter, msg="无效的数据库类型")
         return res.data
-    
+
     result = update_database_config(
         id=config_id,
         host=obj['host'],
@@ -131,11 +131,11 @@ def update_api():
         db_type=obj['db_type'],
         description=obj.get('description')
     )
-    
+
     if not result:
         res.update(code=ResponseCode.Fail, msg="更新失败")
         return res.data
-        
+
     res.update(data=result)
     return res.data
 
@@ -146,15 +146,15 @@ def delete_api():
     res = ResMsg()
     obj = request.get_json(force=True)
     config_id = obj.get('id')
-    
+
     if not config_id:
         res.update(code=ResponseCode.InvalidParameter, msg="配置ID不能为空")
         return res.data
-        
+
     result = delete_database_config(id=config_id)
     if not result:
         res.update(code=ResponseCode.Fail, msg="删除失败")
         return res.data
-        
+
     res.update(data=result)
-    return res.data 
+    return res.data

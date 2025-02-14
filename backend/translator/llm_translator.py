@@ -2,6 +2,7 @@ import json
 import asyncio
 from llm_model.llm_manager import llm_manager
 
+
 class LLMTranslator:
     def __init__(self, model_name, model_conf=None):
         self.model_name = model_name
@@ -14,7 +15,7 @@ class LLMTranslator:
             messages = [{"role": "system", "content": sys_prompt}]
         else:
             messages = []
-            
+
         for message in history:
             if 'choices' in message.keys():
                 messages.append(message['choices'][0]['message'])
@@ -25,11 +26,11 @@ class LLMTranslator:
         # 使用 asyncio.run() 运行异步调用
         response = asyncio.run(self.model.chat(messages))
 
-        if out_json:
-            return self._extract_json(response)
-            
-        return response
+        # if out_json:
+        #     # return self._extract_json(response)
+        #     response_parsed = parse_llm_answer_v2(self.model_name, response, TRANSLATION_FORMAT)
 
+        return response
 
     def _extract_json(self, response: str):
         """从AI回答中提取JSON内容
@@ -64,6 +65,6 @@ class LLMTranslator:
                     json_str = next(group for group in match.groups() if group is not None)
                     result = json.loads(json_str)
             return result
-            
+
         except Exception as e:
             raise ValueError(f"JSON解析失败: {str(e)}")

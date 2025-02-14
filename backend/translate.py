@@ -8,7 +8,9 @@ import traceback
 import sqlglot
 from typing import Dict
 from datetime import datetime
-from utils.constants import KNOWLEDGE_FIELD_LIST, map_rep
+
+from api.services.rewrite import RewriteService
+from utils.constants import KNOWLEDGE_FIELD_LIST, map_rep, FAILED_TEMPLATE
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode, lift_node
 from preprocessor.query_simplifier.rewrite import get_all_piece
@@ -79,10 +81,10 @@ def get_restore_piece_flag(assist_info, piece, last_time_piece, ori_piece):
 
 
 class Translate:
-    def __init__(self, 
+    def __init__(self,
                  model_name: str,
                  src_sql: str,
-                 src_dialect: str, 
+                 src_dialect: str,
                  tgt_dialect: str,
                  tgt_db_config: dict,
                  embedding_config: dict,
@@ -121,27 +123,32 @@ class Translate:
         # 基础配置
         self.model_name = model_name
         self.src_sql = src_sql
-        self.src_dialect = src_dialect 
+        self.src_dialect = src_dialect
         self.tgt_dialect = tgt_dialect
+
+        if self.src_dialect == "postgresql":
+            self.src_dialect = "pg"
+        if self.tgt_dialect == "postgresql":
+            self.tgt_dialect = "pg"
 
         # 目标数据库配置
         self.tgt_db_config = tgt_db_config
-        
+
         # 嵌入模型相关配置
-        self.src_embedding_model_name = embedding_config['src_model_name']  # 源方言嵌入模型
-        self.tgt_embedding_model_name = embedding_config['tgt_model_name']  # 目标方言嵌入模型
-        self.src_collection_id = vector_config['src_collection_id']      # 源方言向量集合
-        self.tgt_collection_id = vector_config['tgt_collection_id']      # 目标方言向量集合
-        self.top_k = vector_config['top_k']                             # 检索TOP-K结果数
+        self.src_embedding_model_name = embedding_config['src_embedding_model_name']  # 源方言嵌入模型
+        self.tgt_embedding_model_name = embedding_config['tgt_embedding_model_name']  # 目标方言嵌入模型
+        self.src_collection_id = vector_config['src_collection_id']  # 源方言向量集合
+        self.tgt_collection_id = vector_config['tgt_collection_id']  # 目标方言向量集合
+        self.top_k = vector_config['top_k']  # 检索TOP-K结果数
 
         # 其他配置
         self.history_id = history_id  # 历史记录ID
-        self.out_type = out_type      # 输出类型
+        self.out_type = out_type  # 输出类型
         self.retrieval_on = retrieval_on  # 是否启用检索
 
         # 初始化核心组件
         self.translator = LLMTranslator(model_name)  # 初始化LLM翻译器
-        self.vector_db = ChromaStore()              # 初始化向量数据库
+        self.vector_db = ChromaStore()  # 初始化向量数据库
 
     def local_rewrite(self, max_retry_time=2):
         """局部SQL改写方法
@@ -192,16 +199,16 @@ class Translate:
         now_sql = self.src_sql
         ori_piece, last_time_piece = None, None
         err_msg_list, err_info_list = list(), list()
-        
+
         # 定位第一个需要处理的片段
-        piece, assist_info = locate_node_piece(now_sql, self.src_dialect, self.tgt_dialect, 
-                                             all_pieces, root_node, self.tgt_db_config['db_name'])
-        
+        piece, assist_info = locate_node_piece(now_sql, self.tgt_dialect, all_pieces,
+                                               root_node, self.tgt_db_config)
+
         # 如果没有定位到片段,使用模型判断
         if piece is None:
             history, sys_prompt, user_prompt = list(), None, None
             piece, assist_info, judge_raw = self.model_judge(root_node, all_pieces, self.src_sql, now_sql,
-                                                           last_time_piece, history, sys_prompt, user_prompt)
+                                                             last_time_piece, history, sys_prompt, user_prompt)
             model_ans_list.append(judge_raw)
 
         # 主循环:处理每个定位到的片段
@@ -232,12 +239,12 @@ class Translate:
                 err_msg_list, err_info_list = list(), list()
 
             node, tree_node = piece['Node'], piece['Tree']
-            
+
             # 检查是否需要提升操作
             if piece['Count'] > max_retry_time:
                 node = piece['Node']
                 if node == root_node:
-                    return 'Cannot translate!', model_ans_list, used_pieces, lift_histories
+                    return FAILED_TEMPLATE, model_ans_list, used_pieces, lift_histories
                 pri_node_expr = str(node)
                 terminate_flag = False
                 while not terminate_flag:
@@ -258,19 +265,21 @@ class Translate:
             })
 
             # 尝试转换当前片段
-            if piece["Count"] == 0:
-                try:
-                    # 首次尝试使用sqlglot直接转换
-                    ans_slice = sqlglot.transpile(str(piece['Node']), read=self.src_dialect, write=self.tgt_dialect)[0]
-                    model_ans = {"role": "sqlglot", "content": ans_slice, "Action": "translate",
-                               "Time": str(datetime.now())}
-                except Exception as e:
-                    # sqlglot转换失败,使用自定义转换方法
-                    traceback.print_exc()
-                    ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
-            else:
-                # 非首次尝试,直接使用自定义转换方法
-                ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
+            # if piece["Count"] == 0:
+            #     try:
+            #         # 首次尝试使用sqlglot直接转换
+            #         ans_slice = sqlglot.transpile(str(piece['Node']), read=self.src_dialect, write=self.tgt_dialect)[0]
+            #         model_ans = {"role": "sqlglot", "content": ans_slice, "Action": "translate",
+            #                      "Time": str(datetime.now())}
+            #     except Exception as e:
+            #         # sqlglot转换失败,使用自定义转换方法
+            #         traceback.print_exc()
+            #         ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
+            # else:
+            #     # 非首次尝试,直接使用自定义转换方法
+            #     ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
+            # 非首次尝试,直接使用自定义转换方法
+            ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
 
             # 处理SELECT语句的特殊情况
             if 'select' in ans_slice.lower() and 'select' not in str(piece['Node']).lower():
@@ -278,12 +287,12 @@ class Translate:
 
             # 创建新的树节点并更新语法树
             last_time_node = TreeNode(ans_slice, self.src_dialect, is_terminal=True, father=None,
-                                    father_child_index=None, children=None, model_get=True)
+                                      father_child_index=None, children=None, model_get=True)
             if piece['Node'] == root_node:
                 root_node = last_time_node
             else:
                 piece["Node"].father.replace_child(piece["Node"], last_time_node)
-            
+
             # 更新片段列表
             all_pieces.remove(piece)
             new_piece = {
@@ -308,8 +317,8 @@ class Translate:
             model_ans_list.append(model_ans)
 
             # 定位下一个需要处理的片段
-            piece, assist_info = locate_node_piece(now_sql, self.src_dialect,
-                                                 self.tgt_dialect, all_pieces, root_node, self.tgt_db_config['db_name'])
+            piece, assist_info = locate_node_piece(now_sql, self.tgt_dialect, all_pieces,
+                                                   root_node, self.tgt_db_config)
             if piece is None:
                 # 检查是否出现重复结果
                 if now_sql in sql_ans_list:
@@ -317,8 +326,17 @@ class Translate:
 
                 # 使用模型判断是否需要继续处理
                 piece, assist_info, judge_raw = self.handle_syntactic_correct_piece(self.src_sql, now_sql, root_node,
-                                                                              all_pieces, last_time_piece,
-                                                                              model_ans_list)
+                                                                                    all_pieces, last_time_piece,
+                                                                                    model_ans_list)
+
+                # RewriteService.add_rewrite_process(
+                #     history_id=self.history_id,
+                #     content=str(judge_raw['content']),
+                #     step_name="错误信息",
+                #     role='system',
+                #     is_success=False
+                # )
+
                 model_ans_list.append(judge_raw)
 
             # 记录当前SQL结果
@@ -357,7 +375,8 @@ class Translate:
 
         hint = str()
         if self.retrieval_on:  # 如果启用检索增强
-            if piece['Count'] == 0:  # 首次尝试
+            # if piece['Count'] == 0:  # 首次尝试
+            if True:  # 首次尝试
                 # 使用基础转换提示模板
                 sys_prompt = SYSTEM_PROMPT_SEG.format(
                     src_dialect=map_rep[self.src_dialect],
@@ -366,8 +385,8 @@ class Translate:
                 user_prompt = USER_PROMPT_SEG.format(
                     src_dialect=map_rep[self.src_dialect],
                     tgt_dialect=map_rep[self.tgt_dialect],
-                    sql=input_sql, 
-                    hint=hint, 
+                    sql=input_sql,
+                    hint=hint,
                     example=example
                 ).strip("\n")
             else:  # 非首次尝试,使用检索增强
@@ -381,8 +400,8 @@ class Translate:
                 user_prompt = USER_PROMPT_RET.format(
                     src_dialect=map_rep[self.src_dialect],
                     tgt_dialect=map_rep[self.tgt_dialect],
-                    sql=input_sql, 
-                    hint=hint, 
+                    sql=input_sql,
+                    hint=hint,
                     example=example,
                     document=document
                 ).strip("\n")
@@ -395,24 +414,48 @@ class Translate:
             user_prompt = USER_PROMPT_NA.format(
                 src_dialect=map_rep[self.src_dialect],
                 tgt_dialect=map_rep[self.tgt_dialect],
-                sql=input_sql, 
+                sql=input_sql,
                 example=example
             ).strip("\n")
 
         # 调用翻译器进行转换
+        RewriteService.add_rewrite_process(
+            history_id=self.history_id,
+            content=str(user_prompt),
+            step_name="错误信息",
+            role='user',
+            is_success=True,
+        )
         answer_raw = self.translator.trans_func(
-            history, 
-            sys_prompt, 
-            user_prompt, 
+            history,
+            sys_prompt,
+            user_prompt,
             out_json=True
         )
-        
+        RewriteService.add_rewrite_process(
+            history_id=self.history_id,
+            # content=f"```{json.loads(answer_raw['content'])['Answer']}```",
+            content=str(answer_raw['content']),
+            step_name="错误信息",
+            role='assistant',
+            is_success=True,
+        )
+
+        # 使用正则表达式解析模型回答
+        pattern = r'"SQL Snippet":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)\s*,"Confidence":\s*(.*?)\s*'
+        pattern = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)'
+        pattern = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"Confidence":\s*(.*?)\s'
+        res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
+        answer_raw["Answer"] = res["Answer"]
+
+        print("Answer", answer_raw["Answer"])
+
         # 添加额外信息到响应中
         answer_raw["Action"] = "translate"  # 动作类型
         answer_raw["Time"] = str(datetime.now())  # 执行时间
         answer_raw["SYSTEM_PROMPT"] = sys_prompt  # 系统提示
-        answer_raw["USER_PROMPT"] = user_prompt   # 用户提示
-        
+        answer_raw["USER_PROMPT"] = user_prompt  # 用户提示
+
         return answer_raw["Answer"], answer_raw
 
     def get_sql_pieces(self):
@@ -449,24 +492,24 @@ class Translate:
         if flag:
             # 创建根片段字典
             root_piece = {
-                "Node": root_node,          # 语法树节点
-                "Tree": root_node,          # 完整语法树
-                "Description": {            # 片段描述
+                "Node": root_node,  # 语法树节点
+                "Tree": root_node,  # 完整语法树
+                "Description": {  # 片段描述
                     "Type": "Keyword",
                     "Desc": "The whole SQL snippet above."
                 },
-                "Keyword": '',             # 关键字（根节点为空）
+                "Keyword": '',  # 关键字（根节点为空）
                 "SubPieces": [piece for piece in all_pieces],  # 子片段列表
-                "FatherPiece": None,       # 父片段（根节点无父片段）
-                "Count": 0,                # 处理计数器
-                'TrackPieces': []          # 追踪片段列表
+                "FatherPiece": None,  # 父片段（根节点无父片段）
+                "Count": 0,  # 处理计数器
+                'TrackPieces': []  # 追踪片段列表
             }
 
             # 更新所有没有父片段的片段，将其父片段设置为根片段
             for piece in all_pieces:
                 if piece['FatherPiece'] is None:
                     piece['FatherPiece'] = root_piece
-            
+
             # 将根片段添加到片段列表
             all_pieces.append(root_piece)
 
@@ -494,7 +537,7 @@ class Translate:
 
         # 存储检索到的文档信息
         document = list()
-        
+
         # 处理每个关键字和描述对
         for key, desc in zip(src_key, src_desc):
             # 跳过无效或根节点描述
@@ -510,15 +553,15 @@ class Translate:
                     self.src_embedding_model_name
                 )
                 results.extend([ite[0] for ite in
-                              self.vector_db.search_by_id(self.src_collection_id, emebddingstr, top_k=self.top_k)])
+                                self.vector_db.search_by_id(self.src_collection_id, emebddingstr, top_k=self.top_k)])
             else:
                 # 普通模型：仅使用描述进行检索
                 emebddingstr = embedding_manager.get_embedding(
-                    desc["Desc"], 
+                    desc["Desc"],
                     self.tgt_embedding_model_name
                 )
                 results.extend([ite[0] for ite in
-                              self.vector_db.search_by_id(self.tgt_collection_id, emebddingstr, top_k=self.top_k)])
+                                self.vector_db.search_by_id(self.tgt_collection_id, emebddingstr, top_k=self.top_k)])
 
             # 去重处理：确保每个关键字只出现一次
             results_key = set()
@@ -594,7 +637,7 @@ class Translate:
         if self.tgt_dialect == "oracle":
             # 初始化错误信息前缀
             assist_info_pre = f"Some error occurs near the snippet:"
-            
+
             try:
                 # 处理Oracle特定错误
                 # 跳过'ORA-00933'错误（SQL命令未正确结束），处理其他ERROR信息
@@ -604,16 +647,16 @@ class Translate:
                     err_pos = assist_info.index("ERROR")
                     # 添加错误位置后的信息
                     assist_info_pre += assist_info[err_pos:]
-                    
+
                 # 处理错误消息格式
                 assist_info_pre = process_err_msg(assist_info_pre)
-                
+
                 # 添加到错误信息列表
                 err_info_list.append({
-                    "Error": assist_info_pre,           # 处理后的错误信息
-                    "SQL Snippet": str(piece["Node"])   # 相关的SQL片段
+                    "Error": assist_info_pre,  # 处理后的错误信息
+                    "SQL Snippet": str(piece["Node"])  # 相关的SQL片段
                 })
-                
+
             except Exception as e:
                 # 异常处理：记录异常并添加基础错误信息
                 traceback.print_exc()
@@ -654,7 +697,7 @@ class Translate:
         """
         # 初始化历史记录和提示信息
         history, sys_prompt, user_prompt = list(), None, None
-        
+
         # 如果存在模型回答历史
         if len(model_ans_list) > 0:
             # 查找最近一次包含系统提示的回答
@@ -663,13 +706,13 @@ class Translate:
                 if "SYSTEM_PROMPT" in model_ans_list[i].keys():
                     no = i
                     break
-                
+
             # 复制模型消息以避免修改原始数据
             model_message = copy.deepcopy(model_ans_list[no])
 
             # 移除动作标记
             model_message.pop("Action")
-            
+
             # 提取系统提示和用户提示
             sys_prompt = None
             if "SYSTEM_PROMPT" in model_message.keys():
@@ -678,7 +721,7 @@ class Translate:
 
             # 构建对话历史
             history.append({
-                "role": "user", 
+                "role": "user",
                 "content": user_prompt
             })
             history.append(model_message)
@@ -694,14 +737,14 @@ class Translate:
 
         # 调用模型进行判断
         piece, assist_info, judge_raw = self.model_judge(
-            root_node,           # 语法树根节点
-            all_pieces,          # 所有SQL片段
-            src_sql,            # 源SQL
-            now_sql,            # 当前SQL
-            last_time_piece,    # 上一次处理的片段
-            history,            # 对话历史
-            sys_prompt,         # 系统提示
-            user_prompt         # 用户提示
+            root_node,  # 语法树根节点
+            all_pieces,  # 所有SQL片段
+            src_sql,  # 源SQL
+            now_sql,  # 当前SQL
+            last_time_piece,  # 上一次处理的片段
+            history,  # 对话历史
+            sys_prompt,  # 系统提示
+            user_prompt  # 用户提示
         )
 
         return piece, assist_info, judge_raw
@@ -737,10 +780,10 @@ class Translate:
         # 如果没有提供系统提示，使用默认的判断提示模板
         if sys_prompt is None:
             sys_prompt = SYSTEM_PROMPT_JUDGE.format(
-                src_dialect=self.src_dialect, 
+                src_dialect=self.src_dialect,
                 tgt_dialect=self.tgt_dialect
             ).strip("\n")
-        
+
         # 如果没有提供用户提示，使用默认的判断提示模板
         if user_prompt is None:
             user_prompt = USER_PROMPT_JUDGE.format(
@@ -753,7 +796,7 @@ class Translate:
 
         # 调用翻译器获取模型判断结果
         answer_raw = self.translator.trans_func(history, sys_prompt, user_prompt)
-        
+
         # 使用正则表达式解析模型回答
         pattern = r'"SQL Snippet":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"Confidence":\s*(.*?)\s'
         res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
@@ -763,11 +806,11 @@ class Translate:
         answer_raw["Action"] = "judge"  # 动作类型
         answer_raw["Time"] = str(datetime.now())  # 执行时间
         answer_raw["SYSTEM_PROMPT"] = sys_prompt  # 系统提示
-        answer_raw["USER_PROMPT"] = user_prompt   # 用户提示
+        answer_raw["USER_PROMPT"] = user_prompt  # 用户提示
 
         # 初始化返回值
         piece, assist_info = None, None
-        
+
         # 判断是否需要进一步处理
         # 当模型认为不需要修改或置信度低时，直接返回
         if "NONE" in snippet or "almost equivalent" in str(answer_raw) \
@@ -849,11 +892,11 @@ class Translate:
         """
         # 导入RewriteService服务类
         from api.services.rewrite import RewriteService
-        
+
         # 调用服务类的更新方法
         RewriteService.update_rewrite_status(
             history_id=self.history_id,  # 历史记录ID
-            status=status,               # 重写状态
-            sql=sql,                     # SQL语句
-            error=error                  # 错误信息
+            status=status,  # 重写状态
+            sql=sql,  # SQL语句
+            error=error  # 错误信息
         )

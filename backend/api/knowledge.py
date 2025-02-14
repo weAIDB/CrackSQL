@@ -20,8 +20,8 @@ from api.services.knowledge import (
 )
 from task.task import process_json_data
 
-
 bp = Blueprint("knowledge", __name__, url_prefix='/api/knowledge_base')
+
 
 @route(bp, '/list', methods=["GET"])
 # @login_required
@@ -35,6 +35,7 @@ def list_knowledge_bases():
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
+
 
 @route(bp, '/detail', methods=["GET"])
 # @login_required
@@ -58,6 +59,7 @@ def get_kb():
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
+
 
 @route(bp, '/create', methods=["POST"])
 # @login_required
@@ -95,6 +97,7 @@ def create_kb():
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
 
+
 @route(bp, '/update', methods=["POST"])
 # @login_required
 def update_kb():
@@ -118,6 +121,7 @@ def update_kb():
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
+
 
 @route(bp, '/delete', methods=["POST"])
 # @login_required
@@ -150,6 +154,7 @@ def delete_kb():
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
 
+
 @route(bp, '/search', methods=["POST"])
 # @login_required
 def search_kb():
@@ -173,6 +178,7 @@ def search_kb():
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
 
+
 @route(bp, '/upload', methods=['POST'])
 # @login_required
 def upload_json():
@@ -182,19 +188,19 @@ def upload_json():
         file = request.files.get('file')
         kb_name = request.form.get('kb_name')
         user_id = session.get('user_id')
-        
+
         if not file or not kb_name:
             res.update(code=ResponseCode.InvalidParameter, msg="缺少必要参数")
             return res.data
-            
+
         if not file.filename.endswith('.json'):
             res.update(code=ResponseCode.InvalidParameter, msg="仅支持JSON文件")
             return res.data
-            
+
         result = upload_json_file(kb_name, file, user_id)
         res.update(data=result)
         return res.data
-        
+
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
@@ -210,7 +216,7 @@ def get_items():
         if not kb_name:
             res.update(code=ResponseCode.InvalidParameter, msg="知识库名称不能为空")
             return res.data
-        
+
         # 获取分页
         page = request.args.get('page', 1)
         page_size = request.args.get('page_size', 10)
@@ -237,7 +243,7 @@ def add_items():
         if not kb_name or not items:
             res.update(code=ResponseCode.InvalidParameter, msg="缺少必要参数或格式错误")
             return res.data
-            
+
         # 如果传入的是单个对象,转换为列表
         if not isinstance(items, list):
             items = [items]
@@ -246,7 +252,7 @@ def add_items():
         result = add_kb_items(kb_name, items, user_id)
         res.update(data=result)
         return res.data
-        
+
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
@@ -261,21 +267,21 @@ def delete_items():
         data = request.get_json()
         kb_name = data.get('kb_name')
         item_ids = data.get('item_ids')  # 可选参数
-        
+
         if not kb_name:
             res.update(code=ResponseCode.InvalidParameter, msg="缺少知识库名称")
             return res.data
-            
+
         # 验证item_ids格式
         if item_ids is not None:
             if not isinstance(item_ids, list) or not all(isinstance(id, int) for id in item_ids):
                 res.update(code=ResponseCode.InvalidParameter, msg="item_ids必须是整数ID列表")
                 return res.data
-                
+
         result = delete_kb_items(kb_name, item_ids)
         res.update(data=result)
         return res.data
-        
+
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
@@ -291,11 +297,11 @@ def vectorize_items():
         kb_name = data.get('kb_name')
         item_ids = data.get('item_ids')  # 可选参数
         user_id = session.get('user_id')
-        
+
         if not kb_name:
             res.update(code=ResponseCode.InvalidParameter, msg="缺少知识库名称")
             return res.data
-            
+
         # 验证item_ids格式(如果提供)
         if item_ids is not None:
             if not isinstance(item_ids, list) or not all(isinstance(id, int) for id in item_ids):
@@ -314,13 +320,13 @@ def vectorize_items():
             misfire_grace_time=3600,
             coalesce=True
         )
-        
+
         res.update(data={
             "status": True,
             "job_id": job_id
         })
         return res.data
-        
+
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))
         return res.data
