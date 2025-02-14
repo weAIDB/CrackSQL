@@ -5,7 +5,7 @@ from doc_process.make_tree import *
 from preprocessor.query_simplifier.Tree import *
 from preprocessor.antlr_parser.parse_tree import parse_tree
 
-dbg = (load_config())['dbg']
+# dbg = (load_config())['dbg']
 
 
 def tree_matcher(src_sql: str, dialect: str):
@@ -87,11 +87,11 @@ def filter_by_string(keywords: str, src_sql):
 
 
 def check_path(node: TreeNode, path, index: int):
-    if dbg:
-        print('--')
-        print(node.value)
-        print(path[index])
-        print('--')
+    # if dbg:
+    #     print('--')
+    #     print(node.value)
+    #     print(path[index])
+    #     print('--')
     if node.value != path[index]:
         return False
     elif index > len(path) - 1 or (index == len(path) - 1 and node.value == path[index]):

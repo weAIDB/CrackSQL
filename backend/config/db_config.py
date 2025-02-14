@@ -5,10 +5,12 @@ from functools import wraps
 
 db = SQLAlchemy()
 
+
 def db_session_manager(func):
     """数据库会话管理装饰器
     确保在应用上下文中执行数据库操作
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:

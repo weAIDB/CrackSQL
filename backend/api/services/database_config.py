@@ -19,7 +19,7 @@ def database_config_list(limit: int, offset: int, keyword: str = None):
             query = query.filter(DatabaseConfig.database.contains(keyword))
         total = query.count()
         configs = query.order_by(DatabaseConfig.created_at.desc()).limit(limit).offset(offset).all()
-        
+
         return {
             'total': total,
             'data': [{
@@ -58,9 +58,9 @@ def get_database_config(id: int):
         return None
 
 
-def insert_database_config(host: str, port: int, database: str, 
-                         username: str, password: str, db_type: str,
-                         description: str = None) -> bool:
+def insert_database_config(host: str, port: int, database: str,
+                           username: str, password: str, db_type: str,
+                           description: str = None) -> bool:
     """创建数据库配置"""
     try:
         config = DatabaseConfig(
@@ -72,7 +72,7 @@ def insert_database_config(host: str, port: int, database: str,
             db_type=db_type,
             description=description
         )
-        
+
         db.session.add(config)
         db.session.commit()
         cache.delete_memoized(database_config_list)
@@ -84,8 +84,8 @@ def insert_database_config(host: str, port: int, database: str,
 
 
 def update_database_config(id: int, host: str, port: int, database: str,
-                         username: str, password: str, db_type: str,
-                         description: str = None) -> bool:
+                           username: str, password: str, db_type: str,
+                           description: str = None) -> bool:
     """更新数据库配置"""
     try:
         config = DatabaseConfig.query.get(id)
@@ -127,4 +127,4 @@ def delete_database_config(id: int) -> bool:
     except Exception as e:
         logger.error(f"delete_database_config error: {e}")
         db.session.rollback()
-        return False 
+        return False

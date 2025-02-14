@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "license": "MIT",
   "author": "kuanghua",
-  "packageManager": "pnpm@7.9.0",
   "scripts": {
     "dev": "vite --mode serve-dev",
     "test": "vite --mode serve-test",
