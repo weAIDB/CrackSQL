@@ -81,7 +81,8 @@ class LLMManager:
                     return None
             else:
                 # 使用字典访问方式
-                if config['deployment_type'] == 'cloud' and (config.get('api_base') is None or config.get('api_key') is None):
+                #  or config.get('api_key') is None
+                if config['deployment_type'] == 'cloud' and (config.get('api_base') is None):
                     logger.error(f"模型配置参数不全: {config['name']}")
                     return None
                 elif config['deployment_type'] == 'local' and config.get('path') is None:

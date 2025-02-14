@@ -67,7 +67,10 @@ def get_knowledge_base(kb_name: str) -> Dict:
     except Exception as e:
         logger.error(f"get_knowledge_base error: {e}")
         raise
-def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_model_name: str, db_type: str, embedding_key: str) -> Dict:
+
+
+def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_model_name: str, db_type: str,
+                          embedding_key: str) -> Dict:
     """创建知识库"""
     try:
         # 检查知识库名称是否已存在
@@ -83,7 +86,7 @@ def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_mo
             category='embedding',
             is_active=True
         ).first()
-        
+
         if not embedding_model:
             return {
                 "status": False,
@@ -133,6 +136,7 @@ def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_mo
         db.session.rollback()
         raise
 
+
 def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict]:
     """搜索知识库"""
     try:
@@ -140,10 +144,10 @@ def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
             raise ValueError(f"知识库不存在: {kb_name}")
-  
+
         # 获取查询文本的向量表示
         query_embedding = asyncio.run(get_embeddings([query], kb.embedding_model_name))[0]
-        
+
         # 使用Chroma搜索
         store = ChromaStore()
         results = store.search_by_id(
@@ -151,19 +155,19 @@ def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict
             query_embedding=query_embedding,
             top_k=top_k
         )
-        
+
         # 获取完整内容
         for result in results:
             content_id = result['metadata']['content_id']
             content = JSONContent.query.get(content_id)
             if content:
                 result['json_content'] = json.loads(content.content)
-        
+
         return results
-        
+
     except Exception as e:
         logger.error(f"search_knowledge_base error: {e}")
-        raise 
+        raise
 
 
 def upload_json_file(kb_name: str, file) -> Dict:
@@ -173,7 +177,7 @@ def upload_json_file(kb_name: str, file) -> Dict:
         json_items = json.load(file)
         if not isinstance(json_items, list):
             raise ValueError("JSON内容必须是数组格式")
-        
+
         # 安全处理文件名
         filename = secure_filename_with_unicode(file.filename)
 
@@ -181,7 +185,7 @@ def upload_json_file(kb_name: str, file) -> Dict:
         save_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], kb_name)
         os.makedirs(save_dir, exist_ok=True)
         file_path = os.path.join(save_dir, filename)
-        
+
         # 保存文件
         file.save(file_path)
 
@@ -190,6 +194,7 @@ def upload_json_file(kb_name: str, file) -> Dict:
     except Exception as e:
         logger.error(f"上传JSON文件失败: {str(e)}")
         raise
+
 
 def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
     """获取JSON记录"""
@@ -204,7 +209,7 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
 
         # 获取总数
         total = query.count()
-        
+
         # 确保页码和每页数量是整数
         try:
             page = int(page)
@@ -212,14 +217,14 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
         except (TypeError, ValueError):
             page = 1
             page_size = 10
-            
+
         # 分页
         pagination = query.order_by(JSONContent.created_at.desc()).paginate(
-            page=page, 
-            per_page=page_size, 
+            page=page,
+            per_page=page_size,
             error_out=False
         )
-        
+
         items = []
         for item in pagination.items:
             try:
@@ -235,7 +240,7 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
             except json.JSONDecodeError:
                 logger.error(f"JSON解析失败，content_id: {item.id}")
                 continue
-                
+
         return {
             'total': total,
             'items': items
@@ -247,19 +252,20 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
             'items': []
         }
 
+
 def secure_filename_with_unicode(filename: str) -> str:
     """处理包含Unicode字符的文件名"""
     # 分离文件名和扩展名
     name, ext = os.path.splitext(filename)
-    
+
     # 处理文件名(保留中文等Unicode字符)
     name = "".join(c for c in name if c.isalnum() or c.isspace() or c in '-._')
     name = name.strip('._')
-    
+
     # 如果文件名为空，使用时间戳
     if not name:
         name = str(int(time.time()))
-        
+
     return name + ext
 
 
@@ -285,16 +291,15 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
             if 'Description' not in item.keys() or 'Detail' not in item.keys():
                 raise ValueError("数据项必须包含Description和Detail字段")
 
-                
             # 获取并验证embedding文本
             embedding_text = f"{item.get('Description')} {item.get('Detail')}"
             if embedding_text is None:
                 raise ValueError(f"未找到embedding文本")
-                
+
             # 计算内容哈希
             content_str = json.dumps(item, sort_keys=True)
             content_hash = hashlib.sha256(content_str.encode('utf-8')).hexdigest()
-            
+
             # 创建内容对象
             content = JSONContent(
                 knowledge_base_id=kb.id,
@@ -306,18 +311,18 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
                 status="pending"  # 显式设置初始状态
             )
             contents.append(content)
-            
+
         # 如果没有有效数据
         if not contents:
             return {
                 'status': False,
                 'message': '没有找到有效的数据项'
             }
-        
+
         try:
             db.session.add_all(contents)
             db.session.commit()
-            
+
             return {
                 'status': True,
                 'message': f'成功添加 {len(contents)} 条记录',
@@ -350,12 +355,12 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
             raise ValueError(f"知识库不存在: {kb_name}")
-            
+
         # 构建查询
         query = JSONContent.query.filter_by(knowledge_base_id=kb.id)
         if item_ids:
             query = query.filter(JSONContent.id.in_(item_ids))
-            
+
         # 获取要删除的内容
         contents = query.all()
         if not contents:
@@ -363,33 +368,33 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
                 'status': True,
                 'message': '没有找到要删除的条目'
             }
-            
+
         # 获取vector_ids
         vector_ids = [c.vector_id for c in contents if c.vector_id]
-        
+
         try:
             # 从Chroma中删除向量
             if vector_ids:
                 store = ChromaStore()
                 store.delete_by_ids(kb.collection_id, vector_ids)
-                
+
             # 从数据库中删除记录
             for content in contents:
                 db.session.delete(content)
             db.session.commit()
-            
+
             return {
                 'status': True,
                 'message': f'成功删除 {len(contents)} 条记录'
             }
-            
+
         except Exception as e:
             db.session.rollback()
             raise Exception(f"删除失败: {str(e)}")
-            
+
     except Exception as e:
         logger.error(f"delete_kb_items error: {str(e)}")
-        raise 
+        raise
 
 
 def update_knowledge_base(kb_name: str, data: Dict) -> Dict:
@@ -417,6 +422,7 @@ def update_knowledge_base(kb_name: str, data: Dict) -> Dict:
         db.session.rollback()
         raise
 
+
 def delete_knowledge_base(kb_name: str) -> Dict:
     """删除知识库及其所有关联数据
     
@@ -438,11 +444,11 @@ def delete_knowledge_base(kb_name: str) -> Dict:
         try:
             # 1. 删除所有JSON内容记录
             JSONContent.query.filter_by(knowledge_base_id=kb.id).delete()
-            
+
             # 2. 删除Chroma集合（会自动删除集合中的所有向量）
             store = ChromaStore()
             store.delete_collection(kb.collection_id)
-            
+
         except Exception as e:
             logger.error(f"删除关联数据失败: {str(e)}")
             db.session.rollback()
@@ -465,4 +471,4 @@ def delete_knowledge_base(kb_name: str) -> Dict:
     except Exception as e:
         logger.error(f"delete_knowledge_base error: {e}")
         db.session.rollback()
-        raise 
+        raise

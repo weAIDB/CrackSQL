@@ -1,5 +1,9 @@
 # backend/llm_model/implementations.py
 from typing import Dict, Any, List, Union
+
+import json
+import requests
+
 from .base import BaseLLM
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
@@ -14,17 +18,19 @@ class CloudLLM(BaseLLM):
 
     def __init__(self, model_config: Dict[str, Any]):
         super().__init__(model_config)  # 先调用父类构造函数
-        self.llm = ChatOpenAI(
-            model_name=self.model_config.get('name'),
-            openai_api_key=self.model_config.get('api_key'),
-            openai_api_base=self.model_config.get('api_base'),
-            temperature=self.model_config.get('temperature', 0.7),
-            max_tokens=self.model_config.get('max_tokens', 32000)
-        )
+
+        if 'gpt' in self.model_config.get('name'):
+            self.llm = ChatOpenAI(
+                model_name=self.model_config.get('name'),
+                openai_api_key=self.model_config.get('api_key'),
+                openai_api_base=self.model_config.get('api_base'),
+                temperature=self.model_config.get('temperature', 0.7),
+                max_tokens=self.model_config.get('max_tokens', 32000)
+            )
 
     def validate_config(self) -> bool:
         """验证模型配置"""
-        required_fields = ['name', 'api_key', 'api_base']
+        required_fields = ['name', 'api_base']  # 'api_key',
         for field in required_fields:
             if not self.model_config.get(field):
                 raise ValueError(f"缺少必要的配置项: {field}")
@@ -35,9 +41,17 @@ class CloudLLM(BaseLLM):
                    **kwargs) -> str:
         """使用LangChain的ChatOpenAI进行聊天"""
         try:
-            # 使用 ainvoke 进行异步调用
-            response = await self.llm.ainvoke(messages)
-            return response.content
+            if 'gpt' in self.model_config.get('name'):
+                # 使用 ainvoke 进行异步调用
+                response = await self.llm.ainvoke(messages)
+                return response.content
+            else:
+                print(self.model_config.get('api_base'))
+                response = requests.request(method="POST", url=self.model_config.get('api_base'),
+                                            data=json.dumps({"messages": messages}))
+                print(response)
+                return json.loads(response.text)
+
         except Exception as e:
             logger.error(f"Cloud LLM chat error: {str(e)}")
             raise
@@ -146,5 +160,3 @@ class LocalLLM(BaseLLM):
             elif isinstance(msg, HumanMessage):
                 formatted_messages.append(f"Human: {msg.content}")
         return "\n".join(formatted_messages) + "\nAssistant:"
-
-

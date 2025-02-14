@@ -1,4 +1,8 @@
-TRANSLATION_FORMAT = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)'
+TOP_K = 5
+
+FAILED_TEMPLATE = 'Cannot translate!'
+
+TRANSLATION_FORMAT = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"Confidence":\s*(.*?)'
 
 map_parser = ["pg", "mysql", "sqlite", "oracle"]
 
@@ -7,6 +11,8 @@ KNOWLEDGE_FIELD_LIST = ['Argument Type', 'Argument Type(s)',
                         'Direct Argument Type(s)', 'Return Type',
                         "Description", 'Example', 'Result',
                         'Example Query', 'Example Result', "Demo"]
+
+oracle_locate_open = False
 
 # TODO: 优化掉，用户自己填
 map_rep = {

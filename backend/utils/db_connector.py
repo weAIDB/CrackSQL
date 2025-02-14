@@ -16,35 +16,36 @@ from psycopg2 import Error
 
 import cx_Oracle
 
-from utils.tools import load_config
+# from utils.tools import load_config
+from utils.constants import oracle_locate_open
 
 mysql_conn_map = {}
 mysql_cursor_map = {}
 
-config = load_config()
-oracle_locate_open = config['oracle_locate_open']
+
+# config = load_config()
+# oracle_locate_open = config['oracle_locate_open']
 
 
-def sql_execute(dialect: str, db_name: str, sql: str):
+def sql_execute(dialect: str, tgt_db_config: dict, sql: str):
     if dialect == 'pg':
-        return pg_sql_execute(db_name, sql)
+        return pg_sql_execute(tgt_db_config, sql)
     elif dialect == 'mysql':
-        return mysql_sql_execute(db_name, sql)
+        return mysql_sql_execute(tgt_db_config, sql)
     elif dialect == 'oracle':
-        return oracle_sql_execute(db_name, sql)
+        return oracle_sql_execute(tgt_db_config, sql)
     else:
         raise ValueError(f"{dialect} is not supported")
 
 
-def mysql_db_connect(dbname):
+def mysql_db_connect(db_config):
+    dbname = db_config["db_name"]
     try:
-        connection = pymysql.connect(
-            host='your host', 
-            port='your port',  
-            user='your name',  
-            password='your password',
-            database="your database"
-        )
+        connection = pymysql.connect(database=db_config["db_name"],
+                                     user=db_config["user"],
+                                     password=db_config["password"],
+                                     host=db_config["host"],
+                                     port=db_config["port"])
         cursor = connection.cursor()
         mysql_conn_map[dbname] = connection
         mysql_cursor_map[dbname] = cursor
@@ -54,9 +55,10 @@ def mysql_db_connect(dbname):
         print(f"Error while connecting to MySQL: {e}")
 
 
-def mysql_sql_execute(db_name: str, sql):
+def mysql_sql_execute(db_config: dict, sql):
+    db_name = db_config["db_name"]
     if db_name not in mysql_conn_map:
-        mysql_db_connect(db_name)
+        mysql_db_connect(db_config)
     connection = mysql_conn_map[db_name]
     cursor = mysql_cursor_map[db_name]
     try:
@@ -82,13 +84,14 @@ pg_conn_map = {}
 pg_cursor_map = {}
 
 
-def pg_db_connect(dbname):
+def pg_db_connect(db_config):
+    dbname = db_config["db_name"]
     try:
-        connection = psycopg2.connect(database="your database",
-                                      user="your name",
-                                      password="your password",
-                                      host="your host",
-                                      port="your port")
+        connection = psycopg2.connect(database=db_config["db_name"],
+                                      user=db_config["user"],
+                                      password=db_config["password"],
+                                      host=db_config["host"],
+                                      port=db_config["port"])
 
         cursor = connection.cursor()
 
@@ -101,9 +104,10 @@ def pg_db_connect(dbname):
         print(f"Error while connecting to PostgreSQL: {error}")
 
 
-def pg_sql_execute(db_name: str, sql):
+def pg_sql_execute(db_config: dict, sql):
+    db_name = db_config['db_name']
     if db_name not in pg_conn_map:
-        pg_db_connect(db_name)
+        pg_db_connect(db_config)
     connection = pg_conn_map[db_name]
     cursor = pg_cursor_map[db_name]
     try:
@@ -153,9 +157,10 @@ def read_output(shell, prompt, timeout=15):
     return output
 
 
-def oracle_db_connect(db_name):
-    dsn = cx_Oracle.makedsn("your host", "your port", service_name="your service")
-    connection = cx_Oracle.connect("your database", "your password", dsn)
+def oracle_db_connect(db_config):
+    db_name = db_config["db_name"]  # db_config["user"]
+    dsn = cx_Oracle.makedsn(db_config["host"], db_config["port"], service_name="your service")
+    connection = cx_Oracle.connect(db_config["db_name"], db_config["password"], dsn)
 
     cursor = connection.cursor()
 
@@ -164,9 +169,10 @@ def oracle_db_connect(db_name):
     return connection, cursor
 
 
-def oracle_sql_execute(db_name: str, sql, flag=False):
+def oracle_sql_execute(db_config: dict, sql, flag=False):
+    db_name = db_config["db_name"]
     if db_name not in oracle_conn_map:
-        oracle_db_connect(db_name)
+        oracle_db_connect(db_config)
     connection = oracle_conn_map[db_name]
     cursor = oracle_cursor_map[db_name]
     try:
@@ -183,7 +189,8 @@ def oracle_sql_execute(db_name: str, sql, flag=False):
             ssh.connect("your host", username='your name', password='your password')
 
             shell = ssh.invoke_shell()
-            shell.send(f'sqlplus xxxx/xxxx@//xxxx:xxxx/xxxx\n')
+            shell.send(f'sqlplus {db_config["db_name"]}/{db_config["password"]}@//'
+                       f'{db_config["host"]}:{db_config["port"]}/your service\n')
 
             time.sleep(2)
 

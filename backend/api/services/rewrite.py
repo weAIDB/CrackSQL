@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 from config.logging_config import logger
+from utils.constants import TOP_K, FAILED_TEMPLATE
 
 
 class RewriteService:
@@ -49,9 +50,10 @@ class RewriteService:
                 engine.dispose()
 
     @staticmethod
-    def create_history(source_db_type: str, original_sql: str, source_kb_id: int, target_kb_id: int, target_db_id: int, llm_model_name: str) -> dict:
+    def create_history(source_db_type: str, original_sql: str, source_kb_id: int, target_kb_id: int, target_db_id: int,
+                       llm_model_name: str) -> dict:
         """创建改写历史"""
-        
+
         # 验证目标数据库连接
         try:
 
@@ -92,7 +94,7 @@ class RewriteService:
         """将 RewriteHistory 对象转换为字典"""
         if not history:
             return None
-            
+
         history_dict = {
             'id': history.id,
             'source_db_type': history.source_db_type,
@@ -120,12 +122,12 @@ class RewriteService:
             'error_message': history.error_message,
             'rewritten_sql': history.rewritten_sql
         }
-        
+
         # 获取关联的processes
         processes = RewriteProcess.query \
             .filter_by(history_id=history.id) \
             .all()
-            
+
         history_dict['processes'] = [{
             'id': process.id,
             'history_id': process.history_id,
@@ -138,7 +140,7 @@ class RewriteService:
             'created_at': process.created_at,
             'updated_at': process.updated_at
         } for process in processes]
-        
+
         return history_dict
 
     @staticmethod
@@ -154,11 +156,11 @@ class RewriteService:
             .offset(offset) \
             .limit(limit) \
             .all()
-        
+
         print(histories)
-            
+
         result = [RewriteService._convert_history_to_dict(history) for history in histories]
-        
+
         return {
             'total': total,
             'data': result
@@ -177,13 +179,13 @@ class RewriteService:
     @staticmethod
     @db_session_manager
     def add_rewrite_process(
-        history_id: int,
-        content: str,
-        step_name: str = None,
-        sql: str = None,
-        role: str = 'assistant',
-        is_success: bool = True,
-        error: str = None
+            history_id: int,
+            content: str,
+            step_name: str = None,
+            sql: str = None,
+            role: str = 'assistant',
+            is_success: bool = True,
+            error: str = None
     ) -> RewriteProcess:
         """添加改写过程记录"""
         process = RewriteProcess(
@@ -202,16 +204,16 @@ class RewriteService:
     @staticmethod
     @db_session_manager
     def update_rewrite_status(
-        history_id: int,
-        status: RewriteStatus,
-        sql: str = None,
-        error: str = None
+            history_id: int,
+            status: RewriteStatus,
+            sql: str = None,
+            error: str = None
     ):
         """更新改写状态"""
         history = db.session.query(RewriteHistory).get(history_id)
         if not history:
             raise ValueError(f"改写历史不存在: {history_id}")
-        
+
         history.status = status
         if sql:
             history.rewritten_sql = sql
@@ -244,16 +246,40 @@ class RewriteService:
                 }
                 vector_config = {
                     "src_collection_id": history.original_kb.collection_id,
-                    "tgt_collection_id": history.target_kb.collection_id
+                    "tgt_collection_id": history.target_kb.collection_id,
+                    "top_k": TOP_K
                 }
-                
-                translate = Translate(model_name=history.llm_model_name, src_sql=history.original_sql, src_dialect=history.source_db_type.lower(), tgt_dialect=history.target_db.db_type.lower(), tgt_db_config=target_db_config, embedding_config=embedding_config, vector_config=vector_config, history_id=history_id, out_type="db", retrieval_on=True)
-                translate.load_rewrite()
+
+                translate = Translate(model_name=history.llm_model_name, src_sql=history.original_sql,
+                                      src_dialect=history.source_db_type.lower(),
+                                      tgt_dialect=history.target_db.db_type.lower(), tgt_db_config=target_db_config,
+                                      embedding_config=embedding_config, vector_config=vector_config,
+                                      history_id=history_id, out_type="db", retrieval_on=True)
+                now_sql, model_ans_list, used_pieces, lift_histories = translate.local_rewrite(max_retry_time=2)
+                print(now_sql)
+                RewriteService.add_rewrite_process(
+                    history_id=history_id,
+                    content=f"```{str(now_sql)}```",
+                    step_name="错误信息",
+                    role='assistant',
+                    is_success=False
+                )
+
+                if now_sql != FAILED_TEMPLATE:
+                    RewriteService.update_rewrite_status(
+                        history_id=history_id,
+                        status=RewriteStatus.SUCCESS
+                    )
+                else:
+                    RewriteService.update_rewrite_status(
+                        history_id=history_id,
+                        status=RewriteStatus.FAILED
+                    )
             except Exception as e:
                 # 更新改写状态为成功
                 RewriteService.update_rewrite_status(
-                    history_id=history_id, 
-                    status=RewriteStatus.FAILED, 
+                    history_id=history_id,
+                    status=RewriteStatus.FAILED,
                     error=str(e)
                 )
                 raise ValueError(f"SQL改写失败: {str(e)}")
