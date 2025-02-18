@@ -1,6 +1,7 @@
 /* Element Chalk Variables */
 @use 'sass:math';
 @use 'sass:map';
+@use 'sass:color';
 @use '../../mixins/function.scss' as *;
 
 // types
@@ -48,7 +49,7 @@ $color-info: map.get($colors, 'info', 'base') !default;
   $colors: map.deep-merge(
     (
       $type: (
-        '#{$mode}-#{$number}': mix($mix-color, map.get($colors, $type, 'base'), math.percentage(math.div($number, 10)))
+        '#{$mode}-#{$number}': color.mix($mix-color, map.get($colors, $type, 'base'), math.percentage(math.div($number, 10)))
       )
     ),
     $colors

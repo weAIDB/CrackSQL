@@ -1,9 +1,9 @@
 //scss 语法糖包含常用的布局方式 flex column
 @use './scss-suger.scss';
 //重置 element-plus 样式
-@import './reset-elemenet-plus-style.scss';
+@use 'reset-elemenet-plus-style.scss';
 //动画文件
-@import './transition.scss';
+@use 'transition.scss';
 
 //reset style
 body {

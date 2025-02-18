@@ -1,6 +1,23 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { defineConfig } = require('eslint-define-config')
 module.exports = defineConfig({
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          "style-loader",
+          "css-loader",
+          {
+            loader: "sass-loader",
+            options: {
+              api: "modern"
+            }
+          }
+        ]
+      }
+    ]
+  },
   env: {
     es6: true,
     browser: true,
