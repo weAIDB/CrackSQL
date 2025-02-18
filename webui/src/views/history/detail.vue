@@ -62,7 +62,7 @@
 import {rewriteDetailReq} from '@/api/rewrite.js'
 import ChatItem from '@/components/ChatItem.vue'
 import type {RewriteHistory} from '@/types/database'
-import {onMounted, ref} from 'vue'
+import {onMounted, ref, onUnmounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {formatDate, formatUserMessage, getStatusType} from '@/utils/rewrite'
 import {useI18n} from '@/hooks/use-i18n'
@@ -73,19 +73,48 @@ const i18n = useI18n()
 
 const historyDetail = ref<RewriteHistory | null>(null)
 const messagesScrollDiv = ref<HTMLElement | null>(null)
+const pollTimer = ref<number | null>(null)
 
 // 获取改写详情
 const getRewriteDetail = async () => {
   try {
     const res = await rewriteDetailReq(Number(route.params.id))
     historyDetail.value = res.data
+    
+    if (historyDetail.value?.status === 'processing') {
+      startPolling()
+    } else {
+      stopPolling()
+    }
   } catch (error) {
     console.error('获取改写详情失败:', error)
+    stopPolling()
+  }
+}
+
+// 开始轮询
+const startPolling = () => {
+  if (!pollTimer.value) {
+    pollTimer.value = window.setInterval(() => {
+      getRewriteDetail()
+    }, 3000)
+  }
+}
+
+// 停止轮询
+const stopPolling = () => {
+  if (pollTimer.value) {
+    clearInterval(pollTimer.value)
+    pollTimer.value = null
   }
 }
 
 onMounted(() => {
   getRewriteDetail()
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 </script>
 
