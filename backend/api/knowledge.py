@@ -104,14 +104,14 @@ def update_kb():
     """更新知识库"""
     res = ResMsg()
     data = request.get_json(force=True)
-    kb_name = data.get('kb_name')
+    kb_id = data.get('kb_id')
 
-    if not kb_name:
-        res.update(code=ResponseCode.InvalidParameter, msg="知识库名称不能为空")
+    if not kb_id:
+        res.update(code=ResponseCode.InvalidParameter, msg="知识库ID不能为空")
         return res.data
 
     try:
-        result = update_knowledge_base(kb_name, data)
+        result = update_knowledge_base(kb_id, data)
         if not result['status']:
             res.update(code=ResponseCode.Fail, msg=result['msg'])
             return res.data

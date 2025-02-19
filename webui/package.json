@@ -37,6 +37,7 @@
     "path-to-regexp": "^6.2.1",
     "pinia": "^2.0.16",
     "pinia-plugin-persistedstate": "2.3.0",
+    "sass-migrator": "^2.3.1",
     "uuid": "^9.0.1",
     "vue": "^3.2.37",
     "vue-clipboard3": "^2.0.0",
@@ -46,7 +47,6 @@
   },
   "devDependencies": {
     "@achrinza/node-ipc": "9.2.7",
-    "ejs": "^3.1.9",
     "@babel/eslint-parser": "7.16.3",
     "@types/mockjs": "1.0.6",
     "@types/node": "^17.0.35",
@@ -62,6 +62,7 @@
     "@vue/cli-service": "^5.0.8",
     "@vue/test-utils": "^2.0.2",
     "@vueuse/core": "^8.7.5",
+    "ejs": "^3.1.9",
     "eslint": "8.18.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-define-config": "1.5.1",

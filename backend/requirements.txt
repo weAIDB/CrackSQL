@@ -20,8 +20,6 @@ langchain-openai>=0.2.14
 openai>=1.3.0
 aiohttp>=3.8.0  # 用于异步HTTP请求
 tenacity>=8.2.0  # 用于重试机制
-transformers>=4.30.0  # 用于本地模型支持
-torch>=2.0.0  # PyTorch，用于本地模型
 sentence-transformers>=2.2.0  # 用于文本向量化
 numpy>=1.24.0  # 科学计算
 scikit-learn>=1.0.0  # 用于向量计算
@@ -30,3 +28,10 @@ chromadb>=0.4.15  # Chroma向量数据库
 # SQL解析相关
 sqlglot==26.6.0
 antlr4-python3-runtime==4.13.2
+
+# 如果使用本地模型，需要导入
+transformers>=4.47.1
+torch==2.1.0  ##on Windows system, install the cuda version manually from https://pytorch.org/
+torchvision  #on Windows system, install the cuda version manually from https://pytorch.org/
+torchaudio  #on Windows system, install the cuda version manually from https://pytorch.org/
+accelerate>=0.26.0
