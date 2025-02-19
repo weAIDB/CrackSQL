@@ -7,7 +7,6 @@ from preprocessor.query_simplifier.tree_matcher import *
 from utils.tools import *
 from utils.db_connector import sql_execute
 
-
 # config = load_config()
 # dbg = config['dbg']
 # use_test = config['use_test']
@@ -21,6 +20,7 @@ rewrite_function_map = {}
 
 rewrite_pieces = []
 
+
 # model = 'gpt-4o'
 
 
@@ -29,6 +29,7 @@ def function_rewrite(node: TreeNode, src_dialect: str):
     # it is needed to check whether there are difference in Function call
     if src_dialect not in rewrite_keyword_map:
         keyword_table_json, function_table_json = load_json_keywords(src_dialect)
+        # keyword_table_json, function_table_json = list(), list()
         rewrite_keyword_map[src_dialect] = keyword_table_json
         rewrite_function_map[src_dialect] = function_table_json
     else:
@@ -301,7 +302,7 @@ def ask_for_rewrite(masked_sql: str, description: str, src_dialect: str, tgt_dia
     tgt_dialect = map_rep[tgt_dialect]
     sys_prompt = ("You are an expert in translating SQL queries between different dialects, "
                   "such as PostgreSQL and MySQL.")
-    
+
     user_prompt = (
         f"Please translate the following SQL expression from {src_dialect} to {tgt_dialect}.\n\n"
         f"Key details:\n"
