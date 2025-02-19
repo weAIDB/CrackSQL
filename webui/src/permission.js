@@ -1,7 +1,8 @@
 import router from '@/router'
 import {progressClose, progressStart } from '@/hooks/use-permission'
 // import { useBasicStore } from '@/store/basic'
-import { langTitle } from '@/hooks/use-common'
+import { i18n } from '@/lang/index'
+
 // import settings from "@/settings";
 
 //路由进入前拦截
@@ -9,7 +10,7 @@ import { langTitle } from '@/hooks/use-common'
 // const whiteList = ['/login', '/404', '/401'] // no redirect whitelist
 router.beforeEach(async (to) => {
   progressStart()
-  document.title = langTitle(to.meta?.title) // i18 page title
+  document.title = i18n.global.t(to.meta?.title || 'CrackSQL') // i18 page title
 
   const basicStore = useBasicStore()
   basicStore.setFilterAsyncRoutes([])

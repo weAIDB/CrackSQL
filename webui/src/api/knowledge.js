@@ -30,10 +30,10 @@ export const knowledgeBaseDetailReq = (knowledgeBaseName) => {
 }
 
 // 更新知识库
-export const knowledgeBaseUpdateInfoReq = (knowledgeBaseName, info) => {
+export const knowledgeBaseUpdateInfoReq = (knowledgeBaseName, info, kbId) => {
     return axiosReq({
         url: '/api/knowledge_base/update',
-        data: {kb_name: knowledgeBaseName, kb_info: info},
+        data: {kb_name: knowledgeBaseName, kb_info: info, kb_id: kbId},
         method: 'post'
     })
 }

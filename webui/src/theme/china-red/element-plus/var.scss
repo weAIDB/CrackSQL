@@ -2,7 +2,7 @@
 @use 'sass:math';
 @use 'sass:map';
 @use '../../mixins/function.scss' as *;
-
+@use "sass:color";
 // types
 $types: primary, success, warning, danger, error, info;
 
@@ -48,7 +48,7 @@ $color-info: map.get($colors, 'info', 'base') !default;
   $colors: map.deep-merge(
     (
       $type: (
-        '#{$mode}-#{$number}': mix($mix-color, map.get($colors, $type, 'base'), math.percentage(math.div($number, 10)))
+        '#{$mode}-#{$number}': color.mix($mix-color, map.get($colors, $type, 'base'), math.percentage(math.div($number, 10)))
       )
     ),
     $colors

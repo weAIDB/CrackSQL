@@ -341,7 +341,8 @@ export default {
       },
       button: {
         delete: '删除',
-        retry: '重新处理'
+        retry: '重新处理',
+        save: '保存'
       },
       next: '下一步',
       complete: '完成'

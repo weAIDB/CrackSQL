@@ -61,6 +61,7 @@ def get_knowledge_base(kb_name: str) -> Dict:
                 "deployment_type": kb.embedding_model.deployment_type,
                 "description": kb.embedding_model.description
             } if kb.embedding_model else None,
+            "db_type": kb.db_type,
             "created_at": kb.created_at.strftime("%Y-%m-%d %H:%M:%S") if kb.created_at else None,
             "updated_at": kb.updated_at.strftime("%Y-%m-%d %H:%M:%S") if kb.updated_at else None
         }
@@ -397,25 +398,27 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
         raise
 
 
-def update_knowledge_base(kb_name: str, data: Dict) -> Dict:
+def update_knowledge_base(kb_id: int, data: Dict) -> Dict:
     """更新知识库"""
     try:
-        kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
+        kb = KnowledgeBase.query.filter_by(id=kb_id).first()
         if not kb:
             return {
                 "status": False,
-                "msg": f"知识库 '{kb_name}' 不存在"
+                "msg": f"知识库不存在"
             }
 
         # 更新知识库信息
         if 'kb_info' in data:
             kb.kb_info = data['kb_info']
+        if 'kb_name' in data:
+            kb.kb_name = data['kb_name']
 
         db.session.commit()
 
         return {
             "status": True,
-            "data": get_knowledge_base(kb_name)
+            "data": get_knowledge_base(kb.kb_name)
         }
     except Exception as e:
         logger.error(f"update_knowledge_base error: {e}")
