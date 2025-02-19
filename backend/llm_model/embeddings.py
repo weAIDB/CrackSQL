@@ -10,6 +10,7 @@ from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
+
 class EmbeddingManager:
     """Embedding管理器"""
 

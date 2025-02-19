@@ -17,11 +17,11 @@ def convert_distance_to_score(distance: float) -> float:
     distance = 0 表示完全相同，distance = 2 表示完全相反
     我们将其转换为：0 表示完全不同，100 表示完全相同
     """
-    
+
     if distance is None:
         return 0
     # 将distance从[0,2]映射到[0,100]
-    score = (1 - distance/2) * 100
+    score = (1 - distance / 2) * 100
     # 小数点后两位
     score = round(score, 2)
     # 确保分数在0-100范围内
@@ -46,7 +46,7 @@ def generate_kb_name(kb_name: str) -> str:
 
 class ChromaStore:
     """Chroma向量存储管理器"""
-    
+
     def __init__(self, persist_directory: str = "./instance/chroma"):
         """
         初始化ChromaStore
@@ -56,7 +56,7 @@ class ChromaStore:
         """
         self.persist_directory = persist_directory
         os.makedirs(persist_directory, exist_ok=True)
-        
+
         # 配置Chroma客户端
         self.client = chromadb.PersistentClient(
             path=persist_directory,
@@ -66,19 +66,19 @@ class ChromaStore:
                 is_persistent=True
             )
         )
-    
+
     def _get_collection(self, collection_id: str):
         """获取集合"""
         return self.client.get_collection(
             name=collection_id,
             embedding_function=None
         )
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def get_collection_by_id(self, collection_id: str):
         """通过ID获取集合"""
         return self._get_collection(collection_id)
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def get_or_create_collection(self, kb_name: str, dimension: int = 1536) -> str:
         """获取或创建集合
@@ -109,44 +109,44 @@ class ChromaStore:
                     "hnsw:construction_ef": 200,
                     "hnsw:M": 32
                 }
-                
+
                 collection = self.client.create_collection(
                     name=kb_name,
                     embedding_function=None,
                     metadata=metadata
                 )
                 logger.info(f"创建新集合: {kb_name}")
-                
+
             return kb_name
         except Exception as e:
             logger.error(f"创建集合失败: {str(e)}")
             raise
-    
+
     def _validate_inputs(self, texts: List[str], embeddings: List[List[float]], ids: Optional[List[str]] = None):
         """验证输入数据的一致性"""
         if len(texts) != len(embeddings):
             raise ValueError("文本数量与向量数量不匹配")
         if ids and len(ids) != len(texts):
             raise ValueError("ID数量与文本数量不匹配")
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def add_texts(
-        self,
-        collection_id: str,
-        texts: List[str],
-        embeddings: List[List[float]],
-        metadatas: Optional[List[Dict]] = None,
-        ids: Optional[List[str]] = None,
-        batch_size: int = 100
+            self,
+            collection_id: str,
+            texts: List[str],
+            embeddings: List[List[float]],
+            metadatas: Optional[List[Dict]] = None,
+            ids: Optional[List[str]] = None,
+            batch_size: int = 100
     ):
         """添加文本到向量库"""
         self._validate_inputs(texts, embeddings, ids)
         collection = self._get_collection(collection_id)
-        
+
         if not ids:
             existing_count = collection.count()
             ids = [str(i) for i in range(existing_count, existing_count + len(texts))]
-        
+
         # 分批添加，避免内存溢出
         for i in range(0, len(texts), batch_size):
             end_idx = min(i + batch_size, len(texts))
@@ -156,31 +156,30 @@ class ChromaStore:
                 metadatas=metadatas[i:end_idx] if metadatas else None,
                 ids=ids[i:end_idx]
             )
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def search_by_id(
-        self,
-        collection_id: str,
-        query_embedding: List[float],
-        top_k: int = 5,
-        where: Optional[Dict] = None,
-        where_document: Optional[Dict] = None,
-        **kwargs
+            self,
+            collection_id: str,
+            query_embedding: List[float],
+            top_k: int = 5,
+            where: Optional[Dict] = None,
+            where_document: Optional[Dict] = None,
+            **kwargs
     ) -> List[Dict]:
         """通过集合ID搜索"""
         collection = self._get_collection(collection_id)
-        
+
         try:
             results = collection.query(
-                query_embeddings=[query_embedding],
+                query_embeddings=query_embedding.tolist(),
                 n_results=top_k,
                 where=where,
                 include=["documents", "metadatas", "distances"],
                 where_document=where_document,
                 **kwargs
             )
-            
-            
+
             return [
                 {
                     'content': doc,
@@ -198,7 +197,7 @@ class ChromaStore:
         except Exception as e:
             logger.error(f"搜索失败: {str(e)}")
             raise
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def delete_by_ids(self, collection_id: str, ids: List[str]):
         """通过ID删除向量"""
@@ -208,15 +207,15 @@ class ChromaStore:
         except Exception as e:
             logger.error(f"删除向量失败: {str(e)}")
             raise
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def update_texts(
-        self,
-        collection_id: str,
-        texts: List[str],
-        embeddings: List[List[float]],
-        ids: List[str],
-        metadatas: Optional[List[Dict]] = None
+            self,
+            collection_id: str,
+            texts: List[str],
+            embeddings: List[List[float]],
+            ids: List[str],
+            metadatas: Optional[List[Dict]] = None
     ):
         """更新向量"""
         self._validate_inputs(texts, embeddings, ids)
@@ -231,7 +230,7 @@ class ChromaStore:
         except Exception as e:
             logger.error(f"更新向量失败: {str(e)}")
             raise
-    
+
     @retry_on_error(logger_name="ChromaDB")
     def delete_collection(self, collection_id: str):
         """删除集合"""
@@ -240,7 +239,7 @@ class ChromaStore:
         except Exception as e:
             logger.error(f"删除集合失败: {str(e)}")
             raise
-    
+
     @cache.memoize(timeout=60)  # 1分钟缓存
     def get_collection_stats(self, collection_id: str) -> Dict[str, Any]:
         """获取集合统计信息"""

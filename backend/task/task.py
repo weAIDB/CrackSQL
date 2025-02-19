@@ -5,6 +5,7 @@ from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
 from config.db_config import db, db_session_manager
 import uuid
+import json
 from typing import List
 
 
@@ -42,19 +43,20 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
                     embedding_texts,
                     model_name=kb.embedding_model_name
                 )
-                
+
                 # 使用uuid生成唯一ID
                 vector_ids = [str(uuid.uuid4()) for _ in contents]
-                
+
                 # 准备元数据
                 metadatas = []
                 for c in contents:
                     metadata = {
                         'content_id': str(c.id),
                         'knowledge_base_id': str(kb.id),
+                        'content': json.dumps(c.content)
                     }
                     metadatas.append(metadata)
-                
+
                 # 保存到Chroma
                 store = ChromaStore()
                 store.add_texts(
@@ -64,12 +66,12 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
                     ids=vector_ids,
                     metadatas=metadatas
                 )
-                
+
                 # 更新状态
                 for content, vector_id in zip(contents, vector_ids):
                     content.status = 'completed'
                     content.vector_id = vector_id
-                    
+
                 db.session.commit()
 
                 return {
@@ -85,7 +87,7 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
                     content.status = 'failed'
                     content.error_msg = f"向量化处理失败: {str(e)}"
                 db.session.commit()
-                
+
                 return {
                     'status': False,
                     'message': f'向量化处理失败: {str(e)}'

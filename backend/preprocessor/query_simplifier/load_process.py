@@ -5,6 +5,8 @@ from glob import glob
 from typing import List
 
 from preprocessor.query_simplifier.Tree import TreeNode
+
+
 # from utils.tools import load_config
 
 # config = load_config()
@@ -23,6 +25,7 @@ def load_json_keywords(dialect: str):
         for file_path in keyword_json_files:
             with open(file_path, 'r', encoding='utf-8') as file:
                 keywords_json = keywords_json + keyword_load_preprocess(json.loads(file.read()), dialect)
+        print("keyword_load_preprocess", keywords_json)
     except Exception as e:
         raise e
 
@@ -31,6 +34,7 @@ def load_json_keywords(dialect: str):
         for file_path in op_json_files:
             with open(file_path, 'r', encoding='utf-8') as file:
                 keywords_json = keywords_json + op_load_preprocess(json.loads(file.read()), dialect)
+        print("op_load_preprocess", keywords_json)
     except Exception as e:
         raise e
 
@@ -39,9 +43,10 @@ def load_json_keywords(dialect: str):
         for file_path in type_json_files:
             with open(file_path, 'r', encoding='utf-8') as file:
                 keywords_json = keywords_json + type_load_preprocess(json.loads(file.read()), dialect)
+        print("type_load_preprocess", keywords_json)
     except Exception as e:
         raise e
-            
+
     # replace all the str_rep in the keyword_json to be the TreeNode
     # Unified as Keyword, Description, Tree
     try:
@@ -51,6 +56,7 @@ def load_json_keywords(dialect: str):
             with open(file_path, 'r', encoding='utf-8') as file:
                 json_array = json.loads(file.read())
                 functions_json = functions_json + func_load_preprocess(json_array, dialect)
+        print("func_load_preprocess", keywords_json)
     except Exception as e:
         raise e
     return keywords_json, functions_json
