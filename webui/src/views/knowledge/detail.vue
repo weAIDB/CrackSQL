@@ -218,36 +218,39 @@
         <div v-if="activeIndex === 'setting'" style="width: 100%; height: 100%; background: white; padding: 20px; border-radius: 10px;">
           <div class="relative columnSS" style="width: 100%">
             <div class="rowSC" style="width: 100%;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+              <span style="color: #000000; width: 160px; text-align: left; font-size: 16px; flex-shrink: 0">
                 {{ $t('knowledge.detail.form.name') }}
               </span>
-              <span style="color: #333333;">{{ editForm.kb_name }}</span>
+              <el-input size="large" v-model="editForm.kb_name" style="width: 200px;" />
             </div>
 
             <div class="rowSC" style="width: 100%; margin-top: 20px;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+              <span style="color: #000000; width: 160px; text-align: left; font-size: 16px; flex-shrink: 0">
                 {{ $t('knowledge.detail.form.description') }}
               </span>
-              <el-input v-model="editForm.kb_info" disabled :rows="2" type="textarea"/>
+              <el-input size="large" v-model="editForm.kb_info" :rows="2" type="textarea"/>
             </div>
 
             <div class="rowSC" style="width: 100%; margin-top: 20px;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+              <span style="color: #000000; width: 160px; text-align: left; font-size: 16px; flex-shrink: 0">
                 {{ $t('knowledge.detail.form.embeddingModel') }}
               </span>
-              <span style="color: #333333;">{{ editForm.embedding_model_name }}</span>
+              <el-input size="large" v-model="editForm.embedding_model_name" disabled style="width: 200px;" />
             </div>
 
             <div class="rowSC" style="width: 100%; margin-top: 20px;">
-              <span style="color: #000000; width: 120px; text-align: left; font-size: 16px; flex-shrink: 0">
+              <span style="color: #000000; width: 160px; text-align: left; font-size: 16px; flex-shrink: 0">
                 {{ $t('knowledge.detail.form.databaseType') }}
               </span>
-              <span style="color: #333333;">{{ editForm.db_type }}</span>
+              <el-input size="large" v-model="editForm.db_type" disabled style="width: 200px;" />
             </div>
 
             <div class="rowSC" style="margin-top: 20px">
               <el-button :icon="Delete" size="small" @click="onHandleDeleteClick">
                 {{ $t('knowledge.detail.button.delete') }}
+              </el-button>
+              <el-button size="medium" icon="Edit" type="primary" @click="onHandleSaveClick">
+                {{ $t('knowledge.detail.button.save') }}
               </el-button>
             </div>
           </div>
@@ -334,7 +337,7 @@
 </template>
 
 <script setup lang="ts" name="KnowledgeDetail">
-import {knowledgeBaseDeleteReq, knowledgeBaseDetailReq, knowledgeBaseUpdateInfoReq, knowledgeSearchDocsReq, getKnowledgeBaseItemsReq, addKnowledgeBaseItemsReq, deleteKnowledgeBaseItemsReq} from "@/api/knowledge";
+import {knowledgeBaseDeleteReq, knowledgeBaseDetailReq, knowledgeBaseUpdateInfoReq, knowledgeSearchDocsReq, getKnowledgeBaseItemsReq, addKnowledgeBaseItemsReq, deleteKnowledgeBaseItemsReq, vectorizeKnowledgeBaseItemsReq} from "@/api/knowledge";
 import {useBasicStore} from "@/store/basic";
 import {Delete, Document, Search, Setting} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from 'element-plus'
@@ -363,6 +366,7 @@ const pollingTimer = ref<NodeJS.Timer | null>(null)
 const expandLoading = ref<boolean>(false)
 
 const editForm = reactive({
+  kb_id: '',
   kb_name: '',
   kb_info: '',
   embedding_model_name: '',
@@ -456,6 +460,7 @@ const stopPolling = () => {
 const getKnowledgeBaseDetail = () => {
   knowledgeBaseDetailReq(route.query.kb_name).then(res => {
     if (res.code === 0 && res.data) {
+      editForm.kb_id = res.data.id
       editForm.kb_name = res.data.kb_name
       editForm.kb_info = res.data.kb_info
       editForm.embedding_model_name = res.data.embedding_model ? res.data.embedding_model.name : ''
@@ -468,19 +473,18 @@ const getKnowledgeBaseDetail = () => {
   })
 }
 
-const onHandleDetailContentClick = (index) => {
-  if (showDetailIndex.value === index) {
-    showDetailIndex.value = -1
-  } else {
-    showDetailIndex.value = index
-  }
-}
-
 const onHandleSaveClick = () => {
-  knowledgeBaseUpdateInfoReq(route.query.kb_name, editForm.kb_info).then(() => {
+  knowledgeBaseUpdateInfoReq(editForm.kb_name, editForm.kb_info, editForm.kb_id).then(() => {
     ElMessage({
       type: 'success',
       message: 'Update completed',
+    })
+    // 修改当前路由的query参数
+    router.replace({
+      query: {
+        ...route.query,
+        kb_name: editForm.kb_name
+      }
     })
   })
 }
@@ -546,7 +550,7 @@ const formatFileSize = (bytes: number): string => {
 // 监听分页变化
 const handlePageChange = (page: number) => {
   currentPage.value = page
-  getDocuments()
+  getItems()
 }
 
 // 获取状态类型
@@ -585,7 +589,7 @@ const formatTime = (time: string) => {
 // 重试处理
 const handleRetry = async (item: any) => {
   try {
-    await retryProcessItemReq(item.id)
+    await vectorizeKnowledgeBaseItemsReq(route.query.kb_name, [item.id])
     ElMessage.success(i18n.t('knowledge.detail.message.retrySuccess'))
     getItems()
   } catch (error) {
@@ -601,24 +605,6 @@ const onOpenUpdateDialog = () => {
       kb_name: route.query.kb_name
     }
   })
-}
-
-const handleRetryDocument = async (row) => {
-  const res = await vectorizeDocumentReq(
-    row.id,
-    row.process_type,
-    row.chunk_size,
-    row.separator,
-    row.ai_summary,
-    row.ai_qa,
-    row.strengthen_model_name,
-    row.splitter_model_name
-  )
-  if (res.code !== 0) {
-    ElMessage.error(i18n.t('knowledge.detail.error.processFile', { msg: res.msg }))
-    return
-  }
-  getDocuments()
 }
 
 // 在组件挂载时获取知识库详情

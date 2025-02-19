@@ -23,7 +23,7 @@ class LLMManager:
         Returns:
             Optional[BaseLLM]: 加载的模型实例
         """
-        try:                
+        try:
             # 根据类型创建相应的模型实例
             model_cls = CloudLLM if model_config['deployment_type'] == 'cloud' else LocalLLM
             model = model_cls(model_config)
@@ -40,6 +40,7 @@ class LLMManager:
         except Exception as e:
             logger.error(f"加载模型失败 {model_config['name']}: {str(e)}")
             return None
+    
 
     @db_session_manager
     def get_model_config_from_db(self, name: str) -> Optional[Dict]:
@@ -65,6 +66,26 @@ class LLMManager:
 
         return model_config
 
+
+    def reload_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
+        """
+        重新加载模型
+        Args:
+            name: 模型名称
+            config: 可选的模型配置字典
+        Returns:
+            Optional[BaseLLM]: 重新加载的模型实例
+        """
+        if name not in self._models:
+            logger.error(f"模型不存在: {name}, 不需要重新加载")
+
+        # 释放模型，释放后模型会被销毁
+        self._models[name].release()
+
+        # 重新加载模型
+        return self.get_model(name, config)
+
+
     def get_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
         """获取模型实例
         Args:
@@ -81,11 +102,10 @@ class LLMManager:
                     return None
             else:
                 # 使用字典访问方式
-                #  or config.get('api_key') is None
-                if config['deployment_type'] == 'cloud' and (config.get('api_base') is None):
+                if config['deployment_type'] == 'cloud' and (config.get('api_base') is None or config.get('api_key') is None):
                     logger.error(f"模型配置参数不全: {config['name']}")
                     return None
-                elif config['deployment_type'] == 'local' and config.get('path') is None:
+                elif config['deployment_type'] == 'local' and config.get('model_path') is None:
                     logger.error(f"模型配置参数不全: {config['name']}")
                     return None
             return self.load_model(config)

@@ -21,7 +21,7 @@
     </div>
 
     <div class="columnCC">
-      <el-popconfirm :title="$t('layout.sidebar.tooltip.logoutConfirm')" @confirm="onExitClick">
+      <!-- <el-popconfirm :title="$t('layout.sidebar.tooltip.logoutConfirm')" @confirm="onExitClick">
         <template #reference>
           <div class="columnCC"
                style="margin-bottom: 10px; cursor: pointer; background: RGBA(232, 231, 230, 1.00); padding: 2px; border-radius: 8px"
@@ -40,7 +40,7 @@
             </svg>
           </div>
         </template>
-      </el-popconfirm>
+      </el-popconfirm> -->
       <el-tooltip
           class="box-item"
           effect="dark"
@@ -49,7 +49,7 @@
       >
         <div class="columnCC"
              style="margin-bottom: 15px; cursor: pointer; background: RGBA(232, 231, 230, 1.00); padding: 4px; border-radius: 8px"
-             @click="onLanguageClick">
+             @click="onGotoGitHubIssueClick">
           <svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
             <path
                 d="M222.6176 835.8912h410.5728l312.3712-312.3712c16.7936-16.7424 26.0096-39.0656 26.0096-62.7712s-9.216-46.0288-26.0096-62.7712L651.008 103.424a88.14592 88.14592 0 0 0-62.7712-26.0096c-23.7056 0-46.0288 9.216-62.7712 26.0096l-454.912 454.912c-34.6112 34.6112-34.6112 90.9312 0 125.5424l152.064 152.0128z m26.7776-261.4272l300.2368-9.3184a19.01056 19.01056 0 0 0 18.432-19.6096l-8.7552-280.9344c-0.4096-14.1312 10.6496-25.9584 24.7808-26.368 14.1824-0.3072 25.9584 10.6496 26.368 24.7808l8.7552 280.9344c1.1776 38.7072-29.3376 71.168-68.0448 72.3968l-300.2368 9.3184h-0.8192a25.6512 25.6512 0 0 1-25.6-24.7808c-0.3584-14.1824 10.752-26.0096 24.8832-26.4192zM920.7808 883.0976H82.688c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6h838.144c14.1312 0 25.6-11.4688 25.6-25.6s-11.52-25.6-25.6512-25.6z"
@@ -76,7 +76,7 @@
       >
         <div class="columnCC"
              style="margin-bottom: 15px; cursor: pointer; background: RGBA(232, 231, 230, 1.00); padding: 4px; border-radius: 8px"
-             @click="onLanguageClick">
+             @click="onGotoGitHubClick">
           <svg t="1732003027727" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18782" width="24" height="23">
             <path
                 d="M511.6 76.3C264.3 76.2 64 276.4 64 523.5 64 718.9 189.3 885 363.8 946c23.5 5.9 19.9-10.8 19.9-22.2v-77.5c-135.7 15.9-141.2-73.9-150.3-88.9C215 726 171.5 718 184.5 703c30.9-15.9 62.4 4 98.9 57.9 26.4 39.1 77.9 32.5 104 26 5.7-23.5 17.9-44.5 34.7-60.8-140.6-25.2-199.2-111-199.2-213 0-49.5 16.3-95 48.3-131.7-20.4-60.5 1.9-112.3 4.9-120 58.1-5.2 118.5 41.6 123.2 45.3 33-8.9 70.7-13.6 112.9-13.6 42.4 0 80.2 4.9 113.5 13.9 11.3-8.6 67.3-48.8 121.3-43.9 2.9 7.7 24.7 58.3 5.5 118 32.4 36.8 48.9 82.7 48.9 132.3 0 102.2-59 188.1-200 212.9 23.5 23.2 38.1 55.4 38.1 91v112.5c0.8 9 0 17.9 15 17.9 177.1-59.7 304.6-227 304.6-424.1 0-247.2-200.4-447.3-447.5-447.3z"
@@ -170,6 +170,12 @@ const activeMenu = computed(() => {
 
 function goToHome() {
   router.push('/');
+}
+const onGotoGitHubClick = () => {
+  window.open('https://github.com/code4DB/CrackSQL', '_blank')
+}
+const onGotoGitHubIssueClick = () => {
+  window.open('https://github.com/code4DB/CrackSQL/issues', '_blank')
 }
 const onExitClick = () => {
   basicStore.resetStateAndToLogin()
