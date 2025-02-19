@@ -353,7 +353,8 @@ export default {
       },
       button: {
         delete: 'Delete',
-        retry: 'Retry'
+        retry: 'Retry',
+        save: 'Save'
       },
       next: 'Next',
       complete: 'Complete'

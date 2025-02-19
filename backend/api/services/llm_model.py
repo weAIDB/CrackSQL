@@ -2,7 +2,7 @@ from typing import List, Optional, Dict, Any
 from models import LLMModel
 from config.db_config import db
 from sqlalchemy import or_
-
+from llm_model.llm_manager import llm_manager
 
 class LLMModelService:
     """LLM模型服务"""
@@ -67,6 +67,12 @@ class LLMModelService:
                 setattr(model, key, value)
 
         db.session.commit()
+        # 重新加载模型
+        llm_manager.reload_model(model.name, {
+            'path': model.path,
+            'api_base': model.api_base,
+            'api_key': model.api_key
+        })
         return {
             'id': model.id,
             'name': model.name,

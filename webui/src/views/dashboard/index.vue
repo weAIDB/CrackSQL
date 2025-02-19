@@ -18,28 +18,76 @@
 
     <!-- 主要操作区域 -->
     <div class="main-section">
-      <!-- 左侧功能介绍 -->
+      <!-- 左侧功能介绍改为案例分享 -->
       <div class="features-panel">
         <div class="feature-card">
           <el-icon class="feature-icon">
-            <Connection/>
+            <Document/>
           </el-icon>
-          <h3>{{ $t('dashboard.features.database.title') }}</h3>
-          <p>{{ $t('dashboard.features.database.desc') }}</p>
-        </div>
-        <div class="feature-card">
-          <el-icon class="feature-icon">
-            <Monitor/>
-          </el-icon>
-          <h3>{{ $t('dashboard.features.conversion.title') }}</h3>
-          <p>{{ $t('dashboard.features.conversion.desc') }}</p>
+          <h3>Oracle 转 MySQL</h3>
+          <div class="sql-compare">
+            <div class="sql-block source">
+              <div class="label">Oracle</div>
+              <code>SELECT DECODE(status, 1, '活跃', 2, '暂停', '未知') 
+FROM users 
+WHERE ROWNUM <= 10</code>
+            </div>
+            <div class="sql-block target">
+              <div class="label">MySQL</div>
+              <code>SELECT CASE status 
+    WHEN 1 THEN '活跃' 
+    WHEN 2 THEN '暂停' 
+    ELSE '未知' 
+END 
+FROM users 
+LIMIT 10</code>
+            </div>
+          </div>
         </div>
         <div class="feature-card">
           <el-icon class="feature-icon">
             <Document/>
           </el-icon>
-          <h3>{{ $t('dashboard.features.validation.title') }}</h3>
-          <p>{{ $t('dashboard.features.validation.desc') }}</p>
+          <h3>MySQL 转 PostgreSQL</h3>
+          <div class="sql-compare">
+            <div class="sql-block source">
+              <div class="label">MySQL</div>
+              <code>SELECT TOP 5 
+    ISNULL(name, 'Unknown') as name,
+    GETDATE() as current_time
+FROM employees</code>
+            </div>
+            <div class="sql-block target">
+              <div class="label">PostgreSQL</div>
+              <code>SELECT 
+    COALESCE(name, 'Unknown') as name,
+    CURRENT_TIMESTAMP as current_time
+FROM employees
+LIMIT 5</code>
+            </div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <el-icon class="feature-icon">
+            <Document/>
+          </el-icon>
+          <h3>Oracle 转 PostgreSQL</h3>
+          <div class="sql-compare">
+            <div class="sql-block source">
+              <div class="label">DB2</div>
+              <code>SELECT SUBSTR(name, 1, 3) || '-' || 
+    DIGITS(employee_id)
+FROM employee
+FETCH FIRST 5 ROWS ONLY</code>
+            </div>
+            <div class="sql-block target">
+              <div class="label">Oracle</div>
+              <code>SELECT SUBSTR(name, 1, 3) || '-' || 
+    LPAD(employee_id, 6, '0')
+FROM employee
+WHERE ROWNUM <= 5</code>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -464,10 +512,11 @@ const onSaveClick = async () => {
 
   .feature-card {
     background: white;
-    padding: 30px;
+    padding: 20px;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
     transition: transform 0.3s ease;
+    border-left: 4px solid var(--el-color-primary);
 
     &:hover {
       transform: translateY(-5px);
@@ -476,20 +525,48 @@ const onSaveClick = async () => {
 
     .feature-icon {
       font-size: 24px;
-      color: var(--el-color-primary);
+      color: #666;
       margin-bottom: 16px;
     }
 
     h3 {
       font-size: 1.1em;
-      margin-bottom: 12px;
-      color: #333;
+      margin-bottom: 16px;
+      color: var(--el-color-primary);
+      font-weight: 600;
     }
 
-    p {
-      font-size: 1em;
-      color: #666;
-      line-height: 1.6;
+    .sql-compare {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .sql-block {
+      margin-bottom: 12px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .label {
+        font-size: 0.9em;
+        color: var(--el-color-primary);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      code {
+        display: block;
+        background: #2b2b2b;
+        color: #fff;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: 'Monaco', monospace;
+        font-size: 0.85em;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
     }
   }
 }
