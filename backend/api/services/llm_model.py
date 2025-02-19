@@ -68,11 +68,7 @@ class LLMModelService:
 
         db.session.commit()
         # 重新加载模型
-        llm_manager.reload_model(model.name, {
-            'path': model.path,
-            'api_base': model.api_base,
-            'api_key': model.api_key
-        })
+        llm_manager.reload_model(model.name)
         return {
             'id': model.id,
             'name': model.name,
