@@ -1,6 +1,6 @@
-backend/app.py
-webui/.env.serve-dev
-webui/package.json
+./backend/app.py
+./webui/.env.serve-dev
+./webui/package.json
 
 ### venv template
 # Virtualenv

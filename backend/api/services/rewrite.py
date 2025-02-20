@@ -157,8 +157,6 @@ class RewriteService:
             .limit(limit) \
             .all()
 
-        print(histories)
-
         result = [RewriteService._convert_history_to_dict(history) for history in histories]
 
         return {
@@ -241,8 +239,8 @@ class RewriteService:
                     "db_name": target_db.database
                 }
                 embedding_config = {
-                    "src_embedding_model_name": history.source_db_type.lower(),
-                    "tgt_embedding_model_name": history.target_db.db_type.lower()
+                    "src_embedding_model_name": history.original_kb.embedding_model_name,
+                    "tgt_embedding_model_name": history.original_kb.embedding_model_name
                 }
                 vector_config = {
                     "src_collection_id": history.original_kb.collection_id,
@@ -256,7 +254,7 @@ class RewriteService:
                                       embedding_config=embedding_config, vector_config=vector_config,
                                       history_id=history_id, out_type="db", retrieval_on=True)
                 now_sql, model_ans_list, used_pieces, lift_histories = translate.local_rewrite(max_retry_time=2)
-                print(now_sql)
+                print("now_sql", now_sql)
                 RewriteService.add_rewrite_process(
                     history_id=history_id,
                     content=f"```{str(now_sql)}```",

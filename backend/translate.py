@@ -1,3 +1,4 @@
+import asyncio
 import re
 import sys
 
@@ -20,11 +21,11 @@ from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
     SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_RET, USER_PROMPT_RET, USER_PROMPT_DIR, EXAMPLE_PROMPT
 from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
 from translator.llm_translator import LLMTranslator
-from llm_model.embeddings import embedding_manager
+from llm_model.embeddings import embedding_manager, get_embeddings
 from vector_store.chroma_store import ChromaStore
 from utils.tools import parse_llm_answer_v2, process_err_msg
 
-chunk_size = 100
+chunk_size = 50
 
 
 # def init_model(model_name, ret_id, db_id, db_path, top_k, tgt_dialect=None):
@@ -376,7 +377,7 @@ class Translate:
         hint = str()
         if self.retrieval_on:  # 如果启用检索增强
             # if piece['Count'] == 0:  # 首次尝试
-            if True:  # 首次尝试
+            if False:  # 首次尝试
                 # 使用基础转换提示模板
                 sys_prompt = SYSTEM_PROMPT_SEG.format(
                     src_dialect=map_rep[self.src_dialect],
@@ -442,8 +443,8 @@ class Translate:
         )
 
         # 使用正则表达式解析模型回答
-        pattern = r'"SQL Snippet":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)\s*,"Confidence":\s*(.*?)\s*'
-        pattern = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)'
+        # pattern = r'"SQL Snippet":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)\s*,"Confidence":\s*(.*?)\s*'
+        # pattern = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?)'
         pattern = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"Confidence":\s*(.*?)\s'
         res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
         answer_raw["Answer"] = res["Answer"]
@@ -548,31 +549,33 @@ class Translate:
             results = list()
             if self.model_name == "cross-lingual":
                 # 跨语言模型：使用关键字和描述的组合进行检索
-                emebddingstr = embedding_manager.get_embedding(
+                emebdding_text = asyncio.run(get_embeddings(
                     str(key) + '--separator--' + str(desc),
-                    self.src_embedding_model_name
-                )
-                results.extend([ite[0] for ite in
-                                self.vector_db.search_by_id(self.src_collection_id, emebddingstr, top_k=self.top_k)])
+                    self.tgt_embedding_model_name
+                ))
+                results.extend([ite['content'] for ite in
+                                self.vector_db.search_by_id(self.src_collection_id, emebdding_text, top_k=self.top_k)])
             else:
                 # 普通模型：仅使用描述进行检索
-                emebddingstr = embedding_manager.get_embedding(
+                emebdding_text = asyncio.run(get_embeddings(
                     desc["Desc"],
                     self.tgt_embedding_model_name
-                )
-                results.extend([ite[0] for ite in
-                                self.vector_db.search_by_id(self.tgt_collection_id, emebddingstr, top_k=self.top_k)])
+                ))
+                results.extend([ite['content'] for ite in
+                                self.vector_db.search_by_id(self.tgt_collection_id, emebdding_text, top_k=self.top_k)])
 
             # 去重处理：确保每个关键字只出现一次
-            results_key = set()
-            results_pre = list()
-            for ite in results:
-                if ite.metadata["KEYWORD"] not in results_key:
-                    results_key.add(ite.metadata["KEYWORD"])
-                    results_pre.append(ite)
+            # results_key = set()
+            # results_pre = list()
+            # for ite in results:
+            #     if ite.metadata["KEYWORD"] not in results_key:
+            #         results_key.add(ite.metadata["KEYWORD"])
+            #         results_pre.append(ite)
+            results_pre = results
 
             # 处理目标关键字：移除多余的分隔符
-            tgt_key = [re.sub(r'(<sep>)(\1){2,}', r'\1', ite.metadata["KEYWORD"]) for ite in results_pre]
+            # tgt_key = [re.sub(r'(<sep>)(\1){2,}', r'\1', ite.metadata["KEYWORD"]) for ite in results_pre]
+            tgt_key = [re.sub(r'(<sep>)(\1){2,}', r'\1', ite) for ite in results_pre]
 
             # 处理目标描述
             tgt_desc = list()
@@ -580,10 +583,11 @@ class Translate:
                 temp = list()
                 try:
                     # 解析存储的元数据
-                    detail = eval(ite.metadata["ALL"])
+                    # detail = eval(ite.metadata["ALL"])
                     # 处理每个知识字段
                     for field in KNOWLEDGE_FIELD_LIST:
-                        cont = detail.get(field, "")
+                        # cont = detail.get(field, "")
+                        cont = ite[:chunk_size]
                         # 处理列表类型的内容
                         if isinstance(cont, list):
                             cont = ";".join(cont).replace(";;", ";")
