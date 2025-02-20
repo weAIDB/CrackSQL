@@ -8,7 +8,7 @@
         <p>{{ $t('chat.empty.description') }}</p>
         <p class="sub-text">{{ $t('chat.empty.subText') }}</p>
       </template>
-      <el-button type="primary" @click="router.push('/')">
+      <el-button size="large" type="primary" @click="router.push('/')">
         {{ $t('chat.empty.button') }}
       </el-button>
     </el-empty>

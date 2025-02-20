@@ -227,6 +227,11 @@ export default {
   },
   knowledge: {
     title: 'Knowledge Base List',
+    empty: {
+      title: 'No Knowledge Base',
+      description: 'No knowledge base yet',
+      button: 'Create Knowledge Base'
+    },
     detail: {
       table: {
         fileName: 'File Name',
@@ -342,7 +347,12 @@ export default {
         retryError: 'Retry failed',
         deleteKbConfirm: 'Deleting the knowledge base will also delete all documents and vector data. This operation cannot be undone. Do you want to continue?',
         deleteKbTitle: 'Delete Knowledge Base',
-        deleteKbSuccess: 'Delete successful'
+        deleteKbSuccess: 'Delete successful',
+        keywordRequired: 'Please enter keyword',
+        typeRequired: 'Please select type',
+        detailRequired: 'Please enter detail',
+        descriptionRequired: 'Please enter description',
+        treeRequired: 'Please enter tree'
       },
       search: {
         title: 'Search Results (Similarity score is percentile, higher score means more relevant, 100 is maximum.)',
@@ -394,7 +404,7 @@ export default {
       }
     },
     import: {
-      json: 'Import JSON',
+      json: 'Import JSON File',
       single: 'Add Single Item',
       search: {
         placeholder: 'Please enter search content',

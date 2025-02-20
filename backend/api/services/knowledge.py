@@ -31,8 +31,6 @@ def get_knowledge_base_list() -> List[Dict]:
                 "created_at": kb.created_at.strftime("%Y-%m-%d %H:%M:%S") if kb.created_at else None,
                 "updated_at": kb.updated_at.strftime("%Y-%m-%d %H:%M:%S") if kb.updated_at else None,
                 "db_type": kb.db_type,
-                "embedding_key": kb.embedding_key,
-                "collection_id": kb.collection_id
             }
             result.append(kb_dict)
         return result
@@ -70,8 +68,7 @@ def get_knowledge_base(kb_name: str) -> Dict:
         raise
 
 
-def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_model_name: str, db_type: str,
-                          embedding_key: str) -> Dict:
+def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_model_name: str, db_type: str) -> Dict:
     """创建知识库"""
     try:
         # 检查知识库名称是否已存在
@@ -94,29 +91,13 @@ def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_mo
                 "msg": "无效的Embedding模型"
             }
 
-        # 创建Chroma集合
-        try:
-            store = ChromaStore()
-            collection_id = store.get_or_create_collection(
-                kb_name=kb_name,
-                dimension=embedding_model.dimension
-            )
-        except Exception as e:
-            logger.error(f"创建Chroma集合失败: {str(e)}")
-            return {
-                "status": False,
-                "msg": f"创建向量库失败: {str(e)}"
-            }
-
         # 创建知识库
         kb = KnowledgeBase(
             kb_name=kb_name,
             user_id=user_id,
             kb_info=kb_info,
             embedding_model_name=embedding_model_name,
-            collection_id=collection_id,
-            db_type=db_type,
-            embedding_key=embedding_key
+            db_type=db_type
         )
         db.session.add(kb)
         db.session.commit()
@@ -127,7 +108,6 @@ def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_mo
                 "kb_name": kb.kb_name,
                 "kb_info": kb.kb_info,
                 "embedding_model_name": kb.embedding_model_name,
-                "collection_id": kb.collection_id,
                 "db_type": kb.db_type,
                 "created_at": kb.created_at.strftime("%Y-%m-%d %H:%M:%S") if kb.created_at else None
             }
@@ -151,8 +131,8 @@ def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict
 
         # 使用Chroma搜索
         store = ChromaStore()
-        results = store.search_by_id(
-            collection_id=kb.collection_id,
+        results = store.search(
+            kb_name=kb_name,
             query_embedding=query_embedding,
             top_k=top_k
         )
@@ -278,8 +258,6 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
         if not kb:
             raise ValueError(f"知识库不存在: {kb_name}")
 
-        if not kb.embedding_key:
-            raise ValueError(f"知识库未设置embedding_key: {kb_name}")
 
         # 创建内容记录
         contents = []
@@ -288,14 +266,24 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
             # 验证数据格式
             if not isinstance(item, dict):
                 raise ValueError("数据项必须是字典类型")
-            # 验证是否有Description和Detail
-            if 'Description' not in item.keys() or 'Detail' not in item.keys():
-                raise ValueError("数据项必须包含Description和Detail字段")
+            # 验证是否有keyword、detail、description
+            if 'keyword' not in item.keys():
+                raise ValueError("数据项必须包含keyword字段")
+            
+            if 'detail' not in item.keys():
+                raise ValueError("数据项必须包含detail字段")
 
-            # 获取并验证embedding文本
-            embedding_text = f"{item.get('Description')} {item.get('Detail')}"
-            if embedding_text is None:
-                raise ValueError(f"未找到embedding文本")
+            if 'description' not in item.keys():
+                raise ValueError("数据项必须包含description字段")
+
+            if 'type' not in item.keys():
+                raise ValueError("数据项必须包含type字段")
+
+            if 'tree' not in item.keys():
+                raise ValueError("数据项必须包含tree字段")
+            
+            # 获取并验证embedding文本 keyword--separator--detaildescription
+            embedding_text = f"{item.get('keyword')}--separator--{item.get('detail')}{item.get('description')}"
 
             # 计算内容哈希
             content_str = json.dumps(item, sort_keys=True)
@@ -306,6 +294,7 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
                 knowledge_base_id=kb.id,
                 user_id=user_id,
                 content=content_str,
+                content_type=item.get('type'),
                 content_hash=content_hash,
                 embedding_text=embedding_text,
                 token_count=len(tiktoken.get_encoding("cl100k_base").encode(embedding_text)),
@@ -371,13 +360,18 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
             }
 
         # 获取vector_ids
-        vector_ids = [c.vector_id for c in contents if c.vector_id]
+        vector_type_ids = {}
+        for content in contents:
+            if content.content_type not in vector_type_ids:
+                vector_type_ids[content.content_type] = []
+            vector_type_ids[content.content_type].append(content.vector_id)
 
         try:
             # 从Chroma中删除向量
-            if vector_ids:
+            if vector_type_ids:
                 store = ChromaStore()
-                store.delete_by_ids(kb.collection_id, vector_ids)
+                for content_type, vector_ids in vector_type_ids.items():
+                    store.delete_by_ids(kb.collection_id, content_type, vector_ids)
 
             # 从数据库中删除记录
             for content in contents:
