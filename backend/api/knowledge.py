@@ -83,8 +83,7 @@ def create_kb():
             user_id=user_id,
             kb_info=data.get('kb_info'),
             embedding_model_name=data.get('embedding_model_name'),
-            db_type=data.get('db_type'),
-            embedding_key=data.get('embedding_key', 'Description')
+            db_type=data.get('db_type')
         )
 
         if not result['status']:

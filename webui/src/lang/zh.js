@@ -227,6 +227,11 @@ export default {
   },
   knowledge: {
     title: '知识库列表',
+    empty: {
+      title: '暂无知识库',
+      description: '还没有任何知识库',
+      button: '创建知识库'
+    },
     detail: {
       back: '返回',
       dataCount: '数据数量',
@@ -330,7 +335,12 @@ export default {
         retryError: '重试失败',
         deleteKbConfirm: '删除知识库将同时删除所有文档和向量数据，此操作不可恢复，是否继续？',
         deleteKbTitle: '删除知识库',
-        deleteKbSuccess: '删除成功'
+        deleteKbSuccess: '删除成功',
+        keywordRequired: '请输入关键词',
+        typeRequired: '请选择类型',
+        detailRequired: '请输入详细信息',
+        descriptionRequired: '请输入描述',
+        treeRequired: '请输入语法树'
       },
       search: {
         title: '搜索结果展示（近似值评分为百分制，分数越高，相关性越高，100最高。）',
@@ -379,7 +389,7 @@ export default {
         title: '创建知识库',
         desc: '点击这里创建一个新的知识库'
       }
-    },
+    },  
     import: {
       json: '导入JSON文件',
       single: '添加单条数据',

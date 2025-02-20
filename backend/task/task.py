@@ -19,9 +19,6 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
             if not kb:
                 raise ValueError(f"知识库不存在: {kb_name}")
 
-            if not kb.embedding_key:
-                raise ValueError(f"知识库未设置embedding_key: {kb_name}")
-
             # 获取要处理的内容
             contents = JSONContent.query.filter(
                 JSONContent.user_id == user_id,

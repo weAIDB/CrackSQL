@@ -10,8 +10,23 @@
       </div>
       <div class="rowEC" style="width: 100%; flex-shrink: 1;">
         <div v-if="activeIndex === 'dataset'" class="rowBC">
-          <div class="upload-container" @click="onOpenUpdateDialog">
-            <span>{{ $t('knowledge.import.json') }}</span>
+          <div class="rowBC">
+
+            <el-tooltip
+              effect="dark"
+              placement="top"
+            >
+            <div class="upload-container" @click="onOpenUpdateDialog">
+              <span>{{ $t('knowledge.import.json') }}</span>
+              <el-icon style="margin-left: 10px; height: 20px;">
+              <InfoFilled />
+            </el-icon>
+            </div>
+              <template #content>
+                Json文件请参考以下格式：
+                <pre style="text-align: left; margin: 10px;">{{ jsonFormatExample }}</pre>
+              </template>
+            </el-tooltip>
           </div>
           <div class="upload-container" style="margin-left: 10px;" @click="showAddItemDialog">
             <span>{{ $t('knowledge.import.single') }}</span>
@@ -68,8 +83,8 @@
               >
                 <div class="card-content">
                   <div class="card-header">
-                    <span class="operator">{{ item.content?.Operator }}</span>
-                    <div class="status-actions">
+                    <span class="operator">{{ item.content?.keyword || item.content?.Operator }}</span>
+                    <div class="header-right">
                       <el-tag 
                         :type="getStatusType(item.status)" 
                         size="small" 
@@ -77,11 +92,12 @@
                       >
                         {{ $t(`knowledge.detail.status.${item.status}`) }}
                       </el-tag>
-                      <div class="actions" v-if="item.status === 'completed' || item.status === 'failed'">
-                        <el-button type="danger" link @click="handleDeleteItem(index)">
-                          {{ $t('knowledge.detail.button.delete') }}
-                        </el-button>
-                      </div>
+                      <el-button 
+                        type="primary"  
+                        @click="toggleExpand(index)"
+                      >
+                        {{ expandedCards[index] ? '收起' : '展开' }}
+                      </el-button>
                     </div>
                   </div>
 
@@ -106,24 +122,25 @@
                     </el-alert>
                   </div>
 
-                  <div class="card-info">
-                    <el-tag size="small" type="info" class="time-tag">
-                      {{ formatTime(item.created_at) }}
-                    </el-tag>
-                  </div>
+                  <div v-show="expandedCards[index]" class="card-body">
+                    <div class="card-info">
+                      <div class="info-right">
+                        <el-tag size="small" type="info" class="time-tag">
+                          {{ formatTime(item.created_at) }}
+                        </el-tag>
+                        <div v-if="item.status === 'completed' || item.status === 'failed'" class="actions">
+                          <el-button type="danger" @click="handleDeleteItem(index)">
+                            {{ $t('knowledge.detail.button.delete') }}
+                          </el-button>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div class="card-body">
                     <div class="info-item">
-                      <div class="label">{{ $t('knowledge.detail.card.description') }}</div>
-                      <div class="description">{{ item.content?.Description }}</div>
-                    </div>
-                    <div class="info-item">
-                      <div class="label">{{ $t('knowledge.detail.card.tree') }}</div>
-                      <div class="tree">{{ item.content?.Tree }}</div>
-                    </div>
-                    <div class="info-item">
-                      <div class="label">{{ $t('knowledge.detail.card.detail') }}</div>
-                      <div class="detail">{{ item.content?.Detail }}</div>
+                      <div class="label">Content:</div>
+                      <div class="content-value">
+                        <pre class="json-content">{{ JSON.stringify(item.content, null, 2) }}</pre>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -138,10 +155,10 @@
               :close-on-click-modal="false"
             >
               <el-form v-if="currentEditItem" label-width="auto" label-position="right" class="edit-form">
-                <el-form-item :label="$t('knowledge.detail.form.operator')">
+                <el-form-item label="keyword">
                   <el-input v-model="currentEditItem.Operator" />
                 </el-form-item>
-                <el-form-item :label="$t('knowledge.detail.form.description')">
+                <el-form-item label="description">
                   <el-input
                     v-model="currentEditItem.Description"
                     type="textarea"
@@ -292,30 +309,54 @@
         :element-loading-text="$t('knowledge.detail.dialog.add.loading')"
         element-loading-background="rgba(255, 255, 255, 0.7)"
       >
-        <el-form v-if="newItem" label-width="auto" label-position="right" class="edit-form">
-          <el-form-item :label="$t('knowledge.detail.form.operator')">
-            <el-input v-model="newItem.Operator" />
+        <el-form 
+          ref="newItemForm" 
+          :model="newItem"
+          :rules="newItemRules"
+          v-if="newItem" 
+          size="large" 
+          label-width="auto" 
+          label-position="right" 
+          class="edit-form"
+        >
+          <el-form-item label="keyword" prop="keyword">
+            <el-input v-model="newItem.keyword" />
           </el-form-item>
-          <el-form-item :label="$t('knowledge.detail.form.description')">
+          <el-form-item label="type" prop="type">
+            <el-select v-model="newItem.type" :placeholder="$t('knowledge.detail.dialog.add.typePlaceholder')">
+              <el-option label="function" value="function" />
+              <el-option label="keyword" value="keyword" />
+              <el-option label="type" value="type" />
+              <el-option label="operator" value="operator" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="detail" prop="detail">
             <el-input
-              v-model="newItem.Description"
+              v-model="newItem.detail"
+              type="textarea"
+              :rows="2"
+            />
+          </el-form-item>
+          <el-form-item label="description" prop="description">
+            <el-input
+              v-model="newItem.description"
+              type="textarea"
+              :rows="2"
+            />
+          </el-form-item>
+          <el-form-item label="tree" prop="tree">
+            <el-input
+              v-model="newItem.tree"
               type="textarea"
               :rows="3"
             />
           </el-form-item>
-          <el-form-item :label="$t('knowledge.detail.form.link')">
-            <el-input v-model="newItem.Link" />
+          <el-form-item label="link" prop="link">
+            <el-input v-model="newItem.link" />
           </el-form-item>
-          <el-form-item :label="$t('knowledge.detail.form.tree')">
+          <el-form-item label="example" prop="example">
             <el-input
-              v-model="newItem.Tree"
-              type="textarea"
-              :rows="3"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('knowledge.detail.form.detail')">
-            <el-input
-              v-model="newItem.Detail"
+              v-model="newItem.example"
               type="textarea"
               :rows="5"
             />
@@ -338,15 +379,15 @@
 
 <script setup lang="ts" name="KnowledgeDetail">
 import {knowledgeBaseDeleteReq, knowledgeBaseDetailReq, knowledgeBaseUpdateInfoReq, knowledgeSearchDocsReq, getKnowledgeBaseItemsReq, addKnowledgeBaseItemsReq, deleteKnowledgeBaseItemsReq, vectorizeKnowledgeBaseItemsReq} from "@/api/knowledge";
-import {useBasicStore} from "@/store/basic";
-import {Delete, Document, Search, Setting} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from 'element-plus'
 import type {Ref} from 'vue'
 import {onMounted, reactive, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from '@/hooks/use-i18n'
+import { FormInstance } from 'element-plus'
+import { InfoFilled } from '@element-plus/icons-vue'
+const i18n = useI18n()
 
-const basicStore = useBasicStore()
 const router = useRouter()
 const route = useRoute()
 const activeIndex = ref('dataset')
@@ -354,16 +395,11 @@ const itemList: Ref<Array<any>> = ref([])
 const currentPage = ref(1)
 const pageSize = ref(20)
 const totalCount = ref(0)
-const loading = ref(false)
-const showDetailIndex = ref(-1)
-const reviewDrawer: Ref<boolean> = ref(false)
-const reviewDrawerLoading: Ref<boolean> = ref(true)
-const reviewDrawerTitle: Ref<string> = ref('')
 const searchValue = ref('')
 const searchResult = ref([])
 const searching = ref(false)
+const newItemForm = ref<FormInstance | null>(null)
 const pollingTimer = ref<NodeJS.Timer | null>(null)
-const expandLoading = ref<boolean>(false)
 
 const editForm = reactive({
   kb_id: '',
@@ -372,6 +408,24 @@ const editForm = reactive({
   embedding_model_name: '',
   db_type: ''
 })
+
+const newItemRules = {
+  keyword: [
+    { required: true, message: i18n.t('knowledge.detail.message.keywordRequired'), trigger: 'blur' }
+  ],
+  type: [
+    { required: true, message: i18n.t('knowledge.detail.message.typeRequired'), trigger: 'blur' }
+  ],
+  detail: [
+    { required: true, message: i18n.t('knowledge.detail.message.detailRequired'), trigger: 'blur' }
+  ],
+  description: [
+    { required: true, message: i18n.t('knowledge.detail.message.descriptionRequired'), trigger: 'blur' }
+  ],
+  tree: [
+    { required: true, message: i18n.t('knowledge.detail.message.treeRequired'), trigger: 'blur' }
+  ]
+}
 
 const chunksDialogVisible = ref(false)
 const chunksDialogTitle = ref("文档分块详情")
@@ -387,14 +441,27 @@ const currentEditIndex = ref(-1)
 const addItemDialogVisible = ref(false)
 const addingItem = ref(false)
 const newItem = ref({
-  Operator: '',
-  Description: '',
-  Link: '',
-  Tree: '',
-  Detail: ''
+  keyword: '',
+  type: '',
+  tree: '',
+  detail: '',
+  description: '',
+  link: '',
+  example: ''
 })
 
-const i18n = useI18n()
+// 添加 JSON 格式示例
+const jsonFormatExample = ref(`[
+  {
+    "keyword": "关键词，必填",
+    "type": "function, keyword, type, operator 四个中选择一个。必填",
+    "tree": "语法树，必填",
+    "detail": "详细信息，必填",
+    "description": "简要描述，必填",
+    "link": "相关链接",
+    "example": "使用示例"
+  }
+]`)
 
 watch(() => activeIndex.value,
     (newValue, oldValue) => {
@@ -614,11 +681,13 @@ onMounted(() => {
 
 
 interface JsonItem {
-  Operator: string
-  Description: string
-  Link: string
-  Tree: string
-  Detail: string
+  keyword: string
+  type: string
+  tree: string
+  detail: string
+  description: string
+  link: string
+  example: string
 }
 
 // 处理编辑
@@ -668,30 +737,52 @@ const handleDeleteItem = async (index: number) => {
 // 显示添加对话框
 const showAddItemDialog = () => {
   newItem.value = {
-    Operator: '',
-    Description: '',
-    Link: '',
-    Tree: '',
-    Detail: ''
+    keyword: '',
+    type: '',
+    tree: '',
+    detail: '',
+    description: '',
+    link: '',
+    example: ''
   }
   addItemDialogVisible.value = true
 }
 
 // 处理添加新知识
 const handleAddItem = async () => {
-  try {
-    addingItem.value = true
-    await addKnowledgeBaseItemsReq(route.query.kb_name, [newItem.value])
-    addItemDialogVisible.value = false
-    setTimeout(() => {
-      getItems()
-      addingItem.value = false
-    }, 1000)
-    ElMessage.success(i18n.t('knowledge.detail.message.addSuccess'))
-  } catch (error: any) {
-    ElMessage.error(error.message || i18n.t('knowledge.detail.message.addError'))
-    addingItem.value = false
-  }
+  const formEl = newItemForm.value as FormInstance | undefined
+  
+  if (!formEl) return
+
+  await formEl.validate((valid) => {
+    if (valid) {
+      addingItem.value = true
+      addKnowledgeBaseItemsReq(route.query.kb_name, [newItem.value])
+        .then((res) => {
+          if (res.code === 0 && res.data.status) {
+            addItemDialogVisible.value = false
+            setTimeout(() => {
+              getItems()
+              addingItem.value = false
+            }, 1000)
+            ElMessage.success(i18n.t('knowledge.detail.message.addSuccess'))
+          } else {
+            addingItem.value = false  
+            ElMessage.error(res.data.message || i18n.t('knowledge.detail.message.addError'))
+          }
+        })
+        .catch(() => {
+          addingItem.value = false
+          ElMessage.error(i18n.t('knowledge.detail.message.addError'))
+        })
+    }
+  })
+}
+
+const expandedCards = ref<{ [key: number]: boolean }>({})
+
+const toggleExpand = (index: number) => {
+  expandedCards.value[index] = !expandedCards.value[index]
 }
 
 </script>
@@ -907,8 +998,11 @@ const handleAddItem = async () => {
   color: white;
   border-radius: 10px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  width: 120px;
-  
+  padding: 10px 15px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   &:hover {
     opacity: 0.9;
   }
@@ -922,9 +1016,9 @@ const handleAddItem = async () => {
 }
 
 .cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   padding: 20px;
   overflow-y: auto;
   height: calc(100vh - 120px);
@@ -932,19 +1026,13 @@ const handleAddItem = async () => {
 
 .item-card {
   transition: all 0.3s ease;
-  height: 100%;
-  min-height: 300px;
+  width: 100%;
+  margin-bottom: 0;
 
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-}
-
-.card-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
 }
 
 .card-header {
@@ -953,41 +1041,59 @@ const handleAddItem = async () => {
   align-items: center;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--el-border-color-lighter);
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 .operator {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: var(--el-color-primary);
 }
 
 .card-body {
-  flex: 1;
+  margin-top: 12px;
+  padding: 16px;
+  background-color: var(--el-fill-color-light);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.card-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .info-item {
   .label {
     font-size: 14px;
+    font-weight: bold;
     color: var(--el-text-color-regular);
     margin-bottom: 4px;
   }
 
-  .description,
-  .tree,
-  .detail {
+  .content-value {
     font-size: 14px;
     line-height: 1.3;
     color: var(--el-text-color-primary);
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-  }
-  .detail {
-    margin-bottom: 20px;
+    margin-bottom: 8px;
+    
+    .json-content {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: var(--el-fill-color-light);
+      border-radius: 4px;
+      padding: 8px;
+      margin: 0;
+      font-family: monospace;
+      min-height: 100px;
+      line-height: 1.6;
+      font-size: 16px;
+    }
   }
 }
 
@@ -1021,12 +1127,24 @@ const handleAddItem = async () => {
 
 .card-info {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  gap: 8px;
-  margin: 12px 0;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
   
-  .time-tag {
-    font-size: 12px;
+  .info-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .time-tag {
+      font-size: 12px;
+    }
+    
+    .actions {
+      margin-left: 8px;
+    }
   }
 }
 
@@ -1039,6 +1157,23 @@ const handleAddItem = async () => {
   &.failed {
     border: 1px solid var(--el-color-danger-light-5);
   }
+}
+
+/* 美化滚动条样式 */
+.card-body::-webkit-scrollbar,
+.json-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.card-body::-webkit-scrollbar-thumb,
+.json-content::-webkit-scrollbar-thumb {
+  background-color: var(--el-border-color-lighter);
+  border-radius: 3px;
+}
+
+.card-body::-webkit-scrollbar-track,
+.json-content::-webkit-scrollbar-track {
+  background-color: transparent;
 }
 
 </style>

@@ -120,14 +120,11 @@ class KnowledgeBase(db.Model, BaseModel):
     kb_name = db.Column(db.String(256), unique=True, nullable=False, comment="知识库名称")
     kb_info = db.Column(db.Text, nullable=True, comment="知识库描述")
     db_type = db.Column(db.String(32), nullable=False, comment="数据库类型:mysql/postgresql/oracle")
-    embedding_key = db.Column(db.String(256), nullable=True, default="Description", comment="向量化字段名")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_knowledge_base_user_id'), nullable=True,
                         comment="创建用户ID")
-    collection_id = db.Column(db.String(64), nullable=False, comment="Chroma集合ID")
     embedding_model_name = db.Column(db.String(256),
                                      db.ForeignKey('llm_models.name', name='fk_knowledge_base_embedding_model'),
                                      nullable=False, comment="向量模型名称")
-
     # 添加关联关系
     embedding_model = db.relationship('LLMModel', backref=db.backref('knowledge_bases', lazy=True), lazy='joined')
 
@@ -137,6 +134,7 @@ class JSONContent(db.Model, BaseModel):
     __tablename__ = 'json_contents'
 
     content = db.Column(db.Text, nullable=False, comment="JSON内容")
+    content_type = db.Column(db.String(32), nullable=False, comment="内容类型: function/keyword/type/operator")
     content_hash = db.Column(db.String(64), nullable=False, comment="内容哈希值")
     embedding_text = db.Column(db.Text, nullable=True, comment="用于向量化的文本")
     token_count = db.Column(db.Integer, nullable=True, comment="Token数量")

@@ -32,7 +32,7 @@
           </template>
           <template v-else>
             <p class="sub-text">{{ $t('history.empty.subText') }}</p>
-            <el-button type="primary" @click="router.push('/')">
+            <el-button size="large" type="primary" @click="router.push('/')">
               {{ $t('history.empty.button') }}
             </el-button>
           </template>
