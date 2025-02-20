@@ -1,4 +1,6 @@
-TOP_K = 5
+# TODO: 优化掉，用户自己填
+
+TOP_K = 1
 
 FAILED_TEMPLATE = 'Cannot translate!'
 
@@ -14,7 +16,6 @@ KNOWLEDGE_FIELD_LIST = ['Argument Type', 'Argument Type(s)',
 
 oracle_locate_open = False
 
-# TODO: 优化掉，用户自己填
 map_rep = {
     'pg': 'PostgreSQL 14.7',
     'mysql': "MySQL 8.4",
