@@ -371,7 +371,7 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
             if vector_type_ids:
                 store = ChromaStore()
                 for content_type, vector_ids in vector_type_ids.items():
-                    store.delete_by_ids(kb.collection_id, content_type, vector_ids)
+                    store.delete_by_ids(kb.kb_name, content_type, vector_ids)
 
             # 从数据库中删除记录
             for content in contents:
@@ -444,7 +444,7 @@ def delete_knowledge_base(kb_name: str) -> Dict:
 
             # 2. 删除Chroma集合（会自动删除集合中的所有向量）
             store = ChromaStore()
-            store.delete_collection(kb.collection_id)
+            store.delete_collection(kb.kb_name)
 
         except Exception as e:
             logger.error(f"删除关联数据失败: {str(e)}")

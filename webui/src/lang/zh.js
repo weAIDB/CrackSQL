@@ -397,6 +397,7 @@ export default {
         placeholder: '请输入搜索内容',
         button: '搜索'
       },
+      addQueue: '添加任务队列，将在 {countdown} 秒后跳转回知识列表。',
       title: '导入知识库',
       prevStep: '上一步',
       steps: {
