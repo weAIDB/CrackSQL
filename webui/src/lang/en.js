@@ -406,6 +406,7 @@ export default {
     import: {
       json: 'Import JSON File',
       single: 'Add Single Item',
+      addQueue: 'Add task queue, will redirect back to knowledge list in {countdown} seconds.',
       search: {
         placeholder: 'Please enter search content',
         button: 'Search'

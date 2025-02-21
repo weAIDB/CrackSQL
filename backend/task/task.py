@@ -35,39 +35,50 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
 
             try:
                 # 生成向量
-                embedding_texts = [c.embedding_text for c in contents]
-                embeddings = await get_embeddings(
-                    embedding_texts,
-                    model_name=kb.embedding_model_name
-                )
-
-                # 使用uuid生成唯一ID
-                vector_ids = [str(uuid.uuid4()) for _ in contents]
-
-                # 准备元数据
-                metadatas = []
+                embedding_type_texts = {}
                 for c in contents:
-                    metadata = {
+                    if c.content_type not in embedding_type_texts.keys():
+                        embedding_type_texts[c.content_type] = {
+                            'original_contents': [],
+                            'texts': [],
+                            'metadatas': []
+                        }
+                    embedding_type_texts[c.content_type]['original_contents'].append(c)
+                    embedding_type_texts[c.content_type]['texts'].append(c.embedding_text)
+                    embedding_type_texts[c.content_type]['metadatas'].append({
                         'content_id': str(c.id),
                         'knowledge_base_id': str(kb.id),
+                        'content_type': c.content_type,
                         'content': json.dumps(c.content)
-                    }
-                    metadatas.append(metadata)
+                    })
 
-                # 保存到Chroma
-                store = ChromaStore()
-                store.add_texts(
-                    collection_id=kb.collection_id,
-                    texts=embedding_texts,
-                    embeddings=embeddings,
-                    ids=vector_ids,
-                    metadatas=metadatas
-                )
 
-                # 更新状态
-                for content, vector_id in zip(contents, vector_ids):
-                    content.status = 'completed'
-                    content.vector_id = vector_id
+                for embedding_type in embedding_type_texts.keys():
+
+                    texts = embedding_type_texts[embedding_type]['texts']
+                    metadatas = embedding_type_texts[embedding_type]['metadatas']
+                    embeddings = await get_embeddings(
+                        texts,
+                        model_name=kb.embedding_model_name
+                    )                                    # 使用uuid生成唯一ID
+                    vector_ids = [str(uuid.uuid4()) for _ in texts]
+                    original_contents = embedding_type_texts[embedding_type]['original_contents']
+                    # 保存到Chroma
+                    store = ChromaStore()
+                    store.add_texts(
+                        kb_name=kb.kb_name,
+                        content_type=embedding_type,
+                        texts=texts,
+                        embeddings=embeddings,
+                        ids=vector_ids,
+                        metadatas=metadatas
+                    )
+
+                    # 更新状态
+                    for original_content, vector_id in zip(original_contents, vector_ids):
+                        original_content.status = 'completed'
+                        original_content.vector_id = vector_id
+                        original_content.error_msg = ""
 
                 db.session.commit()
 

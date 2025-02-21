@@ -98,7 +98,7 @@
             >
               <div class="card-content">
                 <div class="card-header">
-                  <span class="operator">{{ item.Operator }}</span>
+                  <span class="operator">#{{ index + 1 }}</span>
                   <div class="actions">
                     <el-button type="primary" link @click="handleEdit(index)">
                       {{ $t('knowledge.import.card.edit') }}
@@ -108,19 +108,11 @@
                     </el-button>
                   </div>
                 </div>
-                <div class="card-body">
-                  <div class="info-item">
-                    <div class="label">{{ $t('knowledge.import.card.description') }}</div>
-                    <div class="description">{{ item.Description }}</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="label">{{ $t('knowledge.import.card.tree') }}</div>
-                    <div class="tree">{{ item.Tree }}</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="label">{{ $t('knowledge.import.card.detail') }}</div>
-                    <div class="detail">{{ item.Detail }}</div>
-                  </div>
+                <div class="key-value-list">
+                    <div v-for="(value, key) in flattenObject(item)" :key="key" class="key-value-item">
+                      <div class="key-label">{{ key }}:</div>
+                      <pre class="value-content">{{ formatValue(value) }}</pre>
+                    </div>
                 </div>
               </div>
             </el-card>
@@ -136,7 +128,7 @@
               <CircleCheckFilled />
             </el-icon>
             <span style="font-size: 16px">
-              {{ $t('knowledge.import.message.addQueue', { countdown }) }}
+              {{ $t('knowledge.import.addQueue', { countdown }) }}
             </span>
           </div>
         </div>
@@ -163,35 +155,14 @@
       width="80%"
       :close-on-click-modal="false"
     >
-      <el-form v-if="currentEditItem" label-width="auto" label-position="right" class="edit-form">
-        <el-form-item :label="$t('knowledge.import.dialog.edit.operator')">
-          <el-input v-model="currentEditItem.Operator" />
-        </el-form-item>
-        <el-form-item :label="$t('knowledge.import.dialog.edit.description')">
-          <el-input
-            v-model="currentEditItem.Description"
-            type="textarea"
-            :rows="3"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('knowledge.import.dialog.edit.link')">
-          <el-input v-model="currentEditItem.Link" />
-        </el-form-item>
-        <el-form-item :label="$t('knowledge.import.dialog.edit.tree')">
-          <el-input
-            v-model="currentEditItem.Tree"
-            type="textarea"
-            :rows="3"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('knowledge.import.dialog.edit.detail')">
-          <el-input
-            v-model="currentEditItem.Detail"
-            type="textarea"
-            :rows="5"
-          />
-        </el-form-item>
-      </el-form>
+      <div v-if="currentEditItem" class="edit-form">
+        <el-input
+          v-model="jsonEditString"
+          type="textarea"
+          :rows="20"
+          :placeholder="$t('knowledge.import.dialog.edit.jsonPlaceholder')"
+        />
+      </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="editDialogVisible = false">
@@ -220,11 +191,7 @@ const uploadRef = ref()
 const i18n = useI18n()
 
 interface JsonItem {
-  Operator: string
-  Description: string
-  Link: string
-  Tree: string
-  Detail: string
+  [key: string]: any
 }
 
 // 添加el-upload的文件类型
@@ -312,25 +279,15 @@ const handleFileChange = async (file: UploadFile) => {
   const reader = new FileReader()
   reader.onload = (e) => {
     try {
-
       const content = JSON.parse(e.target?.result as string)
-      if (!Array.isArray(content)) {
-        fileItem.parseStatus = 'exception'
-        ElMessage.error(`${file.name}: JSON文件内容必须是数组格式`)
-        return
-      }
-
-      // 验证数组项格式
-      const validItems = content.map(item => ({
-        Operator: item.Operator || '',
-        Description: item.Description || '',
-        Link: item.Link || '',
-        Tree: item.Tree || '',
-        Detail: item.Detail || ''
-      }))
+      const items = Array.isArray(content) ? content : [content]
 
       // 更新文件列表
-      fileList.value = fileList.value.map(f => f.name === file.name ? { ...f, parseProgress: 100, parseStatus: 'success', itemCount: validItems.length, items: validItems } : f)
+      fileList.value = fileList.value.map(f => 
+        f.name === file.name 
+          ? { ...f, parseProgress: 100, parseStatus: 'success', itemCount: items.length, items } 
+          : f
+      )
 
       // 合并到总的items中
       jsonItems.value = fileList.value.reduce((acc, file) => {
@@ -340,7 +297,11 @@ const handleFileChange = async (file: UploadFile) => {
         return acc
       }, [])
     } catch (error) {
-      fileList.value = fileList.value.map(f => f.name === file.name ? { ...f, parseProgress: 100, parseStatus: 'exception' } : f)
+      fileList.value = fileList.value.map(f => 
+        f.name === file.name 
+          ? { ...f, parseProgress: 100, parseStatus: 'exception' } 
+          : f
+      )
       ElMessage.error(`${file.name}: JSON文件解析失败`)
       console.error('JSON解析错误:', error)
     }
@@ -376,7 +337,7 @@ const handleNextStep = async () => {
 // 上传数据到知识库
 const handleUpload = async () => {
   if (jsonItems.value.length === 0) {
-    ElMessage.warning('请先选择要上传的数据')
+    ElMessage.warning('Please select data to upload first')
     return
   }
 
@@ -397,13 +358,13 @@ const handleUpload = async () => {
           }
         }, 1000)
       } else {
-        ElMessage.error(vectorizeRes.data.message || '向量化失败')
+        ElMessage.error(vectorizeRes.data.message || 'Vectorize failed')
       }
     } else {
-      ElMessage.error(res.data.message || '上传失败')
+      ElMessage.error(res.data.message || 'Upload failed')
     }
   } catch (error: any) {
-    ElMessage.error(error.message || '上传失败')
+    ElMessage.error(error.message || 'Upload failed')
   } finally {
     uploading.value = false
   }
@@ -412,20 +373,66 @@ const handleUpload = async () => {
 const editDialogVisible = ref(false)
 const currentEditItem = ref<JsonItem | null>(null)
 const currentEditIndex = ref(-1)
+const jsonEditString = ref('')
 
 // 处理编辑
 const handleEdit = (index: number) => {
   currentEditIndex.value = index
-  currentEditItem.value = { ...jsonItems.value[index] }
+  currentEditItem.value = jsonItems.value[index]
+  jsonEditString.value = JSON.stringify(currentEditItem.value, null, 2)
   editDialogVisible.value = true
 }
 
 // 保存编辑
 const handleSaveEdit = () => {
-  if (currentEditItem.value && currentEditIndex.value !== -1) {
-    jsonItems.value[currentEditIndex.value] = { ...currentEditItem.value }
+  try {
+    const parsedJson = JSON.parse(jsonEditString.value)
+    if (currentEditIndex.value !== -1) {
+      jsonItems.value[currentEditIndex.value] = parsedJson
+    }
+    editDialogVisible.value = false
+  } catch (error) {
+    ElMessage.error('Invalid JSON format, please check the format')
   }
-  editDialogVisible.value = false
+}
+
+// 添加展平对象的方法
+const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
+  const flattened: Record<string, any> = {}
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key]
+      const newKey = prefix ? `${prefix}.${key}` : key
+
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        Object.assign(flattened, flattenObject(value, newKey))
+      } else {
+        flattened[newKey] = value
+      }
+    }
+  }
+
+  return flattened
+}
+
+// 格式化值的显示
+const formatValue = (value: any): string => {
+  if (value === null || value === undefined) {
+    return '-'
+  }
+  if (Array.isArray(value)) {
+    return value.length > 50 
+      ? `[Array(${value.length})]` 
+      : JSON.stringify(value)
+  }
+  if (typeof value === 'object') {
+    return '[Object]'
+  }
+  if (typeof value === 'string' && value.length > 100) {
+    return value.slice(0, 100) + '...'
+  }
+  return String(value)
 }
 </script>
 
@@ -633,7 +640,7 @@ const handleSaveEdit = () => {
 
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   gap: 20px;
   padding: 20px;
   overflow-y: auto;
@@ -642,8 +649,8 @@ const handleSaveEdit = () => {
 
 .item-card {
   transition: all 0.3s ease;
-  height: 100%;
-  min-height: 300px;
+  height: 450px;
+  min-height: 100px;
 }
 
 .item-card:hover {
@@ -672,70 +679,47 @@ const handleSaveEdit = () => {
   color: var(--el-color-primary);
 }
 
-.card-body {
+.key-value-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 12px;
-  flex: 1;
-  justify-content: space-between;
+  overflow-y: scroll;
+  padding: 16px;
+  height: 360px;
 }
 
-.info-item {
+.key-value-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 0;
-  flex-shrink: 1;
 }
 
-.info-item:last-child {
-  margin-bottom: 8px;
-}
-
-.label {
-  font-size: 13px;
-  color: #909399;
+.key-label {
+  color: #606266;
   font-weight: 500;
+  font-size: 14px;
+  border-radius: 4px;
 }
 
-.description {
-  font-size: 14px;
-  color: #606266;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.value-content {
+  margin: 0;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
   line-height: 1.5;
-}
-
-.tree {
-  font-size: 14px;
-  color: #606266;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.5;
-}
-
-.detail {
-  font-size: 14px;
-  color: #606266;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #333;
 }
 
 .edit-form {
-  max-height: 60vh;
-  overflow-y: auto;
   padding: 20px;
 }
 
-:deep(.el-dialog__body) {
-  padding: 0;
+:deep(.el-textarea__inner) {
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
 }
 </style>

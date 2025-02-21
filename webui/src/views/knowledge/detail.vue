@@ -458,8 +458,8 @@ const jsonFormatExample = ref(`[
     "tree": "语法树，必填",
     "detail": "详细信息，必填",
     "description": "简要描述，必填",
-    "link": "相关链接",
-    "example": "使用示例"
+    "link": ["相关链接1", "相关链接2", "相关链接3"],
+    "example": ["使用示例1", "使用示例2", "使用示例3"]
   }
 ]`)
 
