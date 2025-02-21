@@ -16,7 +16,7 @@
               effect="dark"
               placement="top"
             >
-            <div class="upload-container" @click="onOpenUpdateDialog">
+            <div class="upload-container rowSC" @click="onOpenUpdateDialog">
               <span>{{ $t('knowledge.import.json') }}</span>
               <el-icon style="margin-left: 10px; height: 20px;">
               <InfoFilled />
@@ -78,7 +78,7 @@
               <el-card 
                 v-for="(item, index) in itemList" 
                 :key="index" 
-                class="item-card"
+                style="overflow: visible !important;"
                 shadow="hover"
               >
                 <div class="card-content">
@@ -1000,9 +1000,6 @@ const toggleExpand = (index: number) => {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   padding: 10px 15px;
   height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   &:hover {
     opacity: 0.9;
   }
@@ -1024,16 +1021,6 @@ const toggleExpand = (index: number) => {
   height: calc(100vh - 120px);
 }
 
-.item-card {
-  transition: all 0.3s ease;
-  width: 100%;
-  margin-bottom: 0;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-}
 
 .card-header {
   display: flex;

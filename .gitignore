@@ -374,9 +374,9 @@ stats.html
 
 
 backend/configs.py
-backend/instance/info.db
-backend/local_models
+backend/instance/
 backend/migrations
+backend/local_models
 webui/node_modules
 webui/dist
 *.venv
@@ -387,3 +387,4 @@ webui/dist
 
 # Add this new rule
 !webui/src/lib
+
