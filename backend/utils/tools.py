@@ -344,11 +344,11 @@ def parse_llm_answer(answer, pattern):
 
 
 def parse_llm_answer_v2(model_id, answer_raw, pattern):
-    if "gpt-" in model_id:
+    if "gpt-" in model_id.lower():
         answer = answer_raw['choices'][0]['message']['content']
-    elif "llama" in model_id:
+    elif "llama" in model_id.lower():
         answer = answer_raw['content']
-    elif "qwen" in model_id:
+    elif "qwen" in model_id.lower():
         answer = answer_raw['content']
 
     try:
@@ -378,6 +378,40 @@ def parse_llm_answer_v2(model_id, answer_raw, pattern):
     except Exception as e:
         traceback.print_exc()
         return {"Answer": str(e), "Reasoning": "Error occurs!", "Confidence": 0}
+
+
+def process_history_text(text, role, action):
+    if role == "user" and action == "translate":
+        # 1. input process
+        input_sql_section = "The input SQL snippet is:"
+        text = f"The current SQL snippet to be translated is:\n {text.split(input_sql_section)[-1]}"
+
+        specification_section_start = "Below are specifications"
+        specification_section_end = "specific SQL snippets in the input SQL snippet."
+        text = f"{text.split(specification_section_start)[0]}{text.split(specification_section_end)[-1]}"
+        text = text.replace("<< SPECIFICATION START >>", "").replace("<< SPECIFICATION END >>", "")
+        text = text.replace("<< EXAMPLE START >>", "").replace("<< EXAMPLE END >>", "")
+        text = text.replace("<reflection>", "`").replace("</reflection>", "`")
+
+        # 2. output process
+        output_section = "## OUTPUT FORMAT ##"
+        text = text.split(output_section)[0]
+
+    if role == "user" and action == "judge":
+        # 1. input process
+        text_prefix = text.split("This means they should return the same results with consistent data types")[0]
+        text_suffix = text.split("## INPUT ##")[-1]
+        text = f"{text_prefix}\n{text_suffix}"
+
+        # 2. output process
+        output_section = "## OUTPUT FORMAT ##"
+        text = text.split(output_section)[0]
+
+    if role == "assistant":
+        if "```" not in text:
+            text = f"```json\n{text}\n```"
+
+    return text
 
 
 def reformat_sql(ori_sql: str):

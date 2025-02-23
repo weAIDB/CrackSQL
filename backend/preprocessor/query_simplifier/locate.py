@@ -217,7 +217,8 @@ def replace_piece(piece, new_piece):
         father_piece['SubPieces'].remove(piece)
         father_piece['SubPieces'].append(new_piece)
         for sub_piece in piece['SubPieces']:
-            father_piece['SubPieces'].remove(sub_piece)
+            if sub_piece in father_piece['SubPieces']:
+                father_piece['SubPieces'].remove(sub_piece)
         for sub_piece in new_piece['SubPieces']:
             father_piece['SubPieces'].append(sub_piece)
         father_piece = father_piece['FatherPiece']

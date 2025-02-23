@@ -15,7 +15,7 @@ class DatabaseType(str, Enum):
     def choices(cls):
         """返回选项列表，用于表单选择"""
         return [
-            {"value": cls.MYSQL.value, "name": "MySql"},
+            {"value": cls.MYSQL.value, "name": "MySQL"},
             {"value": cls.POSTGRESQL.value, "name": "PostgreSQL"},
             {"value": cls.ORACLE.value, "name": "Oracle"}
         ]

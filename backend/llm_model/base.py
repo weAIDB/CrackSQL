@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class BaseLLM(ABC):
     """基础LLM类"""
 
@@ -30,8 +31,8 @@ class BaseLLM(ABC):
 
     @abstractmethod
     async def chat(self,
-                  messages: List[Union[SystemMessage, HumanMessage]],
-                  **kwargs) -> str:
+                   messages: List[Union[SystemMessage, HumanMessage]],
+                   **kwargs) -> str:
         """聊天接口"""
         pass
 

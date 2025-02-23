@@ -4,6 +4,7 @@ from config.db_config import db
 from sqlalchemy import or_
 from llm_model.llm_manager import llm_manager
 
+
 class LLMModelService:
     """LLM模型服务"""
 

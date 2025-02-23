@@ -80,7 +80,7 @@ class LLMManager:
             logger.error(f"模型不存在: {name}, 不需要重新加载")
 
         # 释放模型，释放后模型会被销毁
-        self._models[name].release()
+        # self._models[name].release()
 
         # 重新加载模型
         return self.get_model(name, config)
