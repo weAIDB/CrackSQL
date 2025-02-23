@@ -4,7 +4,11 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 from config.logging_config import logger
-from utils.constants import TOP_K, FAILED_TEMPLATE
+from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, OUT_TYPE, RETRIEVAL_ON
+
+
+# TODO:
+# out_type
 
 
 class RewriteService:
@@ -238,37 +242,41 @@ class RewriteService:
                     "password": target_db.password,
                     "db_name": target_db.database
                 }
-                embedding_config = {
-                    "src_embedding_model_name": history.original_kb.embedding_model_name,
-                    "tgt_embedding_model_name": history.original_kb.embedding_model_name
-                }
                 vector_config = {
-                    "src_collection_id": history.original_kb.collection_id,
-                    "tgt_collection_id": history.target_kb.collection_id,
-                    "top_k": TOP_K
+                    "src_kb_name": history.original_kb.kb_name,
+                    "tgt_kb_name": history.target_kb.kb_name,
+                    "src_embedding_model_name": history.original_kb.embedding_model_name,
+                    "tgt_embedding_model_name": history.original_kb.embedding_model_name,
                 }
 
                 translate = Translate(model_name=history.llm_model_name, src_sql=history.original_sql,
                                       src_dialect=history.source_db_type.lower(),
-                                      tgt_dialect=history.target_db.db_type.lower(), tgt_db_config=target_db_config,
-                                      embedding_config=embedding_config, vector_config=vector_config,
-                                      history_id=history_id, out_type="db", retrieval_on=True)
-                now_sql, model_ans_list, used_pieces, lift_histories = translate.local_rewrite(max_retry_time=2)
-                print("now_sql", now_sql)
-                RewriteService.add_rewrite_process(
-                    history_id=history_id,
-                    content=f"```{str(now_sql)}```",
-                    step_name="错误信息",
-                    role='assistant',
-                    is_success=False
-                )
+                                      tgt_dialect=history.target_db.db_type.lower(),
+                                      tgt_db_config=target_db_config, vector_config=vector_config,
+                                      history_id=history_id, out_type=OUT_TYPE, retrieval_on=RETRIEVAL_ON, top_k=TOP_K)
+                current_sql, model_ans_list, \
+                    used_pieces, lift_histories = translate.local_to_global_rewrite(max_retry_time=MAX_RETRY_TIME)
 
-                if now_sql != FAILED_TEMPLATE:
+                if current_sql != FAILED_TEMPLATE:
+                    RewriteService.add_rewrite_process(
+                        history_id=history_id,
+                        content=f"The translated SQL is:\n ```{current_sql}```",
+                        step_name="错误信息",
+                        role='assistant',
+                        is_success=False
+                    )
                     RewriteService.update_rewrite_status(
                         history_id=history_id,
                         status=RewriteStatus.SUCCESS
                     )
                 else:
+                    RewriteService.add_rewrite_process(
+                        history_id=history_id,
+                        content=FAILED_TEMPLATE,
+                        step_name="错误信息",
+                        role='assistant',
+                        is_success=False
+                    )
                     RewriteService.update_rewrite_status(
                         history_id=history_id,
                         status=RewriteStatus.FAILED

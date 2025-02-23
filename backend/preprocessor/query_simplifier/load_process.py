@@ -4,6 +4,7 @@ import sys
 from glob import glob
 from typing import List
 
+from api.services.knowledge import get_json_items
 from preprocessor.query_simplifier.Tree import TreeNode
 
 
@@ -15,7 +16,25 @@ from preprocessor.query_simplifier.Tree import TreeNode
 # use_type = True
 
 
-def load_json_keywords(dialect: str):
+def load_json_keywords(kb_name: str, dialect: str):
+    items = get_json_items(kb_name, all_item=True)
+    keyword_table_json, function_table_json = list(), list()
+    for item in items:
+        item = json.loads(item.content)
+        if item['tree'] == "Parse error" or item['tree'] == "Found error" or item['tree'] == "1":
+            continue
+        # print(item['tree'])
+        item["tree"] = TreeNode.make_g4_tree(item['tree'], dialect)
+
+        if item["type"] == "function":
+            function_table_json.append(item)
+        else:
+            keyword_table_json.append(item)
+
+    return keyword_table_json, function_table_json
+
+
+def load_json_keywords_bak(kb_name: str, dialect: str):
     script_path = os.path.abspath(__file__)
     retrieve_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(script_path))),
                                  'data', 'processed_document', dialect)
@@ -607,3 +626,17 @@ def mysql_op_loader(json_array: List):
         }
         res.append(ans)
     return res
+
+
+if __name__ == "__main__":
+    # mysql, pg, oracle
+    src_dialect = "mysql"
+    keyword_table_json, function_table_json = load_json_keywords_bak(src_dialect)
+
+    src_dialect = "pg"
+    keyword_table_json_pg, function_table_json_pg = load_json_keywords_bak(src_dialect)
+
+    src_dialect = "oracle"
+    keyword_table_json_oracle, function_table_json_oracle = load_json_keywords_bak(src_dialect)
+
+    print(1)

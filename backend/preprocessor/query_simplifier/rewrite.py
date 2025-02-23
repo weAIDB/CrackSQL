@@ -24,34 +24,40 @@ rewrite_pieces = []
 # model = 'gpt-4o'
 
 
-def function_rewrite(node: TreeNode, src_dialect: str):
+def function_rewrite(node: TreeNode, src_kb_name: str, src_dialect: str):
     # Considering the written format of function in the antlr grams, 
     # it is needed to check whether there are difference in Function call
     if src_dialect not in rewrite_keyword_map:
-        keyword_table_json, function_table_json = load_json_keywords(src_dialect)
-        # keyword_table_json, function_table_json = list(), list()
+        keyword_table_json, function_table_json = load_json_keywords(src_kb_name, src_dialect)
         rewrite_keyword_map[src_dialect] = keyword_table_json
         rewrite_function_map[src_dialect] = function_table_json
+
+        # print("rewrite_function_map", rewrite_function_map)
+        # print(len(rewrite_function_map))
+        # raise NotImplementedError
+
     else:
         function_table_json = rewrite_function_map[src_dialect]
     for function in function_table_json:
-        if function['Tree'] is None:
+        if function['tree'] is None:
             continue
-        if check_for_root_node(node, function['Keyword'], function['Tree'], src_dialect):
+        if check_for_root_node(node, function['keyword'], function['tree'], src_dialect):
             return {
                 "Node": node,
-                "Tree": function['Tree'],
-                "Description": function['Description'],
-                "Keyword": function['Keyword']
+                "Tree": function['tree'],
+                "Description": function['description'],
+                "Keyword": function['keyword'],
+                "Type": function['type'],
+                "Detail": function['detail']
             }
     return None
 
 
-def keyword_rewrite(node: TreeNode, src_dialect: str):
+def keyword_rewrite(node: TreeNode, src_kb_name: str, src_dialect: str):
     # Considering the written format of function in the antlr grams, 
     # it is needed to check whether there are difference in Function call
     if src_dialect not in rewrite_keyword_map:
-        keyword_table_json, function_table_json = load_json_keywords(src_dialect)
+        keyword_table_json, function_table_json = load_json_keywords(src_kb_name, src_dialect)
         rewrite_keyword_map[src_dialect] = keyword_table_json
         rewrite_function_map[src_dialect] = function_table_json
     else:
@@ -59,34 +65,38 @@ def keyword_rewrite(node: TreeNode, src_dialect: str):
     to_pick_up_list = []
     cnt_flag = False
     for keyword_list in keyword_table_json:
-        if keyword_list['Tree'] is None:
+        if keyword_list['tree'] is None:
             continue
 
-        for i in range(len(keyword_list['Keyword'])):
-            try:
-                if keyword_list['Tree'][i] == 'Found error' or keyword_list['Tree'][i] == "Parse error":
-                    continue
-            except Exception as e:
-                print(str(e))
-                print("keyword_list['Tree']", keyword_list['Tree'])
-                print("keyword_list['Keyword']", keyword_list['Keyword'])
-                raise NotImplementedError
+        # for i in range(len(keyword_list['keyword'])):
+        try:
+            if keyword_list['tree'] == 'Found error' or keyword_list['tree'] == "Parse error":
+                continue
+        except Exception as e:
+            print(str(e))
+            print("keyword_list['tree']", keyword_list['tree'])
+            print("keyword_list['keyword']", keyword_list['keyword'])
+            raise NotImplementedError
 
-            if check_for_root_node(node, keyword_list['Keyword'][i], keyword_list['Tree'][i], src_dialect):
-                if 'Count' in keyword_list:
-                    cnt_flag = True
-                    to_pick_up_list.append({
-                        "Tree": keyword_list['Tree'][i],
-                        "Description": keyword_list['Description'],
-                        "Keyword": keyword_list['Keyword'][i],
-                        "Count": keyword_list['Count'][i]
-                    })
-                else:
-                    to_pick_up_list.append({
-                        "Tree": keyword_list['Tree'][i],
-                        "Description": keyword_list['Description'],
-                        "Keyword": keyword_list['Keyword'][i],
-                    })
+        if check_for_root_node(node, keyword_list['keyword'], keyword_list['tree'], src_dialect):
+            if 'Count' in keyword_list:
+                cnt_flag = True
+                to_pick_up_list.append({
+                    "Tree": keyword_list['tree'],
+                    "Description": keyword_list['description'],
+                    "Keyword": keyword_list['keyword'],
+                    "Count": keyword_list['Count'],
+                    "Type": keyword_list['type'],
+                    "Detail": keyword_list['detail']
+                })
+            else:
+                to_pick_up_list.append({
+                    "Tree": keyword_list['tree'],
+                    "Description": keyword_list['description'],
+                    "Keyword": keyword_list['keyword'],
+                    "Type": keyword_list['type'],
+                    "Detail": keyword_list['detail']
+                })
     if cnt_flag:
         sorted(to_pick_up_list, key=lambda x: x["Count"], reverse=True)
     if len(to_pick_up_list) > 0:
@@ -94,7 +104,9 @@ def keyword_rewrite(node: TreeNode, src_dialect: str):
             "Node": node,
             "Tree": to_pick_up_list[0]['Tree'],
             "Description": to_pick_up_list[0]['Description'],
-            "Keyword": to_pick_up_list[0]['Keyword']
+            "Keyword": to_pick_up_list[0]['Keyword'],
+            "Type": to_pick_up_list[0]['Type'],
+            "Detail": keyword_list['detail']
         }
     return None
 
@@ -495,7 +507,7 @@ def locate_error(sql, src_dialect, tgt_dialect):
         raise ValueError("must execute in locate_by_err mode")
 
 
-def slice_all(node: TreeNode, src_dialect, only_func) -> List[Dict]:
+def slice_all(node: TreeNode, src_kb_name, src_dialect, only_func) -> List[Dict]:
     """
     List of
     {
@@ -509,14 +521,14 @@ def slice_all(node: TreeNode, src_dialect, only_func) -> List[Dict]:
     """
     res = []
     for i in range(len(node.children)):
-        child_res = slice_all(node.children[i], src_dialect, only_func)
+        child_res = slice_all(node.children[i], src_kb_name, src_dialect, only_func)
         res = res + child_res
     global rewrite_keyword_map
-    rewrite_dict = function_rewrite(node, src_dialect)
+    rewrite_dict = function_rewrite(node, src_kb_name, src_dialect)
     if rewrite_dict is not None:
         res.append(rewrite_dict)
     if not only_func:
-        rewrite_dict = keyword_rewrite(node, src_dialect)
+        rewrite_dict = keyword_rewrite(node, src_kb_name, src_dialect)
         if rewrite_dict is not None:
             res.append(rewrite_dict)
     return res
@@ -536,9 +548,9 @@ def dfs_res(node: TreeNode, node2piece: Dict):
 
 
 # directly slice all the pieces and then sort using the error info
-def get_all_piece(tree_node: TreeNode, src_dialect) -> tuple[List[Dict], TreeNode]:
+def get_all_piece(tree_node: TreeNode, src_kb_name, src_dialect) -> tuple[List[Dict], TreeNode]:
     root_node = TreeNode.make_g4_tree_by_node(tree_node, src_dialect)
-    res = slice_all(root_node, src_dialect, False)
+    res = slice_all(root_node, src_kb_name, src_dialect, False)
     node2piece = {}
     for piece in res:
         node2piece[piece['Node']] = piece
@@ -604,3 +616,12 @@ def search_upward(piece, node2piece: Dict):
             return None
         if node in node2piece:
             return node2piece[node]
+
+
+if __name__ == "__main__":
+    src_sql = 'SELECT DISTINCT "t1"."id" , EXTRACT(YEAR FROM CURRENT_TIMESTAMP) - EXTRACT(YEAR FROM CAST( "t1"."birthday" AS TIMESTAMP )) FROM "patient" AS "t1" INNER JOIN "examination" AS "t2" ON "t1"."id" = "t2"."id" WHERE "t2"."rvvt" = \' + \''
+    src_dialect, src_kb_name = "pg", "MySQL"
+    root_node, line, col, msg = parse_tree(src_sql, src_dialect)
+
+    all_pieces, root_node = get_all_piece(root_node, src_kb_name, src_dialect)
+    print(1)

@@ -52,15 +52,13 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
                         'content': json.dumps(c.content)
                     })
 
-
                 for embedding_type in embedding_type_texts.keys():
-
                     texts = embedding_type_texts[embedding_type]['texts']
                     metadatas = embedding_type_texts[embedding_type]['metadatas']
                     embeddings = await get_embeddings(
                         texts,
                         model_name=kb.embedding_model_name
-                    )                                    # 使用uuid生成唯一ID
+                    )  # 使用uuid生成唯一ID
                     vector_ids = [str(uuid.uuid4()) for _ in texts]
                     original_contents = embedding_type_texts[embedding_type]['original_contents']
                     # 保存到Chroma

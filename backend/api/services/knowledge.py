@@ -177,7 +177,7 @@ def upload_json_file(kb_name: str, file) -> Dict:
         raise
 
 
-def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
+def get_json_items(kb_name: str, page: int = 1, page_size: int = 10, all_item: bool = False) -> Dict:
     """获取JSON记录"""
     try:
         # 获取知识库
@@ -187,6 +187,8 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
 
         # 构建查询
         query = JSONContent.query.filter_by(knowledge_base_id=kb.id)
+        if all_item:
+            return query.all()
 
         # 获取总数
         total = query.count()
@@ -258,7 +260,6 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
         if not kb:
             raise ValueError(f"知识库不存在: {kb_name}")
 
-
         # 创建内容记录
         contents = []
 
@@ -269,7 +270,7 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
             # 验证是否有keyword、detail、description
             if 'keyword' not in item.keys():
                 raise ValueError("数据项必须包含keyword字段")
-            
+
             if 'detail' not in item.keys():
                 raise ValueError("数据项必须包含detail字段")
 
@@ -281,9 +282,10 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
 
             if 'tree' not in item.keys():
                 raise ValueError("数据项必须包含tree字段")
-            
+
             # 获取并验证embedding文本 keyword--separator--detaildescription
-            embedding_text = f"{item.get('keyword')}--separator--{item.get('detail')}{item.get('description')}"
+            # embedding_text = f"{item.get('keyword')}--separator--{item.get('detail')}{item.get('description')}"
+            embedding_text = f"{item.get('description')}"
 
             # 计算内容哈希
             content_str = json.dumps(item, sort_keys=True)
