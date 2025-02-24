@@ -120,3 +120,74 @@ def get_models():
     except Exception as e:
         res.update(code=500, msg=f"获取模型列表失败: {str(e)}")
     return res.data
+
+
+@route(bp, '/release_all_llm_models', methods=['POST'])
+def release_all_llm_models():
+    """释放所有模型"""
+    res = ResMsg()
+    LLMModelService.release_all_llm_models()
+    res.update(msg="释放成功")
+    return res.data
+
+
+@route(bp, '/release_llm_model', methods=['POST'])
+def release_llm_model():
+    """释放模型"""
+    res = ResMsg()
+    data = request.get_json()
+    if not data.get('model_name'):
+        res.update(code=400, msg="缺少模型名称")
+        return res.data
+    LLMModelService.release_llm_model(data.get('model_name'))
+    res.update(msg="释放成功")
+    return res.data
+
+
+@route(bp, '/load_llm_model', methods=['POST'])
+def load_llm_model():
+    """加载模型"""
+    res = ResMsg()
+    data = request.get_json()
+    print("load_model", data.get('model_name'))
+    if not data.get('model_name'):
+        res.update(code=400, msg="缺少模型名称")
+        return res.data
+    LLMModelService.load_llm_model(data.get('model_name'))
+    res.update(msg="加载成功")
+    return res.data
+
+
+@route(bp, '/load_embedding', methods=['POST'])
+def load_embedding():
+    """加载Embedding模型"""
+    res = ResMsg()
+    data = request.get_json()
+    if not data.get('model_name'):
+        res.update(code=400, msg="缺少模型名称")
+        return res.data
+    LLMModelService.load_embedding(data.get('model_name'))
+    res.update(msg="加载成功")
+    return res.data
+
+
+@route(bp, '/release_all_embeddings', methods=['POST'])
+def release_all_embeddings():
+    """释放所有Embedding模型"""
+    res = ResMsg()
+    LLMModelService.release_all_embeddings()
+    res.update(msg="释放成功")
+    return res.data
+
+
+@route(bp, '/release_embedding', methods=['POST'])
+def release_embedding():
+    """释放Embedding模型"""
+    res = ResMsg()
+    data = request.get_json()
+    if not data.get('model_name'):
+        res.update(code=400, msg="缺少模型名称")
+        return res.data
+    LLMModelService.release_embedding(data.get('model_name'))
+    res.update(msg="释放成功")
+    return res.data

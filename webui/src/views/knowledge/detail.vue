@@ -55,12 +55,12 @@
               </el-icon>
               <span>{{ $t('knowledge.detail.menu.dataset') }}</span>
             </div>
-            <div :class="`rowSC menu-item ${activeIndex === 'search' ? ' active' : ''}`" @click="onMenuClick('search')">
+            <!-- <div :class="`rowSC menu-item ${activeIndex === 'search' ? ' active' : ''}`" @click="onMenuClick('search')">
               <el-icon>
                 <Search/>
               </el-icon>
               <span>{{ $t('knowledge.detail.menu.search') }}</span>
-            </div>
+            </div> -->
             <div :class="`rowSC menu-item ${activeIndex === 'setting' ? ' active' : ''}`"
                  @click="onMenuClick('setting')">
               <el-icon>
@@ -146,7 +146,18 @@
                 </div>
               </el-card>
             </div>
-
+                        <!-- 添加分页组件 -->
+            <div class="pagination-container">
+              <el-pagination
+                v-model:current-page="currentPage"
+                v-model:page-size="pageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                :total="totalCount"
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+              />
+            </div>
             <!-- 编辑对话框 -->
             <el-dialog
               v-model="editDialogVisible"
@@ -320,10 +331,10 @@
           class="edit-form"
         >
           <el-form-item label="keyword" prop="keyword">
-            <el-input v-model="newItem.keyword" />
+            <el-input v-model="newItem.keyword" placeholder="Please enter a keyword" />
           </el-form-item>
           <el-form-item label="type" prop="type">
-            <el-select v-model="newItem.type" :placeholder="$t('knowledge.detail.dialog.add.typePlaceholder')">
+            <el-select v-model="newItem.type" placeholder="Please select a type">
               <el-option label="function" value="function" />
               <el-option label="keyword" value="keyword" />
               <el-option label="type" value="type" />
@@ -335,6 +346,7 @@
               v-model="newItem.detail"
               type="textarea"
               :rows="2"
+              placeholder="Please enter a detail"
             />
           </el-form-item>
           <el-form-item label="description" prop="description">
@@ -342,6 +354,7 @@
               v-model="newItem.description"
               type="textarea"
               :rows="2"
+              placeholder="Please enter a description"
             />
           </el-form-item>
           <el-form-item label="tree" prop="tree">
@@ -349,16 +362,21 @@
               v-model="newItem.tree"
               type="textarea"
               :rows="3"
+              placeholder="Please enter a tree"
             />
           </el-form-item>
           <el-form-item label="link" prop="link">
-            <el-input v-model="newItem.link" />
+            <el-input 
+              v-model="newItem.link" 
+              placeholder='Please enter links, ["link1", "link2", "link3"]'
+            />
           </el-form-item>
           <el-form-item label="example" prop="example">
             <el-input
               v-model="newItem.example"
               type="textarea"
               :rows="5"
+              placeholder='Please enter examples, ["example1", "example2", "example3"]'
             />
           </el-form-item>
         </el-form>
@@ -411,19 +429,19 @@ const editForm = reactive({
 
 const newItemRules = {
   keyword: [
-    { required: true, message: i18n.t('knowledge.detail.message.keywordRequired'), trigger: 'blur' }
+    { required: true, message: 'Please enter a keyword', trigger: 'blur' }
   ],
   type: [
-    { required: true, message: i18n.t('knowledge.detail.message.typeRequired'), trigger: 'blur' }
+    { required: true, message: 'Please select a type', trigger: 'blur' }
   ],
   detail: [
-    { required: true, message: i18n.t('knowledge.detail.message.detailRequired'), trigger: 'blur' }
+    { required: true, message: 'Please enter a detail', trigger: 'blur' }
   ],
   description: [
-    { required: true, message: i18n.t('knowledge.detail.message.descriptionRequired'), trigger: 'blur' }
+    { required: true, message: 'Please enter a description', trigger: 'blur' }
   ],
   tree: [
-    { required: true, message: i18n.t('knowledge.detail.message.treeRequired'), trigger: 'blur' }
+    { required: true, message: 'Please enter a tree', trigger: 'blur' }
   ]
 }
 
@@ -725,6 +743,7 @@ const handleDeleteItem = async (index: number) => {
     )
     
     await deleteKnowledgeBaseItemsReq(route.query.kb_name, [itemList.value[index].id])
+    expandedCards.value = {}
     itemList.value.splice(index, 1)
     ElMessage.success(i18n.t('knowledge.detail.dialog.delete.success'))
   } catch (error) {
@@ -761,6 +780,8 @@ const handleAddItem = async () => {
         .then((res) => {
           if (res.code === 0 && res.data.status) {
             addItemDialogVisible.value = false
+            const itemIds = res.data.data.success_ids || []
+            vectorizeKnowledgeBaseItemsReq(route.query.kb_name, itemIds)
             setTimeout(() => {
               getItems()
               addingItem.value = false
@@ -1018,9 +1039,8 @@ const toggleExpand = (index: number) => {
   gap: 16px;
   padding: 20px;
   overflow-y: auto;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 180px);
 }
-
 
 .card-header {
   display: flex;
@@ -1161,6 +1181,14 @@ const toggleExpand = (index: number) => {
 .card-body::-webkit-scrollbar-track,
 .json-content::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+.pagination-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  border-radius: 0 0 10px 10px;
 }
 
 </style>

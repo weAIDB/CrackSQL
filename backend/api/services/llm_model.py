@@ -3,7 +3,7 @@ from models import LLMModel
 from config.db_config import db
 from sqlalchemy import or_
 from llm_model.llm_manager import llm_manager
-
+from llm_model.embeddings import embedding_manager
 
 class LLMModelService:
     """LLM模型服务"""
@@ -147,3 +147,35 @@ class LLMModelService:
             'dimension': model.dimension,
             'is_active': model.is_active
         } for model in models], total
+
+
+    @staticmethod
+    def release_all_llm_models():
+        """释放所有模型"""
+        llm_manager.release_all_models()
+
+    @staticmethod
+    def release_llm_model(model_name: str):
+        """释放模型"""
+        llm_manager.release_model(model_name)
+
+    @staticmethod
+    def load_llm_model(model_name: str):
+        """加载模型"""
+        llm_manager.get_model(model_name)
+
+    @staticmethod
+    def load_embedding(model_name: str):
+        """加载Embedding模型"""
+        embedding_manager.get_embedding(model_name)
+
+    @staticmethod
+    def release_all_embeddings():
+        """释放所有Embedding模型"""
+        embedding_manager.release_all_embeddings()
+
+    @staticmethod
+    def release_embedding(model_name: str):
+        """释放Embedding模型"""
+        embedding_manager.release_embedding(model_name)
+        
