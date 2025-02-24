@@ -112,5 +112,17 @@ class LLMManager:
         return self._models.get(name)
 
 
+    def release_model(self, model_name: str):
+        """释放模型"""
+        if model_name in self._models:
+            self._models[model_name].release()
+            del self._models[model_name]
+
+    def release_all_models(self):
+        """释放所有模型"""
+        for model_name in self._models:
+            self._models[model_name].release()
+        self._models.clear()
+
 # 全局LLM管理器实例
 llm_manager = LLMManager()

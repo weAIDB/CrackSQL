@@ -31,6 +31,32 @@ class EmbeddingManager:
             'deployment_type': config.deployment_type,
             'dimension': config.dimension
         }
+    
+    def release_embedding(self, model_name: str):
+        """释放Embedding模型"""
+        if model_name in self._embeddings:
+            embedding_model = self._embeddings[model_name]
+            try:
+                # 对于HuggingFace模型，需要释放CUDA内存
+                if isinstance(embedding_model, HuggingFaceEmbeddings):
+                    import torch
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                    if hasattr(embedding_model, 'client'):
+                        del embedding_model.client
+                
+                # OpenAI模型不需要特别的释放操作
+                del self._embeddings[model_name]
+                
+            except Exception as e:
+                logger.error(f"释放Embedding模型 {model_name} 失败: {str(e)}")
+
+    def release_all_embeddings(self):
+        """释放所有Embedding模型"""
+        model_names = list(self._embeddings.keys())  # 创建副本避免在迭代时修改字典
+        for model_name in model_names:
+            self.release_embedding(model_name)
+
 
     def get_embedding(self, model_name: str, model_config: Optional[Dict] = None):
         """
@@ -67,7 +93,6 @@ class EmbeddingManager:
                 )
             else:
                 import torch
-
                 # 确定设备
                 device = "cuda" if torch.cuda.is_available() else "cpu"
                 # 本地模型（HuggingFace）
