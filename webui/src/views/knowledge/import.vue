@@ -91,19 +91,22 @@
 
           <div class="cards-container">
             <el-card
-              v-for="(item, index) in jsonItems"
-              :key="index"
+              v-for="(item, index) in paginatedItems"
+              :key="((currentPage - 1) * pageSize) + index"
               class="item-card"
               shadow="hover"
             >
               <div class="card-content">
                 <div class="card-header">
-                  <span class="operator">#{{ index + 1 }}</span>
+                  <span class="operator">#{{ ((currentPage - 1) * pageSize) + index + 1 }}</span>
                   <div class="actions">
-                    <el-button type="primary" link @click="handleEdit(index)">
+                    <el-button type="primary" link @click="handlePreview(((currentPage - 1) * pageSize) + index)">
+                      {{ $t('knowledge.import.card.preview') }}
+                    </el-button>
+                    <el-button type="primary" link @click="handleEdit(((currentPage - 1) * pageSize) + index)">
                       {{ $t('knowledge.import.card.edit') }}
                     </el-button>
-                    <el-button type="danger" link @click="handleDeleteItem(index)">
+                    <el-button type="danger" link @click="handleDeleteItem(((currentPage - 1) * pageSize) + index)">
                       {{ $t('knowledge.import.card.delete') }}
                     </el-button>
                   </div>
@@ -116,6 +119,19 @@
                 </div>
               </div>
             </el-card>
+          </div>
+
+          <!-- 分页器 -->
+          <div class="pagination-container">
+            <el-pagination
+              v-model:current-page="currentPage"
+              v-model:page-size="pageSize"
+              :page-sizes="[10, 20, 50, 100]"
+              :total="totalItems"
+              layout="total, sizes, prev, pager, next"
+              @size-change="handleSizeChange"
+              @current-change="handlePageChange"
+            />
           </div>
         </div>
       </div>
@@ -151,25 +167,27 @@
     <!-- 编辑对话框 -->
     <el-dialog
       v-model="editDialogVisible"
-      :title="$t('knowledge.import.dialog.edit.title')"
+      :title="editDialogIsPreview ? 'Preview' : 'Edit'"
       width="80%"
+      top="3vh"
       :close-on-click-modal="false"
     >
       <div v-if="currentEditItem" class="edit-form">
         <el-input
           v-model="jsonEditString"
           type="textarea"
-          :rows="20"
-          :placeholder="$t('knowledge.import.dialog.edit.jsonPlaceholder')"
+          :disabled="editDialogIsPreview"
+          :rows="50"
+          placeholder="Please enter the JSON data"
         />
       </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="editDialogVisible = false">
-            {{ $t('knowledge.import.dialog.edit.cancel') }}
+            Cancel
           </el-button>
-          <el-button type="primary" @click="handleSaveEdit">
-            {{ $t('knowledge.import.dialog.edit.confirm') }}
+          <el-button v-if="!editDialogIsPreview" type="primary" @click="handleSaveEdit">
+            Confirm
           </el-button>
         </div>
       </template>
@@ -205,6 +223,30 @@ const uploading = ref(false)
 const currentStep = ref(1)
 const countdown = ref(3)
 const fileList = ref<any[]>([])
+const editDialogIsPreview = ref(false)
+
+// 添加分页相关的响应式变量
+const currentPage = ref(1)
+const pageSize = ref(10)
+const totalItems = computed(() => jsonItems.value.length)
+
+// 计算当前页的数据
+const paginatedItems = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return jsonItems.value.slice(start, end)
+})
+
+// 处理页码改变
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+}
+
+// 处理每页条数改变
+const handleSizeChange = (size: number) => {
+  pageSize.value = size
+  currentPage.value = 1
+}
 
 // 是否可以进行下一步
 const canProceed = computed(() => {
@@ -283,9 +325,9 @@ const handleFileChange = async (file: UploadFile) => {
       const items = Array.isArray(content) ? content : [content]
 
       // 更新文件列表
-      fileList.value = fileList.value.map(f => 
-        f.name === file.name 
-          ? { ...f, parseProgress: 100, parseStatus: 'success', itemCount: items.length, items } 
+      fileList.value = fileList.value.map(f =>
+        f.name === file.name
+          ? { ...f, parseProgress: 100, parseStatus: 'success', itemCount: items.length, items }
           : f
       )
 
@@ -297,9 +339,9 @@ const handleFileChange = async (file: UploadFile) => {
         return acc
       }, [])
     } catch (error) {
-      fileList.value = fileList.value.map(f => 
-        f.name === file.name 
-          ? { ...f, parseProgress: 100, parseStatus: 'exception' } 
+      fileList.value = fileList.value.map(f =>
+        f.name === file.name
+          ? { ...f, parseProgress: 100, parseStatus: 'exception' }
           : f
       )
       ElMessage.error(`${file.name}: JSON文件解析失败`)
@@ -375,11 +417,21 @@ const currentEditItem = ref<JsonItem | null>(null)
 const currentEditIndex = ref(-1)
 const jsonEditString = ref('')
 
+// 处理预览
+const handlePreview = (index: number) => {
+  currentEditIndex.value = index
+  currentEditItem.value = jsonItems.value[index]
+  jsonEditString.value = JSON.stringify(currentEditItem.value, null, 2)
+  editDialogIsPreview.value = true
+  editDialogVisible.value = true
+}
+
 // 处理编辑
 const handleEdit = (index: number) => {
   currentEditIndex.value = index
   currentEditItem.value = jsonItems.value[index]
   jsonEditString.value = JSON.stringify(currentEditItem.value, null, 2)
+  editDialogIsPreview.value = false
   editDialogVisible.value = true
 }
 
@@ -396,15 +448,20 @@ const handleSaveEdit = () => {
   }
 }
 
-// 添加展平对象的方法
+// 定义字段顺序
+
+// 修改展平对象的方法
 const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
   const flattened: Record<string, any> = {}
+  const orderedResult: Record<string, any> = {}
 
+  const fieldOrder = ['keyword', 'type', 'tree', 'link', 'description', 'example', 'detail']
+
+  // 先展平所有字段
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const value = obj[key]
       const newKey = prefix ? `${prefix}.${key}` : key
-
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         Object.assign(flattened, flattenObject(value, newKey))
       } else {
@@ -413,7 +470,23 @@ const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
     }
   }
 
-  return flattened
+  // 按照指定顺序重新排列字段
+  // 先添加指定顺序的字段
+  fieldOrder.forEach(field => {
+    Object.keys(flattened).forEach(key => {
+      if (key.toLowerCase().includes(field.toLowerCase())) {
+        orderedResult[key] = flattened[key]
+        delete flattened[key]
+      }
+    })
+  })
+
+  // 添加剩余的字段
+  Object.keys(flattened).forEach(key => {
+    orderedResult[key] = flattened[key]
+  })
+
+  return orderedResult
 }
 
 // 格式化值的显示
@@ -422,8 +495,8 @@ const formatValue = (value: any): string => {
     return '-'
   }
   if (Array.isArray(value)) {
-    return value.length > 50 
-      ? `[Array(${value.length})]` 
+    return value.length > 50
+      ? `[Array(${value.length})]`
       : JSON.stringify(value)
   }
   if (typeof value === 'object') {
@@ -715,11 +788,21 @@ const formatValue = (value: any): string => {
 
 .edit-form {
   padding: 20px;
+  height: 82vh;
 }
 
 :deep(.el-textarea__inner) {
   font-family: monospace;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  background-color: white;
+  border-radius: 4px;
+  margin-bottom: 16px;
 }
 </style>

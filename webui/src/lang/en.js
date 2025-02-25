@@ -443,7 +443,8 @@ export default {
         tree: 'Syntax Tree:',
         detail: 'Details:',
         edit: 'Edit',
-        delete: 'Delete'
+        delete: 'Delete',
+        preview: 'Preview'
       },
       process: {
         title: 'Data Processing Configuration',
