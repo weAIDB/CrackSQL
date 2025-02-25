@@ -6,12 +6,13 @@
       <el-input
           v-if="historyList.length > 0"
           v-model="searchKeyword"
-          :placeholder="$t('history.search.placeholder')"
+          :placeholder="$t('history.search.placeholder')" 
+          size="medium"
           style="width: 300px"
           @keyup.enter="handleSearch"
       >
         <template #append>
-          <el-button @click="handleSearch">
+          <el-button size="medium" @click="handleSearch">
             <el-icon><Search /></el-icon>
           </el-button>
         </template>
@@ -43,17 +44,39 @@
       <div v-for="item in historyList" :key="item.id" class="history-item">
         <div class="item-header">
           <div class="left-info">
+            <el-tag :type="getStatusType(item.status)" class="status-tag">
+              {{ $t(`history.status.${item.status.toLowerCase()}`) }}
+            </el-tag>
             <span class="time">{{ formatDate(item.created_at) }}</span>
+            <span class="duration rowSC" v-if="item.duration">
+              <el-icon><Timer /></el-icon>
+              <span style="margin-left: 5px;">{{ item.duration }}</span>
+            </span>
             <span class="db-type">{{ item.source_db_type }} → {{ item.target_db.db_type }}</span>
             <span class="target-info">
               {{ `${item.target_db.username}@${item.target_db.host}:${item.target_db.port}/${item.target_db.database}` }}
             </span>
           </div>
           <div class="right-info">
-            <el-tag :type="getStatusType(item.status)" class="status-tag">
-              {{ $t(`history.status.${item.status.toLowerCase()}`) }}
-            </el-tag>
-            <el-button type="primary" link @click="showDetail(item)">
+            <el-popconfirm
+              v-if="item.status !== 'processing'"
+              width="300px"
+              :title="$t('history.delete.confirm')"
+              @confirm="confirmDelete(item)"
+              :confirm-button-text="$t('common.confirm')"
+              :cancel-button-text="$t('common.cancel')"
+              confirm-button-type="danger"
+            >
+              <template #reference>
+                <el-button 
+                  type="danger" 
+                  :title="$t('history.list.delete')"
+                >
+                  <el-icon><Delete /></el-icon>
+                </el-button>
+              </template>
+            </el-popconfirm>
+            <el-button type="primary" @click="showDetail(item)">
               {{ $t('history.list.detail') }}
             </el-button>
           </div>
@@ -76,28 +99,17 @@
           @current-change="handleCurrentChange"
       />
     </div>
-
-    <!-- 详情对话框 -->
-    <el-dialog
-        v-model="dialogVisible"
-        title="改写详情"
-        width="80%"
-        destroy-on-close
-    >
-      <div v-if="currentHistory" class="detail-content">
-        <!-- 详情内容 -->
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import {rewriteListReq} from '@/api/rewrite.js'
+import {rewriteListReq, deleteRewriteReq} from '@/api/rewrite.js'
 import type {RewriteHistory} from '@/types/database'
-import {Search, Document} from '@element-plus/icons-vue'
+import {Search, Document, Delete, Timer} from '@element-plus/icons-vue'
 import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useI18n} from '@/hooks/use-i18n'
+import { ElMessage } from 'element-plus'
 
 const i18n = useI18n()
 const historyList = ref<RewriteHistory[]>([])
@@ -105,7 +117,6 @@ const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const searchKeyword = ref('')
-const dialogVisible = ref(false)
 const currentHistory = ref<RewriteHistory | null>(null)
 const router = useRouter()
 
@@ -163,6 +174,22 @@ const clearSearch = () => {
   getHistoryList()
 }
 
+// 确认删除
+const confirmDelete = async (row: RewriteHistory) => {
+  try {
+    const res = await deleteRewriteReq(row.id)
+    if (res.code === 0) {
+      ElMessage.success(i18n.t('history.delete.success'))
+      getHistoryList()
+    } else {
+      ElMessage.error(res.msg || i18n.t('history.delete.error'))
+    }
+  } catch (error) {
+    console.error('删除历史记录失败:', error)
+    ElMessage.error(i18n.t('history.delete.error'))
+  }
+}
+
 onMounted(() => {
   getHistoryList()
 })
@@ -214,6 +241,17 @@ onMounted(() => {
             font-weight: 500;
           }
 
+          .duration {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #666;
+            font-size: 13px;
+            background-color: #f5f7fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+          }
+
           .db-type {
             color: var(--el-color-primary);
           }
@@ -227,12 +265,7 @@ onMounted(() => {
         .right-info {
           display: flex;
           align-items: center;
-          gap: 16px;
-
-          .status-tag {
-            min-width: 70px;
-            text-align: center;
-          }
+          gap: 10px;
         }
       }
 

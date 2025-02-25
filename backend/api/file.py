@@ -1,8 +1,6 @@
 import os
 
-from flask import Blueprint, request, send_from_directory, current_app
-import mimetypes
-from api.utils.auth import login_required
+from flask import Blueprint, request
 from api.utils.code import ResponseCode
 from api.utils.response import ResMsg
 from api.utils.util import route
@@ -25,7 +23,6 @@ def test():
 
 
 @route(bp, '/upload_file', methods=["POST"])
-# @login_required
 def upload_file():
     """
     文件上传接口

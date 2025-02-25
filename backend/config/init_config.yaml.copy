@@ -1,0 +1,55 @@
+# Knowledge base initialization configuration file, used to initialize knowledge bases and embedding models.
+# This file is only used during initialization. Subsequent modifications can be made directly in the database.
+
+# LLM model configuration
+LLM_MODELS:
+  - name: "gpt-4o"                          # Model name
+    deployment_type: "cloud"                # Deployment type: cloud or local
+    category: "llm"                         # Model category
+    api_base: "https://api.openai.com/v1"   # API base URL
+    api_key: "your-openai-api-key"          # Replace with your actual API key
+    path: "./local_models/gpt-4o"           # Local model path
+    description: "OpenAI LLM模型，用于生成文本"  # Model description
+    temperature: 0.7                        # Temperature for text generation
+    max_tokens: 128000                      # Maximum tokens for generation
+
+
+# Embedding model configuration
+EMBEDDING_MODELS:
+  # OpenAI Embedding model
+  - name: "text-embedding-ada-002"          # Model name
+    deployment_type: "cloud"                # Deployment type: cloud or local  
+    category: "embedding"                   # Model category
+    api_base: "https://api.openai.com/v1"   # API base URL
+    api_key: "your-openai-api-key"          # Replace with your actual API key
+    path: "./local_models/text-embedding-ada-002"  # Local model path
+    dimension: 1536                         # Vector dimension
+    description: "OpenAI Embedding模型，用于生成文本向量"  # Model description
+
+# Knowledge base configuration
+KNOWLEDGE_BASES:
+  # MySQL knowledge base
+  - kb_name: "mysql_knowledge"              # Knowledge base name
+    db_type: "mysql"                        # Database type
+    kb_info: "MySQL数据库知识库，包含MySQL的关键字、函数、操作符等信息"  # Knowledge base description
+    embedding_model: "text-embedding-ada-002"  # Embedding model to use
+    knowledge_files:                        # Knowledge files to import
+      - "./scripts/example_knowledge.json"  # Knowledge file path
+      - "./sources/mysql_functions.json"    # Can add multiple knowledge files
+
+  # PostgreSQL knowledge base  
+  - kb_name: "postgresql_knowledge"         # Knowledge base name
+    db_type: "postgresql"                   # Database type
+    kb_info: "PostgreSQL数据库知识库，包含PostgreSQL的关键字、函数、操作符等信息"  # Knowledge base description
+    embedding_model: "text-embedding-ada-002"  # Embedding model to use
+    knowledge_files:                        # Knowledge files to import
+      - "./sources/postgresql_keywords.json"
+      - "./sources/postgresql_functions.json"
+
+  # Oracle knowledge base
+  - kb_name: "oracle_knowledge"             # Knowledge base name
+    db_type: "oracle"                       # Database type
+    kb_info: "Oracle数据库知识库，包含Oracle的关键字、函数、操作符等信息"  # Knowledge base description
+    embedding_model: "text-embedding-ada-002"  # Embedding model to use
+    knowledge_files:                        # Knowledge files to import
+      - "./sources/oracle_keywords.json"

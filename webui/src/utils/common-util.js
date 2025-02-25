@@ -122,5 +122,52 @@ export default {
         }
       })
     return arrObj3
+  },
+  
+  /**
+   * 展平对象，将嵌套对象转换为单层对象，键名使用点号连接
+   * @param {Object} obj - 要展平的对象
+   * @param {String} prefix - 前缀，用于递归调用
+   * @param {Array} fieldOrder - 可选，指定字段排序顺序
+   * @return {Object} - 展平后的对象
+   */
+  flattenObject(obj, prefix = '', fieldOrder = []) {
+    const flattened = {}
+    const orderedResult = {}
+
+    // 默认字段顺序
+    const defaultFieldOrder = ['keyword', 'type', 'tree', 'link', 'description', 'example', 'detail']
+    const finalFieldOrder = fieldOrder.length > 0 ? fieldOrder : defaultFieldOrder
+
+    // 先展平所有字段
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key]
+        const newKey = prefix ? `${prefix}.${key}` : key
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          Object.assign(flattened, this.flattenObject(value, newKey, finalFieldOrder))
+        } else {
+          flattened[newKey] = value
+        }
+      }
+    }
+
+    // 按照指定顺序重新排列字段
+    // 先添加指定顺序的字段
+    finalFieldOrder.forEach(field => {
+      Object.keys(flattened).forEach(key => {
+        if (key.toLowerCase().includes(field.toLowerCase())) {
+          orderedResult[key] = flattened[key]
+          delete flattened[key]
+        }
+      })
+    })
+
+    // 添加剩余的字段
+    Object.keys(flattened).forEach(key => {
+      orderedResult[key] = flattened[key]
+    })
+
+    return orderedResult
   }
 }

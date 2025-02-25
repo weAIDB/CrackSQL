@@ -41,32 +41,6 @@ class DatabaseConfig(db.Model, BaseModel):
     description = db.Column(db.String(256), nullable=True, comment="配置描述")
 
 
-class User(db.Model, BaseModel):
-    """用户表"""
-    __tablename__ = 'user'
-
-    username = db.Column(db.String(64), unique=True, nullable=False, comment="用户名")
-    email = db.Column(db.String(128), unique=True, nullable=True, comment="邮箱")
-    nickname = db.Column(db.String(64), nullable=True, comment="用户昵称")
-    level = db.Column(db.Integer, default=2, comment="用户权限等级(0:超级管理员 1:管理员 2:普通用户)")
-    is_active = db.Column(db.Boolean, default=True, comment="是否启用")
-    last_login = db.Column(db.DateTime, nullable=True, comment="最后登录时间")
-
-
-class UserLoginMethod(db.Model, BaseModel):
-    """用户登录认证表"""
-    __tablename__ = 'user_login_method'
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False, comment="关联用户ID")
-    login_type = db.Column(db.String(32), nullable=False, comment="登录类型(username:用户名密码/wechat:微信/mobile:手机号)")
-    identifier = db.Column(db.String(128), nullable=False, comment="登录标识(用户名/微信openid/手机号)")
-    credential = db.Column(db.String(256), nullable=True, comment="登录凭证(密码hash/token)")
-    is_verified = db.Column(db.Boolean, default=False, comment="是否已验证")
-
-    # 建立与User模型的关系
-    user = db.relationship('User', backref=db.backref('login_methods', lazy=True))
-
-
 class RewriteStatus(str, Enum):
     SUCCESS = "success"
     FAILED = "failed"
@@ -120,8 +94,6 @@ class KnowledgeBase(db.Model, BaseModel):
     kb_name = db.Column(db.String(256), unique=True, nullable=False, comment="知识库名称")
     kb_info = db.Column(db.Text, nullable=True, comment="知识库描述")
     db_type = db.Column(db.String(32), nullable=False, comment="数据库类型:mysql/postgresql/oracle")
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_knowledge_base_user_id'), nullable=True,
-                        comment="创建用户ID")
     embedding_model_name = db.Column(db.String(256),
                                      db.ForeignKey('llm_models.name', name='fk_knowledge_base_embedding_model'),
                                      nullable=False, comment="向量模型名称")
@@ -141,8 +113,6 @@ class JSONContent(db.Model, BaseModel):
     status = db.Column(db.String(32), default="pending", comment="处理状态:pending/completed/failed")
     error_msg = db.Column(db.Text, nullable=True, comment="错误信息")
     vector_id = db.Column(db.String(64), nullable=True, comment="Chroma向量ID")
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_json_content_user_id'), nullable=True,
-                        comment="用户ID")
     knowledge_base_id = db.Column(db.Integer,
                                   db.ForeignKey('knowledge_bases.id', name='fk_json_content_knowledge_base_id'),
                                   nullable=False, comment="关联知识库ID")

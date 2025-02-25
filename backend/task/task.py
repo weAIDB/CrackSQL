@@ -10,7 +10,7 @@ from typing import List
 
 
 @db_session_manager
-def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
+def process_json_data(kb_name: str, item_ids: List[int]):
     """处理JSON数据"""
 
     async def _async_process_json_data():
@@ -22,7 +22,6 @@ def process_json_data(kb_name: str, item_ids: List[int], user_id: int):
 
             # 获取要处理的内容
             contents = JSONContent.query.filter(
-                JSONContent.user_id == user_id,
                 JSONContent.knowledge_base_id == kb.id,
                 JSONContent.id.in_(item_ids)
             ).all()

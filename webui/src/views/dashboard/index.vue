@@ -24,23 +24,15 @@
           <el-icon class="feature-icon">
             <Document/>
           </el-icon>
-          <h3>Oracle 转 MySQL</h3>
+          <h3>Oracle Translate to MySQL</h3>
           <div class="sql-compare">
-            <div class="sql-block source">
+            <div class="sql-block source" @click="useExample(sqlExamples.oracleToMysql.source)">
               <div class="label">Oracle</div>
-              <code>SELECT DECODE(status, 1, '活跃', 2, '暂停', '未知') 
-FROM users 
-WHERE ROWNUM <= 10</code>
+              <code v-html="sqlExamples.oracleToMysql.sourceDisplay || sqlExamples.oracleToMysql.source"></code>
             </div>
             <div class="sql-block target">
               <div class="label">MySQL</div>
-              <code>SELECT CASE status 
-    WHEN 1 THEN '活跃' 
-    WHEN 2 THEN '暂停' 
-    ELSE '未知' 
-END 
-FROM users 
-LIMIT 10</code>
+              <code>{{ sqlExamples.oracleToMysql.target }}</code>
             </div>
           </div>
         </div>
@@ -48,22 +40,15 @@ LIMIT 10</code>
           <el-icon class="feature-icon">
             <Document/>
           </el-icon>
-          <h3>MySQL 转 PostgreSQL</h3>
+          <h3>MySQL Translate to PostgreSQL</h3>
           <div class="sql-compare">
-            <div class="sql-block source">
+            <div class="sql-block source" @click="useExample(sqlExamples.mysqlToPostgres.source)">
               <div class="label">MySQL</div>
-              <code>SELECT TOP 5 
-    ISNULL(name, 'Unknown') as name,
-    GETDATE() as current_time
-FROM employees</code>
+              <code>{{ sqlExamples.mysqlToPostgres.source }}</code>
             </div>
             <div class="sql-block target">
               <div class="label">PostgreSQL</div>
-              <code>SELECT 
-    COALESCE(name, 'Unknown') as name,
-    CURRENT_TIMESTAMP as current_time
-FROM employees
-LIMIT 5</code>
+              <code>{{ sqlExamples.mysqlToPostgres.target }}</code>
             </div>
           </div>
         </div>
@@ -71,21 +56,15 @@ LIMIT 5</code>
           <el-icon class="feature-icon">
             <Document/>
           </el-icon>
-          <h3>Oracle 转 PostgreSQL</h3>
+          <h3>Oracle Translate to PostgreSQL</h3>
           <div class="sql-compare">
-            <div class="sql-block source">
-              <div class="label">DB2</div>
-              <code>SELECT SUBSTR(name, 1, 3) || '-' || 
-    DIGITS(employee_id)
-FROM employee
-FETCH FIRST 5 ROWS ONLY</code>
+            <div class="sql-block source" @click="useExample(sqlExamples.oracleToPostgres.source)">
+              <div class="label">Oracle</div>
+              <code>{{ sqlExamples.oracleToPostgres.source }}</code>
             </div>
             <div class="sql-block target">
-              <div class="label">Oracle</div>
-              <code>SELECT SUBSTR(name, 1, 3) || '-' || 
-    LPAD(employee_id, 6, '0')
-FROM employee
-WHERE ROWNUM <= 5</code>
+              <div class="label">PostgreSQL</div>
+              <code>{{ sqlExamples.oracleToPostgres.target }}</code>
             </div>
           </div>
         </div>
@@ -293,6 +272,38 @@ const sendBtnDisabledText = computed(() => {
 
 const router = useRouter()
 
+// SQL示例数据
+const sqlExamples = reactive({
+  oracleToMysql: {
+    source: "SELECT NVL(employee_name, 'Unknown') as name, TO_CHAR(hire_date, 'YYYY-MM-DD') as hire_date FROM employees WHERE department_id = 10 AND ROWNUM <= 100",
+    target: "SELECT IFNULL(employee_name, 'Unknown') as name, DATE_FORMAT(hire_date, '%Y-%m-%d') as hire_date FROM employees WHERE department_id = 10 LIMIT 100",
+    sourceDisplay: "SELECT NVL(employee_name, 'Unknown') as name, TO_CHAR(hire_date, 'YYYY-MM-DD') as hire_date FROM employees WHERE department_id = 10 AND ROWNUM &lt;= 100",
+  },
+  mysqlToPostgres: {
+    source: "SELECT CONCAT(first_name, ' ', last_name) as full_name, DATEDIFF(NOW(), birth_date) / 365 as age FROM customers WHERE id IN (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 5)",
+    target: "SELECT first_name || ' ' || last_name as full_name, EXTRACT(YEAR FROM AGE(NOW(), birth_date)) as age FROM customers WHERE id IN (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 5)"
+  },
+  oracleToPostgres: {
+    source: `SELECT e.employee_id, e.employee_name, d.department_name, 
+  CONNECT_BY_ROOT e.employee_name as top_manager
+FROM employees e 
+JOIN departments d ON e.department_id = d.department_id
+START WITH e.manager_id IS NULL
+CONNECT BY PRIOR e.employee_id = e.manager_id`,
+    target: `WITH RECURSIVE emp_hierarchy AS (
+  SELECT e.employee_id, e.employee_name, e.manager_id, d.department_name, e.employee_name as top_manager
+  FROM employees e JOIN departments d ON e.department_id = d.department_id
+  WHERE e.manager_id IS NULL
+  UNION ALL
+  SELECT e.employee_id, e.employee_name, e.manager_id, d.department_name, h.top_manager
+  FROM employees e 
+  JOIN departments d ON e.department_id = d.department_id
+  JOIN emp_hierarchy h ON e.manager_id = h.employee_id
+)
+SELECT employee_id, employee_name, department_name, top_manager FROM emp_hierarchy`
+  }
+})
+
 const originalDB = ref("Oracle")
 const originalKb = ref("")
 const targetDB = ref("")
@@ -421,6 +432,11 @@ const onSaveClick = async () => {
   }
 }
 
+// 添加示例SQL到输入框的函数
+const useExample = (exampleSql) => {
+  userInput.value = exampleSql
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -509,6 +525,27 @@ const onSaveClick = async () => {
   gap: 20px;
   position: relative;
   z-index: 1;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 10px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--el-color-primary-light-5);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--el-color-primary);
+  }
 
   .feature-card {
     background: white;
@@ -566,6 +603,33 @@ const onSaveClick = async () => {
         font-size: 0.85em;
         line-height: 1.5;
         white-space: pre-wrap;
+      }
+    }
+
+    .source {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        &::after {
+          content: '点击使用此示例';
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: var(--el-color-primary);
+          color: white;
+          font-size: 12px;
+          padding: 2px 8px;
+          border-radius: 0 4px 0 4px;
+        }
+
+        code {
+          border: 1px solid var(--el-color-primary);
+        }
       }
     }
   }
