@@ -426,7 +426,8 @@ export default {
         delete: '删除',
         description: '描述',
         tree: '语法树',
-        detail: '详细信息'
+        detail: '详细信息',
+        preview: '预览'
       },
       process: {
         title: '数据处理配置',
