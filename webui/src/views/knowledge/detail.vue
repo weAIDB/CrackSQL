@@ -23,7 +23,7 @@
             </el-icon>
             </div>
               <template #content>
-                Json文件请参考以下格式：
+                Please refer to the following format for Json files:
                 <pre style="text-align: left; margin: 10px;">{{ jsonFormatExample }}</pre>
               </template>
             </el-tooltip>
@@ -96,15 +96,15 @@
                         type="primary"  
                         @click="toggleExpand(index)"
                       >
-                        {{ expandedCards[index] ? '收起' : '展开' }}
+                        {{ expandedCards[index] ? 'Collapse' : 'Open' }}
                       </el-button>
                     </div>
                   </div>
 
-                  <!-- 错误信息展示 -->
+                  <!-- Error message display -->
                   <div v-if="item.error_msg" class="error-message">
                     <el-alert
-                      :title="'处理失败：' + item.error_msg"
+                      :title="'Processing Failed: ' + item.error_msg"
                       type="error"
                       :closable="false"
                       show-icon
@@ -125,28 +125,39 @@
                   <div v-show="expandedCards[index]" class="card-body">
                     <div class="card-info">
                       <div class="info-right">
+                        <div v-if="item.status === 'completed' || item.status === 'failed'" class="actions">
+                          <el-popconfirm
+                            :title="i18n.t('knowledge.detail.dialog.delete.confirmMessage')"
+                            :confirm-button-text="i18n.t('common.confirm')"
+                            :cancel-button-text="i18n.t('common.cancel')"
+                            confirm-button-type="danger"
+                            width="300px"
+                            @confirm="handleDeleteItem(index)"
+                          >
+                            <template #reference>
+                              <el-button type="danger">
+                                {{ $t('knowledge.detail.button.delete') }}
+                              </el-button>
+                            </template>
+                          </el-popconfirm>
+                        </div>
                         <el-tag size="small" type="info" class="time-tag">
                           {{ formatTime(item.created_at) }}
                         </el-tag>
-                        <div v-if="item.status === 'completed' || item.status === 'failed'" class="actions">
-                          <el-button type="danger" @click="handleDeleteItem(index)">
-                            {{ $t('knowledge.detail.button.delete') }}
-                          </el-button>
-                        </div>
                       </div>
                     </div>
 
                     <div class="info-item">
                       <div class="label">Content:</div>
                       <div class="content-value">
-                        <pre class="json-content">{{ JSON.stringify(item.content, null, 2) }}</pre>
+                        <pre class="json-content">{{ commonUtil.flattenObject(item.content) }}</pre>
                       </div>
                     </div>
                   </div>
                 </div>
               </el-card>
             </div>
-                        <!-- 添加分页组件 -->
+            <!-- 添加分页组件 -->
             <div class="pagination-container">
               <el-pagination
                 v-model:current-page="currentPage"
@@ -404,6 +415,7 @@ import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from '@/hooks/use-i18n'
 import { FormInstance } from 'element-plus'
 import { InfoFilled } from '@element-plus/icons-vue'
+import commonUtil from '@/utils/common-util'
 const i18n = useI18n()
 
 const router = useRouter()
@@ -652,10 +664,10 @@ const getStatusType = (status: string): string => {
 // 获取状态文本
 const getStatusText = (status: string): string => {
   const statusMap = {
-    completed: '已完成',
-    pending: '等待处理',
-    processing: '处理中',
-    failed: '处理失败'
+    completed: 'Completed',
+    pending: 'Pending',
+    processing: 'Processing',
+    failed: 'Failed'
   }
   return statusMap[status] || status
 }
@@ -732,24 +744,12 @@ const handleSaveEdit = async () => {
 // 删除项目
 const handleDeleteItem = async (index: number) => {
   try {
-    await ElMessageBox.confirm(
-      i18n.t('knowledge.detail.dialog.delete.confirmMessage'),
-      i18n.t('knowledge.detail.dialog.delete.title'),
-      {
-        confirmButtonText: i18n.t('common.confirm'),
-        cancelButtonText: i18n.t('common.cancel'),
-        type: 'warning',
-      }
-    )
-    
     await deleteKnowledgeBaseItemsReq(route.query.kb_name, [itemList.value[index].id])
     expandedCards.value = {}
     itemList.value.splice(index, 1)
     ElMessage.success(i18n.t('knowledge.detail.dialog.delete.success'))
   } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error(i18n.t('knowledge.detail.dialog.delete.error'))
-    }
+    ElMessage.error(i18n.t('knowledge.detail.dialog.delete.error'))
   }
 }
 
@@ -1039,7 +1039,7 @@ const toggleExpand = (index: number) => {
   gap: 16px;
   padding: 20px;
   overflow-y: auto;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 200px);
 }
 
 .card-header {

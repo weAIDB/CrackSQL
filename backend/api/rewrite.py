@@ -4,6 +4,7 @@ from api.utils.response import ResMsg
 from api.utils.util import route
 from api.services.rewrite import RewriteService
 from api.utils.scheduler import scheduler
+from models import RewriteStatus
 
 bp = Blueprint('rewrite', __name__, url_prefix='/api/rewrite')
 
@@ -97,6 +98,26 @@ def create_api():
             max_instances=1
         )
         
+        res.update(data=result)
+    except Exception as e:
+        res.update(code=ResponseCode.Fail, msg=str(e))
+    
+    return res.data
+
+
+@route(bp, '/delete', methods=['POST'])
+def delete_api():
+    """Delete rewrite history"""
+    res = ResMsg()
+    obj = request.get_json(force=True)
+    history_id = obj.get('id')
+    
+    if not history_id:
+        res.update(code=ResponseCode.InvalidParameter, msg="History ID cannot be empty")
+        return res.data
+    
+    try:
+        result = RewriteService.delete_history(history_id)
         res.update(data=result)
     except Exception as e:
         res.update(code=ResponseCode.Fail, msg=str(e))

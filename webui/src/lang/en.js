@@ -205,6 +205,12 @@ export default {
       placeholder: 'Search SQL statements',
       clear: 'Clear Search'
     },
+    delete: {
+      title: 'Delete Rewrite Record',
+      confirm: 'Are you sure you want to delete this rewrite record?',
+      success: 'Delete successful',
+      error: 'Delete failed'
+    },
     empty: {
       title: 'No Rewrite Records',
       description: 'No SQL rewrite records yet',

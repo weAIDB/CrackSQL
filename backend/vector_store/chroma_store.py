@@ -12,95 +12,95 @@ import re
 
 def convert_distance_to_score(distance: float) -> float:
     """
-    将Chroma的距离值转换为0-100的相似度分数
-    Chroma使用cosine distance (1 - cosine_similarity)
-    distance = 0 表示完全相同，distance = 2 表示完全相反
-    我们将其转换为：0 表示完全不同，100 表示完全相同
+    Convert Chroma's distance value to a similarity score of 0-100
+    Chroma uses cosine distance (1 - cosine_similarity)
+    distance = 0 means completely identical, distance = 2 means completely opposite
+    We convert it to: 0 means completely different, 100 means completely identical
     """
 
     if distance is None:
         return 0
-    # 将distance从[0,2]映射到[0,100]
+    # Map distance from [0,2] to [0,100]
     score = (1 - distance / 2) * 100
-    # 小数点后两位
+    # Round to two decimal places
     score = round(score, 2)
-    # 确保分数在0-100范围内
+    # Ensure score is within 0-100 range
     return max(0, min(100, score))
 
 
 def generate_collection_id(kb_name: str, content_type: str) -> str:
-    """生成集合ID
+    """Generate collection ID
     Args:
-        kb_name: 知识库名称
-        content_type: 内容类型
+        kb_name: Knowledge base name
+        content_type: Content type
         
     Returns:
-        str: 合法的表名
+        str: Valid table name
     """
-    # 使用 MD5 对中文名称进行哈希，保证表名唯一性
+    # Use MD5 to hash Chinese names, ensuring table name uniqueness
     name_hash = hashlib.md5(kb_name.encode('utf-8')).hexdigest()[:8]
-    # 移除所有非字母数字字符，转换为小写
+    # Remove all non-alphanumeric characters, convert to lowercase
     safe_name = re.sub(r'[^a-zA-Z0-9]', '_', kb_name.encode('ascii', 'ignore').decode('ascii').lower())
-    # 组合表名：前缀 + 安全名称 + 哈希值
+    # Combine table name: prefix + safe_name + hash
     return f"vector_store_{safe_name}_{name_hash}_{content_type}"
 
 
 class ChromaStore:
-    """Chroma向量存储管理器"""
+    """Chroma vector storage manager"""
 
     def __init__(self, persist_directory: str = "./instance/chroma"):
         """
-        初始化ChromaStore
+        Initialize ChromaStore
         
         Args:
-            persist_directory: 持久化目录
+            persist_directory: Persistence directory
         """
         self.persist_directory = persist_directory
         os.makedirs(persist_directory, exist_ok=True)
 
-        # 配置Chroma客户端
+        # Configure Chroma client
         self.client = chromadb.PersistentClient(
             path=persist_directory,
             settings=Settings(
-                anonymized_telemetry=False,  # 关闭遥测
+                anonymized_telemetry=False,  # Disable telemetry
                 allow_reset=True,
                 is_persistent=True
             )
         )
 
     def _get_collection(self, collection_id: str):
-        """获取集合"""
+        """Get collection"""
         try:
             return self.client.get_collection(
                 name=collection_id,
                 embedding_function=None
             )
         except Exception as e:
-            logger.error(f"获取集合失败: {str(e)}")
+            logger.error(f"Failed to get collection: {str(e)}")
             return None
 
     @retry_on_error(logger_name="ChromaDB")
     def get_or_create_collection(self, collection_id: str, dimension: int = 1536) -> Collection:
-        """获取或创建集合
+        """Get or create collection
         
         Args:
-            collection_id: 集合ID
-            dimension: 向量维度
+            collection_id: Collection ID
+            dimension: Vector dimension
             
         Returns:
-            str: 集合ID
+            str: Collection ID
         """
         try:
-            # 先尝试获取已存在的集合
+            # First try to get existing collection
             try:
                 collection = self.client.get_collection(
                     name=collection_id,
                     embedding_function=None
                 )
-                logger.info(f"获取已存在的集合: {collection_id}")
+                logger.info(f"Retrieved existing collection: {collection_id}")
                 return collection
             except Exception:
-                # 如果集合不存在，创建新集合
+                # If collection doesn't exist, create a new one
                 metadata = {
                     "hnsw:space": "cosine",
                     "dimension": str(dimension),
@@ -114,19 +114,19 @@ class ChromaStore:
                     embedding_function=None,
                     metadata=metadata
                 )
-                logger.info(f"创建新集合: {collection_id}")
+                logger.info(f"Created new collection: {collection_id}")
 
                 return collection
         except Exception as e:
-            logger.error(f"创建集合失败: {str(e)}")
+            logger.error(f"Failed to create collection: {str(e)}")
             raise
 
     def _validate_inputs(self, texts: List[str], embeddings: List[List[float]], ids: Optional[List[str]] = None):
-        """验证输入数据的一致性"""
+        """Validate input data consistency"""
         if len(texts) != len(embeddings):
-            raise ValueError("文本数量与向量数量不匹配")
+            raise ValueError("Number of texts does not match number of vectors")
         if ids and len(ids) != len(texts):
-            raise ValueError("ID数量与文本数量不匹配")
+            raise ValueError("Number of IDs does not match number of texts")
 
     @retry_on_error(logger_name="ChromaDB")
     def add_texts(
@@ -139,7 +139,7 @@ class ChromaStore:
             ids: Optional[List[str]] = None,
             batch_size: int = 100
     ):
-        """添加文本到向量库"""
+        """Add texts to vector database"""
         self._validate_inputs(texts, embeddings, ids)
         collection_id = generate_collection_id(kb_name, content_type)
         collection = self.get_or_create_collection(collection_id)
@@ -148,7 +148,7 @@ class ChromaStore:
             existing_count = collection.count()
             ids = [str(i) for i in range(existing_count, existing_count + len(texts))]
 
-        # 分批添加，避免内存溢出
+        # Add in batches to avoid memory overflow
         for i in range(0, len(texts), batch_size):
             end_idx = min(i + batch_size, len(texts))
             collection.add(
@@ -169,12 +169,12 @@ class ChromaStore:
             where_document: Optional[Dict] = None,
             **kwargs
     ) -> List[Dict]:
-        """通过知识库名称和内容类型搜索"""
+        """Search by knowledge base name and content type"""
 
         collection_ids = []
 
         if not content_type:
-            # 获取所有内容类型
+            # Get all content types
             content_types = ['function', 'keyword', 'type', 'operator']
             for content_type in content_types:
                 collection_ids.append(generate_collection_id(kb_name, content_type))
@@ -210,17 +210,17 @@ class ChromaStore:
                     )
                 ])
             except Exception as e:
-                logger.error(f"搜索失败: {str(e)}")
+                logger.error(f"Search failed: {str(e)}")
                 raise
         
-        # 根据score排序
+        # Sort by score
         results_all.sort(key=lambda x: x['score'], reverse=True)
 
         return results_all
 
     @retry_on_error(logger_name="ChromaDB")
     def delete_by_ids(self, kb_name: str, content_type: str, ids: List[str]):
-        """通过ID删除向量"""
+        """Delete vectors by ID"""
         collection_id = generate_collection_id(kb_name, content_type)
         collection = self._get_collection(collection_id)
         if not collection:
@@ -228,14 +228,14 @@ class ChromaStore:
         try:
             collection.delete(ids=ids)
         except Exception as e:
-            logger.error(f"删除向量失败: {str(e)}")
+            logger.error(f"Failed to delete vectors: {str(e)}")
             raise
 
     @retry_on_error(logger_name="ChromaDB")
     def delete_collection(self, kb_name: str):
-        """删除集合"""
+        """Delete collection"""
         try:
             for content_type in ['function', 'keyword', 'type', 'operator']:
                 self.client.delete_collection(generate_collection_id(kb_name, content_type))
         except Exception as e:
-            logger.error(f"删除集合失败: {str(e)}")
+            logger.error(f"Failed to delete collection: {str(e)}")

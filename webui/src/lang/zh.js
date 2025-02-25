@@ -205,6 +205,12 @@ export default {
       placeholder: '搜索SQL语句',
       clear: '清除搜索'
     },
+    delete: {
+      title: '删除改写记录',
+      confirm: '确定要删除这条改写历史记录吗？',
+      success: '删除成功',
+      error: '删除失败'
+    },
     empty: {
       title: '暂无改写记录',
       description: '还没有任何SQL改写记录',
@@ -214,7 +220,8 @@ export default {
     },
     list: {
       detail: '详情',
-      loading: '加载中'
+      loading: '加载中',
+      delete: '删除'
     },
     status: {
       success: '成功',
@@ -223,6 +230,12 @@ export default {
     },
     dialog: {
       title: '改写详情'
+    },
+    delete: {
+      title: '删除确认',
+      confirm: '确定要删除这条改写历史记录吗？',
+      success: '删除成功',
+      error: '删除失败'
     }
   },
   knowledge: {

@@ -112,7 +112,7 @@
                   </div>
                 </div>
                 <div class="key-value-list">
-                    <div v-for="(value, key) in flattenObject(item)" :key="key" class="key-value-item">
+                    <div v-for="(value, key) in commonUtil.flattenObject(item)" :key="key" class="key-value-item">
                       <div class="key-label">{{ key }}:</div>
                       <pre class="value-content">{{ formatValue(value) }}</pre>
                     </div>
@@ -202,6 +202,7 @@ import { ElMessage } from 'element-plus'
 import { Upload, CircleCheckFilled, Document } from '@element-plus/icons-vue'
 import { addKnowledgeBaseItemsReq, vectorizeKnowledgeBaseItemsReq } from '@/api/knowledge'
 import { useI18n } from '@/hooks/use-i18n'
+import commonUtil from '@/utils/common-util'
 
 const router = useRouter()
 const route = useRoute()
@@ -446,47 +447,6 @@ const handleSaveEdit = () => {
   } catch (error) {
     ElMessage.error('Invalid JSON format, please check the format')
   }
-}
-
-// 定义字段顺序
-
-// 修改展平对象的方法
-const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
-  const flattened: Record<string, any> = {}
-  const orderedResult: Record<string, any> = {}
-
-  const fieldOrder = ['keyword', 'type', 'tree', 'link', 'description', 'example', 'detail']
-
-  // 先展平所有字段
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      const value = obj[key]
-      const newKey = prefix ? `${prefix}.${key}` : key
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
-        Object.assign(flattened, flattenObject(value, newKey))
-      } else {
-        flattened[newKey] = value
-      }
-    }
-  }
-
-  // 按照指定顺序重新排列字段
-  // 先添加指定顺序的字段
-  fieldOrder.forEach(field => {
-    Object.keys(flattened).forEach(key => {
-      if (key.toLowerCase().includes(field.toLowerCase())) {
-        orderedResult[key] = flattened[key]
-        delete flattened[key]
-      }
-    })
-  })
-
-  // 添加剩余的字段
-  Object.keys(flattened).forEach(key => {
-    orderedResult[key] = flattened[key]
-  })
-
-  return orderedResult
 }
 
 // 格式化值的显示

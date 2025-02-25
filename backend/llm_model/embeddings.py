@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingManager:
-    """Embedding管理器"""
+    """Embedding Manager"""
 
     def __init__(self):
         self._embeddings = {}
@@ -20,7 +20,7 @@ class EmbeddingManager:
     @db_session_manager
     def get_embedding_config_from_db(self, model_name: str):
         """
-        获取Embedding模型配置
+        Get Embedding model configuration
         """
         config = db.session.query(LLMModel).filter_by(name=model_name, category='embedding', is_active=True).first()
         return {
@@ -33,11 +33,11 @@ class EmbeddingManager:
         }
     
     def release_embedding(self, model_name: str):
-        """释放Embedding模型"""
+        """Release Embedding model"""
         if model_name in self._embeddings:
             embedding_model = self._embeddings[model_name]
             try:
-                # 对于HuggingFace模型，需要释放CUDA内存
+                # For HuggingFace models, need to release CUDA memory
                 if isinstance(embedding_model, HuggingFaceEmbeddings):
                     import torch
                     if torch.cuda.is_available():
@@ -45,47 +45,47 @@ class EmbeddingManager:
                     if hasattr(embedding_model, 'client'):
                         del embedding_model.client
                 
-                # OpenAI模型不需要特别的释放操作
+                # OpenAI models don't need special release operations
                 del self._embeddings[model_name]
                 
             except Exception as e:
-                logger.error(f"释放Embedding模型 {model_name} 失败: {str(e)}")
+                logger.error(f"Failed to release Embedding model {model_name}: {str(e)}")
 
     def release_all_embeddings(self):
-        """释放所有Embedding模型"""
-        model_names = list(self._embeddings.keys())  # 创建副本避免在迭代时修改字典
+        """Release all Embedding models"""
+        model_names = list(self._embeddings.keys())  # Create a copy to avoid modifying dictionary during iteration
         for model_name in model_names:
             self.release_embedding(model_name)
 
 
     def get_embedding(self, model_name: str, model_config: Optional[Dict] = None):
         """
-        获取Embedding模型实例，如果不存在则加载
+        Get Embedding model instance, load if it doesn't exist
         Args:
-            model_name: 模型名称
-            model_config: 模型配置
+            model_name: Model name
+            model_config: Model configuration
         Returns:
-            Embedding模型实例
+            Embedding model instance
         """
         if model_name not in self._embeddings:
-            # 懒加载：只在第一次使用时加载模型
+            # Lazy loading: only load model when first used
             if model_config is None:
                 model_config = self.get_embedding_config_from_db(model_name)
                 if not model_config:
-                    raise ValueError(f"Embedding模型不存在或未启用: {model_name}")
+                    raise ValueError(f"Embedding model does not exist or is not enabled: {model_name}")
             self.load_embedding(model_config)
 
         return self._embeddings.get(model_name)
 
     def load_embedding(self, model_config: dict):
         """
-        加载单个Embedding模型
+        Load a single Embedding model
         Args:
-            model_config: 模型配置
+            model_config: Model configuration
         """
         try:
             if model_config['deployment_type'] == 'cloud':
-                # 云端模型（OpenAI）
+                # Cloud model (OpenAI)
                 embedding = OpenAIEmbeddings(
                     model=model_config['name'],
                     openai_api_key=model_config['api_key'],
@@ -93,22 +93,22 @@ class EmbeddingManager:
                 )
             else:
                 import torch
-                # 确定设备
+                # Determine device
                 device = "cuda" if torch.cuda.is_available() else "cpu"
-                # 本地模型（HuggingFace）
+                # Local model (HuggingFace)
                 embedding = HuggingFaceEmbeddings(
                     model_name=model_config['model_path'],
                     model_kwargs={'device': device},
                     encode_kwargs={'normalize_embeddings': True}
                 )
             self._embeddings[model_config['name']] = embedding
-            logger.info(f"成功加载Embedding模型: {model_config['name']}")
+            logger.info(f"Successfully loaded Embedding model: {model_config['name']}")
         except Exception as e:
-            logger.error(f"加载Embedding模型失败 {model_config['name']}: {str(e)}")
+            logger.error(f"Failed to load Embedding model {model_config['name']}: {str(e)}")
             raise
 
 
-# 全局Embedding管理器实例
+# Global Embedding manager instance
 embedding_manager = EmbeddingManager()
 
 
@@ -116,34 +116,34 @@ embedding_manager = EmbeddingManager()
 async def get_embeddings(text: Union[str, List[str]], model_name: str,
                          model_config: Optional[Dict] = None) -> np.ndarray:
     """
-    获取文本的embedding向量
+    Get embedding vectors for text
     Args:
-        text: 输入文本或文本列表
-        model_name: 模型名称
+        text: Input text or list of texts
+        model_name: Model name
     Returns:
-        numpy.ndarray: 向量或向量列表
+        numpy.ndarray: Vector or list of vectors
     """
     try:
         return await _get_embeddings_with_context(text, model_name, model_config=model_config)
     except Exception as e:
-        logger.error(f"获取Embedding失败: {str(e)}")
+        logger.error(f"Failed to get Embedding: {str(e)}")
         raise
 
 
 async def _get_embeddings_with_context(text: Union[str, List[str]], model_name: str,
                                        model_config: Optional[Dict] = None) -> np.ndarray:
-    """在应用上下文中获取embedding向量"""
-    # 获取模型实例
+    """Get embedding vectors in application context"""
+    # Get model instance
     embedding_model = embedding_manager.get_embedding(model_name, model_config)
     if not embedding_model:
-        raise ValueError(f"Embedding模型不存在或未启用: {model_name}")
+        raise ValueError(f"Embedding model does not exist or is not enabled: {model_name}")
     try:
-        # 使用LangChain的embed_query/embed_documents方法
+        # Use LangChain's embed_query/embed_documents methods
         if isinstance(text, str):
             embedding = await embedding_model.aembed_query(text)
         else:
             embedding = await embedding_model.aembed_documents(text)
         return np.array(embedding)
     except Exception as e:
-        logger.error(f"生成Embedding失败: {str(e)}")
+        logger.error(f"Failed to generate Embedding: {str(e)}")
         raise

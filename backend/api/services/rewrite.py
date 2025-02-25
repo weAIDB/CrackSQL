@@ -14,41 +14,41 @@ from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, OUT_TYPE, RE
 class RewriteService:
     @staticmethod
     def _create_database_url(db_type: str, user: str, password: str, host: str, port: str, database: str) -> str:
-        """创建数据库连接URL"""
-        password = quote_plus(password)  # 对密码进行URL编码
+        """Create database connection URL"""
+        password = quote_plus(password)  # URL encode the password
 
         if db_type.lower() == 'mysql':
             return f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
         elif db_type.lower() == 'postgresql':
             return f"postgresql://{user}:{password}@{host}:{port}/{database}"
         elif db_type.lower() == 'oracle':
-            # 使用 service_name 方式连接
+            # Connect using service_name method
             return f"oracle+cx_oracle://{user}:{password}@{host}:{port}/?service_name={database}"
         else:
-            raise ValueError(f"不支持的数据库类型: {db_type}")
+            raise ValueError(f"Unsupported database type: {db_type}")
 
     @staticmethod
     def test_database_connection(db_type: str, user: str, password: str, host: str, port: str, database: str) -> bool:
-        """测试数据库连接"""
+        """Test database connection"""
         try:
             url = RewriteService._create_database_url(db_type, user, password, host, port, database)
             engine = create_engine(url)
 
-            # 使用 text() 包装 SQL 语句
+            # Use text() to wrap SQL statements
             with engine.connect() as connection:
                 if db_type.lower() == 'oracle':
-                    # Oracle 需要使用 text() 包装 SQL
+                    # Oracle needs to use text() to wrap SQL
                     result = connection.execute(text("SELECT 1 FROM DUAL"))
-                    result.fetchone()  # 确保实际执行了查询
+                    result.fetchone()  # Ensure the query is actually executed
                 else:
                     result = connection.execute(text("SELECT 1"))
                     result.fetchone()
             return True
 
         except SQLAlchemyError as e:
-            raise ValueError(f"数据库连接失败: {str(e)}")
+            raise ValueError(f"Database connection failed: {str(e)}")
         except Exception as e:
-            raise ValueError(f"连接过程出现错误: {str(e)}")
+            raise ValueError(f"Error occurred during connection: {str(e)}")
         finally:
             if 'engine' in locals():
                 engine.dispose()
@@ -56,14 +56,14 @@ class RewriteService:
     @staticmethod
     def create_history(source_db_type: str, original_sql: str, source_kb_id: int, target_kb_id: int, target_db_id: int,
                        llm_model_name: str) -> dict:
-        """创建改写历史"""
+        """Create rewrite history"""
 
-        # 验证目标数据库连接
+        # Validate target database connection
         try:
 
             target_db = DatabaseConfig.query.get(target_db_id)
             if not target_db:
-                raise ValueError(f"目标数据库不存在: {target_db_id}")
+                raise ValueError(f"Target database does not exist: {target_db_id}")
 
             # RewriteService.test_database_connection(
             #     target_db.db_type,
@@ -74,9 +74,9 @@ class RewriteService:
             #     target_db.database
             # )
         except ValueError as e:
-            raise ValueError(f"目标数据库连接测试失败: {str(e)}")
+            raise ValueError(f"Target database connection test failed: {str(e)}")
 
-        # 创建改写历史记录
+        # Create rewrite history record
         history = RewriteHistory(
             source_db_type=source_db_type,
             original_sql=original_sql,
@@ -95,7 +95,7 @@ class RewriteService:
 
     @staticmethod
     def _convert_history_to_dict(history):
-        """将 RewriteHistory 对象转换为字典"""
+        """Convert RewriteHistory object to dictionary"""
         if not history:
             return None
 
@@ -126,8 +126,33 @@ class RewriteService:
             'error_message': history.error_message,
             'rewritten_sql': history.rewritten_sql
         }
+        
+        # 计算持续时间
+        if history.created_at and history.updated_at:
+            # 计算时间差（秒）
+            time_diff = (history.updated_at - history.created_at).total_seconds()
+            
+            # 格式化持续时间
+            if time_diff < 60:
+                duration = f"{int(time_diff)}秒"
+            elif time_diff < 3600:
+                minutes = int(time_diff // 60)
+                seconds = int(time_diff % 60)
+                duration = f"{minutes}分{seconds}秒"
+            elif time_diff < 86400:
+                hours = int(time_diff // 3600)
+                minutes = int((time_diff % 3600) // 60)
+                duration = f"{hours}小时{minutes}分"
+            else:
+                days = int(time_diff // 86400)
+                hours = int((time_diff % 86400) // 3600)
+                duration = f"{days}天{hours}小时"
+            
+            history_dict['duration'] = duration
+        else:
+            history_dict['duration'] = "未知"
 
-        # 获取关联的processes
+        # Get associated processes
         processes = RewriteProcess.query \
             .filter_by(history_id=history.id) \
             .all()
@@ -189,7 +214,7 @@ class RewriteService:
             is_success: bool = True,
             error: str = None
     ) -> RewriteProcess:
-        """添加改写过程记录"""
+        """Add rewrite process record"""
         process = RewriteProcess(
             history_id=history_id,
             step_name=step_name,
@@ -211,10 +236,10 @@ class RewriteService:
             sql: str = None,
             error: str = None
     ):
-        """更新改写状态"""
+        """Update rewrite status"""
         history = db.session.query(RewriteHistory).get(history_id)
         if not history:
-            raise ValueError(f"改写历史不存在: {history_id}")
+            raise ValueError(f"Rewrite history does not exist: {history_id}")
 
         history.status = status
         if sql:
@@ -226,14 +251,14 @@ class RewriteService:
     @staticmethod
     @db_session_manager
     def process_rewrite_task(history_id: int):
-        """处理SQL改写任务"""
+        """Process SQL rewrite task"""
         try:
             history = db.session.query(RewriteHistory).get(history_id)
             if not history:
-                raise ValueError(f"改写历史不存在: {history_id}")
+                raise ValueError(f"Rewrite history does not exist: {history_id}")
             try:
                 from translate import Translate
-                # 原始SQL，源数据库类型，源数据库知识库，目标数据库类型，目标数据库知识库，目标数据库Host，目标数据库Port，目标数据库User，目标数据库Password, LLm-Model-Name
+                # Original SQL, source database type, source database knowledge base, target database type, target database knowledge base, target database Host, target database Port, target database User, target database Password, LLM-Model-Name
                 target_db = DatabaseConfig.query.get(history.target_db_id)
                 target_db_config = {
                     "host": target_db.host,
@@ -261,7 +286,7 @@ class RewriteService:
                     RewriteService.add_rewrite_process(
                         history_id=history_id,
                         content=f"The translated SQL is:\n ```{current_sql}```",
-                        step_name="错误信息",
+                        step_name="Error Message",
                         role='assistant',
                         is_success=False
                     )
@@ -273,7 +298,7 @@ class RewriteService:
                     RewriteService.add_rewrite_process(
                         history_id=history_id,
                         content=FAILED_TEMPLATE,
-                        step_name="错误信息",
+                        step_name="Error Message",
                         role='assistant',
                         is_success=False
                     )
@@ -282,20 +307,20 @@ class RewriteService:
                         status=RewriteStatus.FAILED
                     )
             except Exception as e:
-                # 更新改写状态为成功
+                # Update rewrite status to success
                 RewriteService.update_rewrite_status(
                     history_id=history_id,
                     status=RewriteStatus.FAILED,
                     error=str(e)
                 )
-                raise ValueError(f"SQL改写失败: {str(e)}")
+                raise ValueError(f"SQL rewrite failed: {str(e)}")
         except Exception as e:
-            logger.error(f"处理改写任务失败: {str(e)}")
-            # 添加错误记录和更新状态
+            logger.error(f"Failed to process rewrite task: {str(e)}")
+            # Add error record and update status
             RewriteService.add_rewrite_process(
                 history_id=history_id,
                 content=str(e),
-                step_name="错误信息",
+                step_name="Error Message",
                 role='system',
                 is_success=False,
                 error=str(e)
@@ -306,3 +331,24 @@ class RewriteService:
                 error=str(e)
             )
             raise
+
+    @staticmethod
+    @db_session_manager
+    def delete_history(history_id: int) -> dict:
+        """Delete rewrite history"""
+        history = db.session.query(RewriteHistory).get(history_id)
+        if not history:
+            raise ValueError(f"Rewrite history does not exist: {history_id}")
+            
+        # Check if the history is in processing status
+        if history.status == RewriteStatus.PROCESSING:
+            raise ValueError("Cannot delete history in processing status")
+            
+        # Delete associated processes first
+        db.session.query(RewriteProcess).filter_by(history_id=history_id).delete()
+        
+        # Delete the history record
+        db.session.delete(history)
+        db.session.commit()
+        
+        return {"success": True, "message": "History deleted successfully"}

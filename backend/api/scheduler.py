@@ -2,7 +2,6 @@ import logging
 from flask import Blueprint
 from api.utils.response import ResMsg
 from api.utils.util import route
-from api.utils.auth import login_required
 from api.utils.scheduler import scheduler
 
 
@@ -12,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 @route(bp, '/jobs', methods=["GET"])
-# @login_required
 def jobs():
     """
     获取所有的jobs

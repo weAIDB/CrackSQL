@@ -44,6 +44,10 @@
           <div style="color: #666666; font-size: 14px;">
             {{ formatDate(historyDetail.created_at) }}
           </div>
+          <div v-if="historyDetail.duration" style="color: #666666; font-size: 14px; margin-left: 20px;">
+            <el-icon><Timer /></el-icon>
+            {{ historyDetail.duration }}
+          </div>
         </div>
       </div>
     </div>
@@ -83,6 +87,7 @@ import {onMounted, ref, onUnmounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {formatDate, formatUserMessage, getStatusType} from '@/utils/rewrite'
 import {useI18n} from '@/hooks/use-i18n'
+import {Timer} from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()

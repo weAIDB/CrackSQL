@@ -38,3 +38,12 @@ export const createRewriteReq = (data) => {
     data
   })
 }
+
+// 删除改写历史
+export const deleteRewriteReq = (id) => {
+  return axiosReq({
+    url: 'api/rewrite/delete',
+    method: 'post',
+    data: { id }
+  })
+}

@@ -1,0 +1,52 @@
+# 知识库初始化配置文件, 用于初始化知识库和Embedding模型, 该文件只在初始化时使用。 后续修改可直接在数据库中修改。
+
+# LLM模型配置
+LLM_MODELS:
+  - name: "DeepSeek-R1-Distill-Qwen-1.5B"
+    deployment_type: "local"  # cloud 或 local
+    category: "llm"
+    api_base: ""
+    api_key: ""  # 请替换为您的实际API密钥
+    path: "./local_models/DeepSeek-R1-Distill-Qwen-1.5B"  # 本地模型路径
+    description: "DeepSeek-R1-Distill-Qwen-1.5B LLM模型"
+    temperature: 0.3
+    max_tokens: 260000
+
+
+# Embedding模型配置
+EMBEDDING_MODELS:
+  # OpenAI Embedding模型
+  - name: "all-MiniLM-L6-v2"
+    deployment_type: "local"  # cloud 或 local
+    category: "embedding"
+    api_base: ""
+    api_key: ""  # 请替换为您的实际API密钥
+    path: "./local_models/all-MiniLM-L6-v2"  # 本地模型路径
+    dimension: 384
+    description: "Embedding模型，用于生成文本向量"
+
+# 知识库配置
+KNOWLEDGE_BASES:
+  # MySQL知识库
+  - kb_name: "mysql_knowledge"
+    db_type: "mysql"
+    kb_info: "MySQL数据库知识库，包含MySQL的关键字、函数、操作符等信息"
+    embedding_model: "all-MiniLM-L6-v2"  # 使用上面定义的Embedding模型
+    knowledge_files:
+      - "./data/processed_document/mysql_8_kb.json"
+
+  # PostgreSQL知识库
+  - kb_name: "postgresql_knowledge"
+    db_type: "postgresql"
+    kb_info: "PostgreSQL数据库知识库，包含PostgreSQL的关键字、函数、操作符等信息"
+    embedding_model: "all-MiniLM-L6-v2"
+    knowledge_files:
+      - "./data/processed_document/pg_14_kb.json"
+
+  # Oracle知识库
+  - kb_name: "oracle_knowledge"
+    db_type: "oracle"
+    kb_info: "Oracle数据库知识库，包含Oracle的关键字、函数、操作符等信息"
+    embedding_model: "all-MiniLM-L6-v2"
+    knowledge_files:
+      - "./data/processed_document/oracle_11_kb.json" 

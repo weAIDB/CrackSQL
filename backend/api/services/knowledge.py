@@ -26,7 +26,6 @@ def get_knowledge_base_list() -> List[Dict]:
                 "id": kb.id,
                 "kb_name": kb.kb_name,
                 "kb_info": kb.kb_info,
-                "user_id": kb.user_id,
                 "embedding_model_name": kb.embedding_model_name,
                 "created_at": kb.created_at.strftime("%Y-%m-%d %H:%M:%S") if kb.created_at else None,
                 "updated_at": kb.updated_at.strftime("%Y-%m-%d %H:%M:%S") if kb.updated_at else None,
@@ -50,7 +49,6 @@ def get_knowledge_base(kb_name: str) -> Dict:
             "id": kb.id,
             "kb_name": kb.kb_name,
             "kb_info": kb.kb_info,
-            "user_id": kb.user_id,
             "embedding_model": {
                 "id": kb.embedding_model.id,
                 "name": kb.embedding_model.name,
@@ -68,7 +66,7 @@ def get_knowledge_base(kb_name: str) -> Dict:
         raise
 
 
-def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_model_name: str, db_type: str) -> Dict:
+def create_knowledge_base(kb_name: str, kb_info: str, embedding_model_name: str, db_type: str) -> Dict:
     """创建知识库"""
     try:
         # 检查知识库名称是否已存在
@@ -94,7 +92,6 @@ def create_knowledge_base(kb_name: str, user_id: int, kb_info: str, embedding_mo
         # 创建知识库
         kb = KnowledgeBase(
             kb_name=kb_name,
-            user_id=user_id,
             kb_info=kb_info,
             embedding_model_name=embedding_model_name,
             db_type=db_type
@@ -250,7 +247,7 @@ def secure_filename_with_unicode(filename: str) -> str:
     return name + ext
 
 
-def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
+def add_kb_items(kb_name: str, items: List[Dict]) -> Dict:
     """添加知识库条目(不包含向量化)"""
     try:
         # 获取知识库
@@ -292,7 +289,6 @@ def add_kb_items(kb_name: str, items: List[Dict], user_id: int = None) -> Dict:
             # 创建内容对象
             content = JSONContent(
                 knowledge_base_id=kb.id,
-                user_id=user_id,
                 content=content_str,
                 content_type=item.get('type'),
                 content_hash=content_hash,
