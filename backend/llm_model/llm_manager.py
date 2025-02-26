@@ -10,47 +10,47 @@ logger = logging.getLogger(__name__)
 
 
 class LLMManager:
-    """LLM模型管理器"""
+    """LLM model manager"""
 
     def __init__(self):
         self._models: Dict[str, BaseLLM] = {}
 
     def load_model(self, model_config: Dict) -> Optional[BaseLLM]:
         """
-        加载单个模型
+        Load a single model
         Args:
-            config: 模型配置
+            config: Model configuration
         Returns:
-            Optional[BaseLLM]: 加载的模型实例
+            Optional[BaseLLM]: The loaded model instance
         """
         try:
-            # 根据类型创建相应的模型实例
+            # Create a model instance based on the type
             model_cls = CloudLLM if model_config['deployment_type'] == 'cloud' else LocalLLM
             model = model_cls(model_config)
 
-            # 验证配置
+            # Validate configuration
             if not model.validate_config():
-                logger.error(f"模型配置无效: {model_config['name']}")
+                logger.error(f"Invalid model configuration: {model_config['name']}")
                 return None
 
             self._models[model_config['name']] = model
-            logger.info(f"成功加载模型: {model_config['name']}")
+            logger.info(f"Successfully loaded model: {model_config['name']}")
             return model
 
         except Exception as e:
-            logger.error(f"加载模型失败 {model_config['name']}: {str(e)}")
+            logger.error(f"Failed to load model {model_config['name']}: {str(e)}")
             return None
     
 
     @db_session_manager
     def get_model_config_from_db(self, name: str) -> Optional[Dict]:
-        """从数据库获取模型配置"""
+        """Get model configuration from database"""
         config = LLMModel.query.filter_by(name=name).first()
         if not config:
-            logger.error(f"模型配置不存在: {name}")
+            logger.error(f"Model configuration does not exist: {name}")
             return None
         if not config.is_active:
-            logger.error(f"模型未启用: {name}")
+            logger.error(f"Model is not enabled: {name}")
             return None
 
         model_config = {
@@ -69,60 +69,60 @@ class LLMManager:
 
     def reload_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
         """
-        重新加载模型
+        Reload model
         Args:
-            name: 模型名称
-            config: 可选的模型配置字典
+            name: Model name
+            config: Optional model configuration dictionary
         Returns:
-            Optional[BaseLLM]: 重新加载的模型实例
+            Optional[BaseLLM]: The reloaded model instance
         """
         if name not in self._models:
-            logger.error(f"模型不存在: {name}, 不需要重新加载")
+            logger.error(f"Model does not exist: {name}, no need to reload")
 
-        # 释放模型，释放后模型会被销毁
+        # Release model, after release, the model will be destroyed
         # self._models[name].release()
 
-        # 重新加载模型
+        # Reload model
         return self.get_model(name, config)
 
 
     def get_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
-        """获取模型实例
+        """Get model instance
         Args:
-            name: 模型名称
-            config: 可选的模型配置字典
+            name: Model name
+            config: Optional model configuration dictionary
         Returns:
-            Optional[BaseLLM]: 模型实例
+            Optional[BaseLLM]: The model instance
         """
         if name not in self._models:
             if config is None:
                 config = self.get_model_config_from_db(name)
                 if not config:
-                    logger.error(f"模型配置不存在: {name}")
+                    logger.error(f"Model configuration does not exist: {name}")
                     return None
             else:
-                # 使用字典访问方式
+                # Use dictionary access method
                 if config['deployment_type'] == 'cloud' and (config.get('api_base') is None or config.get('api_key') is None):
-                    logger.error(f"模型配置参数不全: {config['name']}")
+                    logger.error(f"Model configuration parameters are incomplete: {config['name']}")
                     return None
                 elif config['deployment_type'] == 'local' and config.get('model_path') is None:
-                    logger.error(f"模型配置参数不全: {config['name']}")
+                    logger.error(f"Model configuration parameters are incomplete: {config['name']}")
                     return None
             return self.load_model(config)
         return self._models.get(name)
 
 
     def release_model(self, model_name: str):
-        """释放模型"""
+        """Release model"""
         if model_name in self._models:
             self._models[model_name].release()
             del self._models[model_name]
 
     def release_all_models(self):
-        """释放所有模型"""
+        """Release all models"""
         for model_name in self._models:
             self._models[model_name].release()
         self._models.clear()
 
-# 全局LLM管理器实例
+# Global LLM manager instance
 llm_manager = LLMManager()

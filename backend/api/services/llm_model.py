@@ -6,15 +6,15 @@ from llm_model.llm_manager import llm_manager
 from llm_model.embeddings import embedding_manager
 
 class LLMModelService:
-    """LLM模型服务"""
+    """LLM model service"""
 
     @staticmethod
     def create_model(data: Dict[str, Any]) -> LLMModel:
-        """创建模型"""
+        """Create model"""
         required_fields = ['name', 'deployment_type']
         for field in required_fields:
             if field not in data:
-                raise ValueError(f"缺少必填字段: {field}")
+                raise ValueError(f"Missing required field: {field}")
 
         try:
             deployment_type = data['deployment_type']
@@ -22,9 +22,9 @@ class LLMModelService:
             raise ValueError(f"无效的模型类型: {data['deployment_type']}")
 
         if deployment_type == "local" and not data.get('path'):
-            raise ValueError("本地模型必须提供模型路径")
+            raise ValueError("Local model must provide model path")
         if deployment_type == "cloud" and not data.get('api_base'):
-            raise ValueError("云端模型必须提供API基础URL")
+            raise ValueError("Cloud model must provide API base URL")
 
         model = LLMModel(
             name=data['name'],
@@ -58,7 +58,7 @@ class LLMModelService:
 
     @staticmethod
     def update_model(model_id: int, data: Dict[str, Any]) -> Optional[LLMModel]:
-        """更新模型"""
+        """Update model"""
         model = LLMModel.query.get(model_id)
         if not model:
             return None
@@ -68,7 +68,7 @@ class LLMModelService:
                 setattr(model, key, value)
 
         db.session.commit()
-        # 重新加载模型
+        # Reload model
         llm_manager.reload_model(model.name)
         return {
             'id': model.id,
@@ -86,7 +86,7 @@ class LLMModelService:
 
     @staticmethod
     def delete_model(model_id: int) -> bool:
-        """删除模型"""
+        """Delete model"""
         model = LLMModel.query.get(model_id)
         if not model:
             return False
@@ -104,7 +104,7 @@ class LLMModelService:
             category: Optional[str] = None,
             is_active: Optional[bool] = None
     ) -> tuple[List[LLMModel], int]:
-        """获取模型列表"""
+        """Get model list"""
         query = LLMModel.query
 
         if search:
@@ -151,31 +151,31 @@ class LLMModelService:
 
     @staticmethod
     def release_all_llm_models():
-        """释放所有模型"""
+        """Release all models"""
         llm_manager.release_all_models()
 
     @staticmethod
     def release_llm_model(model_name: str):
-        """释放模型"""
+        """Release model"""
         llm_manager.release_model(model_name)
 
     @staticmethod
     def load_llm_model(model_name: str):
-        """加载模型"""
+        """Load model"""
         llm_manager.get_model(model_name)
 
     @staticmethod
     def load_embedding(model_name: str):
-        """加载Embedding模型"""
+        """Load Embedding model"""
         embedding_manager.get_embedding(model_name)
 
     @staticmethod
     def release_all_embeddings():
-        """释放所有Embedding模型"""
+        """Release all Embedding models"""
         embedding_manager.release_all_embeddings()
 
     @staticmethod
     def release_embedding(model_name: str):
-        """释放Embedding模型"""
+        """Release Embedding model"""
         embedding_manager.release_embedding(model_name)
         

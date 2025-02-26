@@ -6,7 +6,7 @@ LLM_MODELS:
   - name: "gpt-4o"                          # Model name
     deployment_type: "cloud"                # Deployment type: cloud or local
     category: "llm"                         # Model category
-    api_base: "https://api.openai.com/v1"   # API base URL
+    api_base: "https://api.openai.com/v1"   # API base URL 
     api_key: "your-openai-api-key"          # Replace with your actual API key
     path: "./local_models/gpt-4o"           # Local model path
     description: "OpenAI LLM模型，用于生成文本"  # Model description

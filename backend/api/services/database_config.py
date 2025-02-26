@@ -6,13 +6,13 @@ from config.logging_config import logger
 
 @cache.memoize(timeout=864000, make_name="support_database_options")
 def get_support_database_options():
-    """获取支持的数据库类型列表"""
+    """Get supported database types list"""
     return DatabaseType.choices()
 
 
 @cache.memoize(timeout=864000, make_name="database_config_list")
 def database_config_list(limit: int, offset: int, keyword: str = None):
-    """获取数据库配置列表"""
+    """Get database configuration list"""
     try:
         query = DatabaseConfig.query
         if keyword:
@@ -40,7 +40,7 @@ def database_config_list(limit: int, offset: int, keyword: str = None):
 
 @cache.memoize(timeout=864000, make_name="database_config")
 def get_database_config(id: int):
-    """获取单个数据库配置"""
+    """Get single database configuration"""
     try:
         config = DatabaseConfig.query.get(id)
         return {'data': {
@@ -61,7 +61,7 @@ def get_database_config(id: int):
 def insert_database_config(host: str, port: int, database: str,
                            username: str, password: str, db_type: str,
                            description: str = None) -> bool:
-    """创建数据库配置"""
+    """Create database configuration"""
     try:
         config = DatabaseConfig(
             host=host,
@@ -86,7 +86,7 @@ def insert_database_config(host: str, port: int, database: str,
 def update_database_config(id: int, host: str, port: int, database: str,
                            username: str, password: str, db_type: str,
                            description: str = None) -> bool:
-    """更新数据库配置"""
+    """Update database configuration"""
     try:
         config = DatabaseConfig.query.get(id)
         if not config:
@@ -112,7 +112,7 @@ def update_database_config(id: int, host: str, port: int, database: str,
 
 
 def delete_database_config(id: int) -> bool:
-    """删除数据库配置"""
+    """Delete database configuration"""
     try:
         config = DatabaseConfig.query.get(id)
         if not config:

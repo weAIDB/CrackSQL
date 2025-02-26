@@ -8,24 +8,24 @@ logger = logging.getLogger(__name__)
 
 
 class BaseLLM(ABC):
-    """基础LLM类"""
+    """Base LLM class"""
 
     def __init__(self, model_config: Dict[str, Any]):
         """
-        初始化LLM
+        Initialize LLM
         Args:
-            model_config: 模型配置
+            model_config: Model configuration
         """
         self.model_config = model_config
-        if not self.validate_config():  # 不再传递 model_config 参数
-            raise ValueError("模型配置验证失败")
+        if not self.validate_config():  # No longer pass model_config parameter
+            raise ValueError("Model configuration validation failed")
 
     @abstractmethod
-    def validate_config(self) -> bool:  # 修改方法签名，使用实例变量
+    def validate_config(self) -> bool:  # Modify method signature, use instance variables
         """
-        验证模型配置
+        Validate model configuration
         Returns:
-            bool: 配置是否有效
+            bool: Whether the configuration is valid
         """
         pass
 
@@ -33,10 +33,10 @@ class BaseLLM(ABC):
     async def chat(self,
                    messages: List[Union[SystemMessage, HumanMessage]],
                    **kwargs) -> str:
-        """聊天接口"""
+        """Chat interface"""
         pass
 
     @abstractmethod
     async def generate(self, prompt: str, **kwargs) -> str:
-        """生成文本"""
+        """Generate text"""
         pass

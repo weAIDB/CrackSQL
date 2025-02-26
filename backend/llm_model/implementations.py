@@ -243,7 +243,6 @@ class LocalLLM(BaseLLM):
             current_response = ""
 
             for new_text in self.streamer:
-                print("======:", new_text)
                 yield new_text.strip()
                 # # Check if contains end marker
                 # if "<|endoftext|>" in new_text:

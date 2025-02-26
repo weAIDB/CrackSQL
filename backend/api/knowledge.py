@@ -24,7 +24,7 @@ bp = Blueprint("knowledge", __name__, url_prefix='/api/knowledge_base')
 
 @route(bp, '/list', methods=["GET"])
 def list_knowledge_bases():
-    """获取知识库列表"""
+    """Get knowledge base list"""
     res = ResMsg()
     try:
         data = get_knowledge_base_list()
@@ -37,18 +37,18 @@ def list_knowledge_bases():
 
 @route(bp, '/detail', methods=["GET"])
 def get_kb():
-    """获取单个知识库信息"""
+    """Get single knowledge base information"""
     res = ResMsg()
     kb_name = request.args.get('kb_name')
 
     if not kb_name:
-        res.update(code=ResponseCode.InvalidParameter, msg="知识库名称不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Knowledge base name cannot be empty")
         return res.data
 
     try:
         data = get_knowledge_base(kb_name)
         if not data:
-            res.update(code=ResponseCode.NoResourceFound, msg="知识库不存在")
+            res.update(code=ResponseCode.NoResourceFound, msg="Knowledge base does not exist")
             return res.data
 
         res.update(data=data)
@@ -60,19 +60,19 @@ def get_kb():
 
 @route(bp, '/create', methods=["POST"])
 def create_kb():
-    """创建知识库"""
+    """Create knowledge base"""
     res = ResMsg()
     data = request.get_json(force=True)
 
-    # 验证必要参数
+    # Verify required parameters
     required_fields = ['kb_name', 'embedding_model_name']
     for field in required_fields:
         if not data.get(field):
-            res.update(code=ResponseCode.InvalidParameter, msg=f"缺少必要参数: {field}")
+            res.update(code=ResponseCode.InvalidParameter, msg=f"Missing required parameter: {field}")
             return res.data
 
     try:
-        # 创建知识库
+        # Create knowledge base
         result = create_knowledge_base(
             kb_name=data.get('kb_name'),
             kb_info=data.get('kb_info'),
@@ -93,13 +93,13 @@ def create_kb():
 
 @route(bp, '/update', methods=["POST"])
 def update_kb():
-    """更新知识库"""
+    """Update knowledge base"""
     res = ResMsg()
     data = request.get_json(force=True)
     kb_id = data.get('kb_id')
 
     if not kb_id:
-        res.update(code=ResponseCode.InvalidParameter, msg="知识库ID不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Knowledge base ID cannot be empty")
         return res.data
 
     try:
@@ -117,23 +117,23 @@ def update_kb():
 
 @route(bp, '/delete', methods=["POST"])
 def delete_kb():
-    """删除知识库"""
+    """Delete knowledge base"""
     res = ResMsg()
     data = request.get_json(force=True)
     kb_name = data.get('kb_name')
 
     if not kb_name:
-        res.update(code=ResponseCode.InvalidParameter, msg="知识库名称不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Knowledge base name cannot be empty")
         return res.data
 
     try:
-        # 获取知识库信息
+        # Get knowledge base information
         kb = get_knowledge_base(kb_name)
         if not kb:
-            res.update(code=ResponseCode.NoResourceFound, msg="知识库不存在")
+            res.update(code=ResponseCode.NoResourceFound, msg="Knowledge base does not exist")
             return res.data
 
-        # 删除知识库及其关联数据
+        # Delete knowledge base and associated data
         result = delete_knowledge_base(kb_name)
         if not result['status']:
             res.update(code=ResponseCode.Fail, msg=result['msg'])
@@ -148,12 +148,12 @@ def delete_kb():
 
 @route(bp, '/search', methods=["POST"])
 def search_kb():
-    """搜索知识库"""
+    """Search knowledge base"""
     res = ResMsg()
     data = request.get_json(force=True)
 
     if not all([data.get('kb_name'), data.get('query')]):
-        res.update(code=ResponseCode.InvalidParameter, msg="知识库名称和搜索词不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Knowledge base name and search query cannot be empty")
         return res.data
 
     try:
@@ -171,18 +171,18 @@ def search_kb():
 
 @route(bp, '/upload', methods=['POST'])
 def upload_json():
-    """上传JSON文件"""
+    """Upload JSON file"""
     res = ResMsg()
     try:
         file = request.files.get('file')
         kb_name = request.form.get('kb_name')
 
         if not file or not kb_name:
-            res.update(code=ResponseCode.InvalidParameter, msg="缺少必要参数")
+            res.update(code=ResponseCode.InvalidParameter, msg="Missing required parameters")
             return res.data
 
         if not file.filename.endswith('.json'):
-            res.update(code=ResponseCode.InvalidParameter, msg="仅支持JSON文件")
+            res.update(code=ResponseCode.InvalidParameter, msg="Only JSON files are supported")
             return res.data
 
         result = upload_json_file(kb_name, file)
@@ -196,15 +196,15 @@ def upload_json():
 
 @route(bp, '/items', methods=['GET'])
 def get_items():
-    """获取JSON记录"""
+    """Get JSON records"""
     res = ResMsg()
     try:
         kb_name = request.args.get('kb_name')
         if not kb_name:
-            res.update(code=ResponseCode.InvalidParameter, msg="知识库名称不能为空")
+            res.update(code=ResponseCode.InvalidParameter, msg="Knowledge base name cannot be empty")
             return res.data
 
-        # 获取分页
+        # Get pagination
         page = request.args.get('page', 1)
         page_size = request.args.get('page_size', 10)
 
@@ -218,22 +218,22 @@ def get_items():
 
 @route(bp, '/add_items', methods=['POST'])
 def add_items():
-    """添加JSON记录(支持单条或批量)"""
+    """Add JSON records (supports single or batch)"""
     res = ResMsg()
     try:
         data = request.get_json()
         kb_name = data.get('kb_name')
-        items = data.get('items')  # 可以是单个对象或对象数组
+        items = data.get('items')  # Can be a single object or an object array
 
         if not kb_name or not items:
-            res.update(code=ResponseCode.InvalidParameter, msg="缺少必要参数或格式错误")
+            res.update(code=ResponseCode.InvalidParameter, msg="Missing required parameters or format error")
             return res.data
 
-        # 如果传入的是单个对象,转换为列表
+        # If the input is a single object, convert it to a list
         if not isinstance(items, list):
             items = [items]
 
-        # 调用添加方法
+        # Call the add method
         result = add_kb_items(kb_name, items)
         res.update(data=result)
         return res.data
@@ -245,21 +245,21 @@ def add_items():
 
 @route(bp, '/delete_items', methods=['POST'])
 def delete_items():
-    """删除知识库条目"""
+    """Delete knowledge base items"""
     res = ResMsg()
     try:
         data = request.get_json()
         kb_name = data.get('kb_name')
-        item_ids = data.get('item_ids')  # 可选参数
+        item_ids = data.get('item_ids')  # Optional parameter
 
         if not kb_name:
-            res.update(code=ResponseCode.InvalidParameter, msg="缺少知识库名称")
+            res.update(code=ResponseCode.InvalidParameter, msg="Missing knowledge base name")
             return res.data
 
-        # 验证item_ids格式
+        # Verify item_ids format
         if item_ids is not None:
             if not isinstance(item_ids, list) or not all(isinstance(id, int) for id in item_ids):
-                res.update(code=ResponseCode.InvalidParameter, msg="item_ids必须是整数ID列表")
+                res.update(code=ResponseCode.InvalidParameter, msg="item_ids must be an integer ID list")
                 return res.data
 
         result = delete_kb_items(kb_name, item_ids)
@@ -273,24 +273,24 @@ def delete_items():
 
 @route(bp, '/vectorize_items', methods=['POST'])
 def vectorize_items():
-    """向量化知识库条目"""
+    """Vectorize knowledge base items"""
     res = ResMsg()
     try:
         data = request.get_json()
         kb_name = data.get('kb_name')
-        item_ids = data.get('item_ids')  # 可选参数
+        item_ids = data.get('item_ids')  # Optional parameter
 
         if not kb_name:
-            res.update(code=ResponseCode.InvalidParameter, msg="缺少知识库名称")
+            res.update(code=ResponseCode.InvalidParameter, msg="Missing knowledge base name")
             return res.data
 
-        # 验证item_ids格式(如果提供)
+        # Verify item_ids format (if provided)
         if item_ids is not None:
             if not isinstance(item_ids, list) or not all(isinstance(id, int) for id in item_ids):
-                res.update(code=ResponseCode.InvalidParameter, msg="item_ids必须是整数ID列表")
+                res.update(code=ResponseCode.InvalidParameter, msg="item_ids must be an integer ID list")
                 return res.data
 
-        # 调用向量化任务
+        # Call the vectorization task
         job_id = f"vectorize_items_{kb_name}"
         scheduler.add_job(
             func=process_json_data,

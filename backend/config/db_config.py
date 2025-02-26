@@ -7,25 +7,25 @@ db = SQLAlchemy()
 
 
 def db_session_manager(func):
-    """数据库会话管理装饰器
-    确保在应用上下文中执行数据库操作
+    """Database session manager decorator
+    Ensure database operations are executed in the application context
     """
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            # 确保在应用上下文中运行
+            # Ensure the operation is performed in the application context
             if not current_app:
                 with db.app.app_context():
                     return func(*args, **kwargs)
             return func(*args, **kwargs)
         except Exception as e:
-            logger.error(f"数据库操作失败: {str(e)}")
+            logger.error(f"Database operation failed: {str(e)}")
             raise
 
     return wrapper
 
-#  flask_migrate 使用
-#  flask db init  初始化
-#  flask db migrate  生成版本文件
-#  flask db upgrade  同步到数据库
+#  flask_migrate Usage
+#  flask db init   Initialize
+#  flask db migrate   Generate version file
+#  flask db upgrade   Synchronize to database

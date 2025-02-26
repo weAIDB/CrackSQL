@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @route(bp, '/jobs', methods=["GET"])
 def jobs():
     """
-    获取所有的jobs
+    Get all jobs
     :return:
     """
     scheduler_jobs = scheduler.get_jobs()

@@ -6,14 +6,14 @@ from config.db_config import db
 
 
 class DatabaseType(str, Enum):
-    """数据库类型枚举"""
+    """Database type enumeration"""
     MYSQL = "mysql"
     POSTGRESQL = "postgresql"
     ORACLE = "oracle"
 
     @classmethod
     def choices(cls):
-        """返回选项列表，用于表单选择"""
+        """Return a list of options for form selection"""
         return [
             {"value": cls.MYSQL.value, "name": "MySQL"},
             {"value": cls.POSTGRESQL.value, "name": "PostgreSQL"},
@@ -23,22 +23,22 @@ class DatabaseType(str, Enum):
 
 class BaseModel:
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment="创建时间")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now, comment="Creation time")
     updated_at = db.Column(db.DateTime, nullable=False, onupdate=datetime.datetime.now, default=datetime.datetime.now,
-                           comment="更新时间")
+                           comment="Update time")
 
 
 class DatabaseConfig(db.Model, BaseModel):
-    """数据库配置表"""
+    """Database configuration table"""
     __tablename__ = 'database_config'
 
-    host = db.Column(db.String(128), nullable=False, comment="数据库主机地址")
-    port = db.Column(db.Integer, nullable=False, comment="数据库端口")
-    database = db.Column(db.String(64), nullable=False, comment="数据库名称")
-    username = db.Column(db.String(64), nullable=False, comment="数据库用户名")
-    password = db.Column(db.String(256), nullable=False, comment="数据库密码")
-    db_type = db.Column(db.Enum(DatabaseType), nullable=False, comment="数据库类型")
-    description = db.Column(db.String(256), nullable=True, comment="配置描述")
+    host = db.Column(db.String(128), nullable=False, comment="Database host address")
+    port = db.Column(db.Integer, nullable=False, comment="Database port")
+    database = db.Column(db.String(64), nullable=False, comment="Database name")
+    username = db.Column(db.String(64), nullable=False, comment="Database username")
+    password = db.Column(db.String(256), nullable=False, comment="Database password")
+    db_type = db.Column(db.Enum(DatabaseType), nullable=False, comment="Database type")
+    description = db.Column(db.String(256), nullable=True, comment="Configuration description")
 
 
 class RewriteStatus(str, Enum):
@@ -48,88 +48,88 @@ class RewriteStatus(str, Enum):
 
 
 class RewriteHistory(db.Model, BaseModel):
-    """改写历史表"""
+    """Rewrite history table"""
     __tablename__ = "rewrite_history"
 
-    source_db_type = db.Column(db.String(50), nullable=False, comment="源数据库类型")
-    original_sql = db.Column(db.Text, nullable=False, comment="原始SQL")
+    source_db_type = db.Column(db.String(50), nullable=False, comment="Source database type")
+    original_sql = db.Column(db.Text, nullable=False, comment="Original SQL")
     llm_model_name = db.Column(db.String(256),
                                db.ForeignKey('llm_models.name', name='fk_rewrite_history_llm_model_name'),
-                               nullable=False, comment="LLM模型名称")
+                               nullable=False, comment="LLM model name")
     original_kb_id = db.Column(db.Integer, db.ForeignKey('knowledge_bases.id',
                                                          name='fk_rewrite_history_original_knowledge_base_id'),
-                               nullable=False, comment="源数据库知识库ID")
+                               nullable=False, comment="Source knowledge base ID")
     target_kb_id = db.Column(db.Integer,
                              db.ForeignKey('knowledge_bases.id', name='fk_rewrite_history_target_knowledge_base_id'),
-                             nullable=False, comment="目标数据库知识库ID")
+                             nullable=False, comment="Target knowledge base ID")
     target_db_id = db.Column(db.Integer, db.ForeignKey('database_config.id', name='fk_rewrite_history_target_db_id'),
-                             nullable=False, comment="目标数据库ID")
-    rewritten_sql = db.Column(db.Text, comment="改写后的SQL")
-    status = db.Column(db.Enum(RewriteStatus), default=RewriteStatus.PROCESSING, comment="改写状态")
-    error_message = db.Column(db.Text, comment="错误信息")
+                             nullable=False, comment="Target database ID")
+    rewritten_sql = db.Column(db.Text, comment="Rewritten SQL")
+    status = db.Column(db.Enum(RewriteStatus), default=RewriteStatus.PROCESSING, comment="Rewrite status")
+    error_message = db.Column(db.Text, comment="Error message")
 
-    # 修改关联关系定义，明确指定外键
+    # Define relationships explicitly with foreign keys
     original_kb = db.relationship('KnowledgeBase', foreign_keys=[original_kb_id], lazy='joined')
     target_kb = db.relationship('KnowledgeBase', foreign_keys=[target_kb_id], lazy='joined')
     target_db = db.relationship('DatabaseConfig', backref=db.backref("rewrite_histories", lazy=True), lazy='joined')
 
 
 class RewriteProcess(db.Model, BaseModel):
-    """改写过程表"""
+    """Rewrite process table"""
     __tablename__ = "rewrite_process"
     history_id = db.Column(db.Integer, db.ForeignKey('rewrite_history.id', name='fk_rewrite_process_history_id'),
-                           nullable=False, comment="改写历史ID")
-    step_name = db.Column(db.String(100), nullable=False, comment="步骤名称")
-    step_content = db.Column(db.Text, comment="步骤内容")
-    intermediate_sql = db.Column(db.Text, comment="中间SQL")
-    is_success = db.Column(db.Boolean, default=True, comment="是否成功")
-    error_message = db.Column(db.Text, comment="错误信息")
-    role = db.Column(db.String(20), default='assistant', comment="角色:user/system/assistant")
+                           nullable=False, comment="Rewrite history ID")
+    step_name = db.Column(db.String(100), nullable=False, comment="Step name")
+    step_content = db.Column(db.Text, comment="Step content")
+    intermediate_sql = db.Column(db.Text, comment="Intermediate SQL")
+    is_success = db.Column(db.Boolean, default=True, comment="Is successful")
+    error_message = db.Column(db.Text, comment="Error message")
+    role = db.Column(db.String(20), default='assistant', comment="Role: user/system/assistant")
 
 
 class KnowledgeBase(db.Model, BaseModel):
-    """知识库模型"""
+    """Knowledge base model"""
     __tablename__ = 'knowledge_bases'
 
-    kb_name = db.Column(db.String(256), unique=True, nullable=False, comment="知识库名称")
-    kb_info = db.Column(db.Text, nullable=True, comment="知识库描述")
-    db_type = db.Column(db.String(32), nullable=False, comment="数据库类型:mysql/postgresql/oracle")
+    kb_name = db.Column(db.String(256), unique=True, nullable=False, comment="Knowledge base name")
+    kb_info = db.Column(db.Text, nullable=True, comment="Knowledge base description")
+    db_type = db.Column(db.String(32), nullable=False, comment="Database type: mysql/postgresql/oracle")
     embedding_model_name = db.Column(db.String(256),
                                      db.ForeignKey('llm_models.name', name='fk_knowledge_base_embedding_model'),
-                                     nullable=False, comment="向量模型名称")
-    # 添加关联关系
+                                     nullable=False, comment="Embedding model name")
+    # Add relationship
     embedding_model = db.relationship('LLMModel', backref=db.backref('knowledge_bases', lazy=True), lazy='joined')
 
 
 class JSONContent(db.Model, BaseModel):
-    """JSON内容表"""
+    """JSON content table"""
     __tablename__ = 'json_contents'
 
-    content = db.Column(db.Text, nullable=False, comment="JSON内容")
-    content_type = db.Column(db.String(32), nullable=False, comment="内容类型: function/keyword/type/operator")
-    content_hash = db.Column(db.String(64), nullable=False, comment="内容哈希值")
-    embedding_text = db.Column(db.Text, nullable=True, comment="用于向量化的文本")
-    token_count = db.Column(db.Integer, nullable=True, comment="Token数量")
-    status = db.Column(db.String(32), default="pending", comment="处理状态:pending/completed/failed")
-    error_msg = db.Column(db.Text, nullable=True, comment="错误信息")
-    vector_id = db.Column(db.String(64), nullable=True, comment="Chroma向量ID")
+    content = db.Column(db.Text, nullable=False, comment="JSON content")
+    content_type = db.Column(db.String(32), nullable=False, comment="Content type: function/keyword/type/operator")
+    content_hash = db.Column(db.String(64), nullable=False, comment="Content hash")
+    embedding_text = db.Column(db.Text, nullable=True, comment="Text for vectorization")
+    token_count = db.Column(db.Integer, nullable=True, comment="Token count")
+    status = db.Column(db.String(32), default="pending", comment="Processing status: pending/completed/failed")
+    error_msg = db.Column(db.Text, nullable=True, comment="Error message")
+    vector_id = db.Column(db.String(64), nullable=True, comment="Chroma vector ID")
     knowledge_base_id = db.Column(db.Integer,
                                   db.ForeignKey('knowledge_bases.id', name='fk_json_content_knowledge_base_id'),
-                                  nullable=False, comment="关联知识库ID")
+                                  nullable=False, comment="Associated knowledge base ID")
 
 
 class LLMModel(db.Model, BaseModel):
-    """LLM模型配置表"""
+    """LLM model configuration table"""
     __tablename__ = 'llm_models'
 
-    name = db.Column(db.String(256), unique=True, nullable=False, comment="模型名称")
-    deployment_type = db.Column(db.String(32), nullable=False, comment="部署类型:local/cloud")
-    category = db.Column(db.String(32), nullable=False, comment="模型类型:llm/embedding")
-    path = db.Column(db.String(512), nullable=True, comment="本地模型路径")
-    api_base = db.Column(db.String(512), nullable=True, comment="API基础URL")
-    api_key = db.Column(db.String(256), nullable=True, comment="API密钥")
-    temperature = db.Column(db.Float, default=0.7, comment="温度参数")
-    max_tokens = db.Column(db.Integer, nullable=True, comment="最大token数")
-    dimension = db.Column(db.Integer, nullable=True, comment="向量维度")
-    description = db.Column(db.Text, nullable=True, comment="模型描述")
-    is_active = db.Column(db.Boolean, default=True, comment="是否启用")
+    name = db.Column(db.String(256), unique=True, nullable=False, comment="Model name")
+    deployment_type = db.Column(db.String(32), nullable=False, comment="Deployment type: local/cloud")
+    category = db.Column(db.String(32), nullable=False, comment="Model type: llm/embedding")
+    path = db.Column(db.String(512), nullable=True, comment="Local model path")
+    api_base = db.Column(db.String(512), nullable=True, comment="API base URL")
+    api_key = db.Column(db.String(256), nullable=True, comment="API key")
+    temperature = db.Column(db.Float, default=0.7, comment="Temperature parameter")
+    max_tokens = db.Column(db.Integer, nullable=True, comment="Max tokens")
+    dimension = db.Column(db.Integer, nullable=True, comment="Vector dimension")
+    description = db.Column(db.Text, nullable=True, comment="Model description")
+    is_active = db.Column(db.Boolean, default=True, comment="Is active")

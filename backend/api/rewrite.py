@@ -11,7 +11,7 @@ bp = Blueprint('rewrite', __name__, url_prefix='/api/rewrite')
 
 @route(bp, '/list', methods=['POST'])
 def list_api():
-    """获取改写列表"""
+    """Get rewrite list"""
     res = ResMsg()
     obj = request.get_json(force=True)
     limit = obj.get('page_size', 20)
@@ -32,19 +32,19 @@ def list_api():
 
 @route(bp, '/detail', methods=['POST'])
 def detail_api():
-    """获取改写详情"""
+    """Get rewrite detail"""
     res = ResMsg()
     obj = request.get_json(force=True)
     history_id = obj.get('id')
     
     if not history_id:
-        res.update(code=ResponseCode.InvalidParameter, msg="历史记录ID不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="History ID cannot be empty")
         return res.data
     
     try:
         result = RewriteService.get_history_by_id(history_id)
         if not result:
-            res.update(code=ResponseCode.NoResourceFound, msg="历史记录不存在")
+            res.update(code=ResponseCode.NoResourceFound, msg="History record does not exist")
             return res.data
             
         res.update(data=result)
@@ -56,13 +56,13 @@ def detail_api():
 
 @route(bp, '/latest', methods=['GET'])
 def latest_api():
-    """获取最近一次改写记录"""
+    """Get the latest rewrite record"""
     res = ResMsg()
     
     try:
         result = RewriteService.get_latest_history()
         if not result:
-            res.update(code=ResponseCode.Success, msg="暂无历史记录")
+            res.update(code=ResponseCode.Success, msg="No history record")
             return res.data
             
         res.update(data=result)
@@ -74,7 +74,7 @@ def latest_api():
 
 @route(bp, '/create', methods=['POST'])
 def create_api():
-    """创建改写历史"""
+    """Create rewrite history"""
     res = ResMsg()
     obj = request.get_json(force=True)
     

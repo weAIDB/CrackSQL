@@ -14,7 +14,7 @@ import tiktoken
 
 
 def get_knowledge_base_list() -> List[Dict]:
-    """获取知识库列表"""
+    """Get knowledge base list"""
     try:
         knowledge_bases = KnowledgeBase.query.all()
         if not knowledge_bases:
@@ -39,7 +39,7 @@ def get_knowledge_base_list() -> List[Dict]:
 
 
 def get_knowledge_base(kb_name: str) -> Dict:
-    """获取单个知识库"""
+    """Get a single knowledge base"""
     try:
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
@@ -67,16 +67,16 @@ def get_knowledge_base(kb_name: str) -> Dict:
 
 
 def create_knowledge_base(kb_name: str, kb_info: str, embedding_model_name: str, db_type: str) -> Dict:
-    """创建知识库"""
+    """Create a knowledge base"""
     try:
-        # 检查知识库名称是否已存在
+        # Check if the knowledge base name already exists
         if KnowledgeBase.query.filter_by(kb_name=kb_name).first():
             return {
                 "status": False,
-                "msg": f"知识库 '{kb_name}' 已存在"
-            }
+                "msg": f"Knowledge base '{kb_name}' already exists"
+            }   
 
-        # 获取 LLMModel 实例
+        # Get LLMModel instance
         embedding_model = LLMModel.query.filter_by(
             name=embedding_model_name,
             category='embedding',
@@ -86,10 +86,10 @@ def create_knowledge_base(kb_name: str, kb_info: str, embedding_model_name: str,
         if not embedding_model:
             return {
                 "status": False,
-                "msg": "无效的Embedding模型"
+                "msg": "Invalid embedding model"
             }
 
-        # 创建知识库
+        # Create knowledge base
         kb = KnowledgeBase(
             kb_name=kb_name,
             kb_info=kb_info,
@@ -116,17 +116,17 @@ def create_knowledge_base(kb_name: str, kb_info: str, embedding_model_name: str,
 
 
 def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict]:
-    """搜索知识库"""
+    """Search knowledge base"""
     try:
-        # 获取知识库
+        # Get knowledge base
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
-            raise ValueError(f"知识库不存在: {kb_name}")
+            raise ValueError(f"Knowledge base does not exist: {kb_name}")
 
-        # 获取查询文本的向量表示
+        # Get the vector representation of the query text
         query_embedding = asyncio.run(get_embeddings([query], kb.embedding_model_name))[0]
 
-        # 使用Chroma搜索
+        # Use Chroma to search
         store = ChromaStore()
         results = store.search(
             kb_name=kb_name,
@@ -134,7 +134,7 @@ def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict
             top_k=top_k
         )
 
-        # 获取完整内容
+        # Get complete content
         for result in results:
             content_id = result['metadata']['content_id']
             content = JSONContent.query.get(content_id)
@@ -149,46 +149,46 @@ def search_knowledge_base(kb_name: str, query: str, top_k: int = 5) -> List[Dict
 
 
 def upload_json_file(kb_name: str, file) -> Dict:
-    """上传JSON文件"""
+    """Upload JSON file"""
     try:
-        # 读取JSON文件
+        # Read JSON file
         json_items = json.load(file)
         if not isinstance(json_items, list):
-            raise ValueError("JSON内容必须是数组格式")
+            raise ValueError("JSON content must be an array format")
 
-        # 安全处理文件名
+        # Securely process file name
         filename = secure_filename_with_unicode(file.filename)
 
-        # 构建文件保存路径
+        # Build file save path
         save_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], kb_name)
         os.makedirs(save_dir, exist_ok=True)
         file_path = os.path.join(save_dir, filename)
 
-        # 保存文件
+        # Save file
         file.save(file_path)
 
         return json_items
 
     except Exception as e:
-        logger.error(f"上传JSON文件失败: {str(e)}")
+        logger.error(f"Upload JSON file failed: {str(e)}")
         raise
 
 
 def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
-    """获取JSON记录"""
+    """Get JSON records"""
     try:
-        # 获取知识库
+        # Get knowledge base
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
-            raise ValueError(f"知识库不存在: {kb_name}")
+            raise ValueError(f"Knowledge base does not exist: {kb_name}")
 
-        # 构建查询
+        # Build query
         query = JSONContent.query.filter_by(knowledge_base_id=kb.id)
 
-        # 获取总数
+        # Get total
         total = query.count()
 
-        # 确保页码和每页数量是整数
+        # Ensure page number and page size are integers
         try:
             page = int(page)
             page_size = int(page_size)
@@ -196,7 +196,7 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
             page = 1
             page_size = 10
 
-        # 分页
+        # Pagination
         pagination = query.order_by(JSONContent.created_at.desc()).paginate(
             page=page,
             per_page=page_size,
@@ -216,7 +216,7 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
                     'created_at': item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else None
                 })
             except json.JSONDecodeError:
-                logger.error(f"JSON解析失败，content_id: {item.id}")
+                logger.error(f"JSON parsing failed, content_id: {item.id}")
                 continue
 
         return {
@@ -224,7 +224,7 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
             'items': items
         }
     except Exception as e:
-        logger.error(f"获取JSON记录失败: {str(e)}")
+        logger.error(f"Get JSON records failed: {str(e)}")
         return {
             'total': 0,
             'items': []
@@ -232,15 +232,15 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
 
 
 def secure_filename_with_unicode(filename: str) -> str:
-    """处理包含Unicode字符的文件名"""
-    # 分离文件名和扩展名
+    """Handle filenames containing Unicode characters"""
+    # Separate filename and extension
     name, ext = os.path.splitext(filename)
 
-    # 处理文件名(保留中文等Unicode字符)
+    # Process file name (keep Unicode characters such as Chinese)
     name = "".join(c for c in name if c.isalnum() or c.isspace() or c in '-._')
     name = name.strip('._')
 
-    # 如果文件名为空，使用时间戳
+    # If filename is empty, use timestamp
     if not name:
         name = str(int(time.time()))
 
@@ -248,45 +248,45 @@ def secure_filename_with_unicode(filename: str) -> str:
 
 
 def add_kb_items(kb_name: str, items: List[Dict]) -> Dict:
-    """添加知识库条目(不包含向量化)"""
+    """Add knowledge base items (without vectorization)"""
     try:
-        # 获取知识库
+        # Get knowledge base
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
-            raise ValueError(f"知识库不存在: {kb_name}")
+            raise ValueError(f"Knowledge base does not exist: {kb_name}")
 
 
-        # 创建内容记录
+        # Create content records
         contents = []
 
         for item in items:
-            # 验证数据格式
+            # Validate data format
             if not isinstance(item, dict):
-                raise ValueError("数据项必须是字典类型")
-            # 验证是否有keyword、detail、description
+                raise ValueError("Data item must be a dictionary type")
+            # Validate if has keyword, detail, description
             if 'keyword' not in item.keys():
-                raise ValueError("数据项必须包含keyword字段")
+                raise ValueError("Data item must contain keyword field")
             
             if 'detail' not in item.keys():
-                raise ValueError("数据项必须包含detail字段")
+                raise ValueError("Data item must contain detail field")
 
             if 'description' not in item.keys():
-                raise ValueError("数据项必须包含description字段")
+                raise ValueError("Data item must contain description field")
 
             if 'type' not in item.keys():
-                raise ValueError("数据项必须包含type字段")
+                raise ValueError("Data item must contain type field")
 
             if 'tree' not in item.keys():
-                raise ValueError("数据项必须包含tree字段")
+                raise ValueError("Data item must contain tree field")
             
-            # 获取并验证embedding文本 keyword--separator--detaildescription
+            # Get and verify embedding text keyword--separator--detaildescription
             embedding_text = f"{item.get('keyword')}--separator--{item.get('detail')}{item.get('description')}"
 
-            # 计算内容哈希
+            # Calculate content hash
             content_str = json.dumps(item, sort_keys=True)
             content_hash = hashlib.sha256(content_str.encode('utf-8')).hexdigest()
 
-            # 创建内容对象
+            # Create content object
             content = JSONContent(
                 knowledge_base_id=kb.id,
                 content=content_str,
@@ -294,15 +294,15 @@ def add_kb_items(kb_name: str, items: List[Dict]) -> Dict:
                 content_hash=content_hash,
                 embedding_text=embedding_text,
                 token_count=len(tiktoken.get_encoding("cl100k_base").encode(embedding_text)),
-                status="pending"  # 显式设置初始状态
+                status="pending"  # Explicitly set initial status
             )
             contents.append(content)
 
-        # 如果没有有效数据
+        # If there is no valid data
         if not contents:
             return {
                 'status': False,
-                'message': '没有找到有效的数据项'
+                'message': 'No valid data items found'
             }
 
         try:
@@ -311,51 +311,51 @@ def add_kb_items(kb_name: str, items: List[Dict]) -> Dict:
 
             return {
                 'status': True,
-                'message': f'成功添加 {len(contents)} 条记录',
+                'message': f'Successfully added {len(contents)} records',
                 'data': {
                     'success_ids': [c.id for c in contents]
                 }
             }
         except Exception as e:
             db.session.rollback()
-            logger.error(f"保存内容记录失败: {str(e)}")
+            logger.error(f"Save content records failed: {str(e)}")
             raise
 
     except Exception as e:
-        logger.error(f"添加知识库条目失败: {str(e)}")
+        logger.error(f"Add knowledge base items failed: {str(e)}")
         return {
             'status': False,
-            'message': f'添加失败: {str(e)}'
+            'message': f'Add failed: {str(e)}'
         }
 
 
 def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
-    """删除知识库条目
+    """Delete knowledge base items
     
     Args:
-        kb_name: 知识库名称
-        item_ids: 要删除的条目ID列表，如果为None则删除所有条目
+        kb_name: Knowledge base name
+        item_ids: List of item IDs to delete, if None, delete all items
     """
     try:
-        # 获取知识库
+        # Get knowledge base
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
-            raise ValueError(f"知识库不存在: {kb_name}")
+            raise ValueError(f"Knowledge base does not exist: {kb_name}")
 
-        # 构建查询
+        # Build query
         query = JSONContent.query.filter_by(knowledge_base_id=kb.id)
         if item_ids:
             query = query.filter(JSONContent.id.in_(item_ids))
 
-        # 获取要删除的内容
+        # Get content to delete
         contents = query.all()
         if not contents:
             return {
                 'status': True,
-                'message': '没有找到要删除的条目'
+                'message': 'No items found to delete'
             }
 
-        # 获取vector_ids
+        # Get vector_ids
         vector_type_ids = {}
         for content in contents:
             if content.content_type not in vector_type_ids:
@@ -363,25 +363,25 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
             vector_type_ids[content.content_type].append(content.vector_id)
 
         try:
-            # 从Chroma中删除向量
+            # Delete vectors from Chroma
             if vector_type_ids:
                 store = ChromaStore()
                 for content_type, vector_ids in vector_type_ids.items():
                     store.delete_by_ids(kb.kb_name, content_type, vector_ids)
 
-            # 从数据库中删除记录
+            # Delete records from database
             for content in contents:
                 db.session.delete(content)
             db.session.commit()
 
             return {
                 'status': True,
-                'message': f'成功删除 {len(contents)} 条记录'
+                'message': f'Successfully deleted {len(contents)} records'
             }
 
         except Exception as e:
             db.session.rollback()
-            raise Exception(f"删除失败: {str(e)}")
+            raise Exception(f"Delete failed: {str(e)}")
 
     except Exception as e:
         logger.error(f"delete_kb_items error: {str(e)}")
@@ -389,16 +389,16 @@ def delete_kb_items(kb_name: str, item_ids: List[int] = None) -> Dict:
 
 
 def update_knowledge_base(kb_id: int, data: Dict) -> Dict:
-    """更新知识库"""
+    """Update knowledge base"""
     try:
         kb = KnowledgeBase.query.filter_by(id=kb_id).first()
         if not kb:
             return {
                 "status": False,
-                "msg": f"知识库不存在"
+                "msg": f"Knowledge base does not exist"
             }
 
-        # 更新知识库信息
+        # Update knowledge base information
         if 'kb_info' in data:
             kb.kb_info = data['kb_info']
         if 'kb_name' in data:
@@ -417,40 +417,40 @@ def update_knowledge_base(kb_id: int, data: Dict) -> Dict:
 
 
 def delete_knowledge_base(kb_name: str) -> Dict:
-    """删除知识库及其所有关联数据
+    """Delete knowledge base and all associated data
     
     Args:
-        kb_name: 知识库名称
+        kb_name: Knowledge base name
         
     Returns:
-        Dict: 删除结果
+        Dict: Delete result
     """
     try:
-        # 获取知识库
+        # Get knowledge base
         kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
         if not kb:
             return {
                 "status": False,
-                "msg": f"知识库 '{kb_name}' 不存在"
+                "msg": f"Knowledge base '{kb_name}' does not exist"
             }
 
         try:
-            # 1. 删除所有JSON内容记录c
+            # 1. Delete all JSON content records
             JSONContent.query.filter_by(knowledge_base_id=kb.id).delete()
 
-            # 2. 删除Chroma集合（会自动删除集合中的所有向量）
+            # 2. Delete Chroma collection (will automatically delete all vectors in the collection)
             store = ChromaStore()
             store.delete_collection(kb.kb_name)
 
         except Exception as e:
-            logger.error(f"删除关联数据失败: {str(e)}")
+            logger.error(f"Delete associated data failed: {str(e)}")
             db.session.rollback()
             return {
                 "status": False,
-                "msg": f"删除关联数据失败: {str(e)}"
+                "msg": f"Delete associated data failed: {str(e)}"
             }
 
-        # 3. 最后删除知识库本身
+        # 3. Delete knowledge base itself
         db.session.delete(kb)
         db.session.commit()
 
@@ -458,7 +458,7 @@ def delete_knowledge_base(kb_name: str) -> Dict:
             "status": True,
             "data": {
                 "kb_name": kb_name,
-                "message": "知识库删除成功"
+                "message": "Knowledge base deleted successfully"
             }
         }
     except Exception as e:
