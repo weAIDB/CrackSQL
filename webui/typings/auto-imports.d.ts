@@ -4,6 +4,7 @@ declare global {
   const EffectScope: typeof import('vue')['EffectScope']
   const axiosReq: typeof import('../src/utils/axios-req.js')['default']
   const bus: typeof import('../src/utils/bus.js')['default']
+  const calculateDuration: typeof import('../src/utils/rewrite')['calculateDuration']
   const casHandleChange: typeof import('../src/hooks/use-element.js')['casHandleChange']
   const cloneDeep: typeof import('../src/hooks/use-common.js')['cloneDeep']
   const closeElLoading: typeof import('../src/hooks/use-element.js')['closeElLoading']

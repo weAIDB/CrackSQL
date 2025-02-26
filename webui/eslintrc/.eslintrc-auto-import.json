@@ -3,6 +3,7 @@
     "EffectScope": true,
     "axiosReq": true,
     "bus": true,
+    "calculateDuration": true,
     "casHandleChange": true,
     "cloneDeep": true,
     "closeElLoading": true,

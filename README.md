@@ -1,131 +1,157 @@
-# 👋 CrackSQL 是一个强大的SQL方言转换工具，支持在不同SQL方言之间进行精确转换(如PostgreSQL到MySQL)。提供命令行、Python API和Web界面三种使用方式。
-
-# 数据库 PG → MySQL
+# CrackSQL
 
 <p align="center">
-  <a href="#-demo">演示</a> •
-  <a href="#-quickstart">快速开始</a> •
-  <a href="#-doc2knowledge">知识与工具</a> • 
-  <a href="#-FAQ">常见问题</a> •  
-  <a href="#-community">社区</a> •  
-  <a href="#-contributors">贡献者</a> •  
-  <a href="#-license">开源协议</a> •  
+  <b>A powerful SQL dialect conversion tool that supports precise conversion between different SQL dialects</b>
 </p>
 
-[English](./README_EN.md) | 简体中文
+<p align="center">
+  <a href="#-demo">Demo</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-feature-extension">Feature Extension</a> • 
+  <a href="#-faq">FAQ</a> •  
+  <a href="#-community">Community</a> •  
+  <a href="#-contributors">Contributors</a> •  
+  <a href="#-license">License</a>
+</p>
 
-## 📚 功能特性
+<p align="center">
+  <b>English</b> | <a href="./README_CH.md">简体中文</a>
+</p>
 
-- 🚀 **多方言支持**: 支持PostgreSQL、MySQL、Oracle三种主流数据库方言的互转
-- 🎯 **高精度转换**: 基于三层转换架构，确保转换结果的准确性
-- 🌟 **多种使用方式**: 支持命令行和Web界面三种使用方式
+## ✨ Project Introduction
 
-- **功能导向的语法处理**: 将SQL语句分解为特定功能的语法元素
-- **基于模型的语法匹配**: 采用创新的跨方言嵌入模型进行转换
-- **局部到全局的转换策略**: 灵活处理复杂SQL转换场景
+CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs of different scenarios.
 
-## 📊 性能展示
+## 📚 Features
 
-等待时间提示
+- 🚀 **Multi-dialect Support**: Supports conversion between three mainstream database dialects: PostgreSQL, MySQL, and Oracle
+- 🎯 **High-precision Conversion**: Based on a three-layer conversion architecture to ensure the accuracy of conversion results
+- 🌟 **Multiple Usage Methods**: Supports command line, Python API, and Web interface
+- 🔍 **Function-oriented Syntax Processing**: Breaks down SQL statements into syntax elements for specific functions
+- 🧠 **Model-based Syntax Matching**: Uses innovative cross-dialect embedding models for conversion
+- 🔄 **Local to Global Conversion Strategy**: Flexibly handles complex SQL conversion scenarios
 
-| 方言对 | 准确率 | 平均转换时间 |
-|-------|--------|------------|
+## 📊 Performance
+
+| Dialect Pair | Accuracy | Average Conversion Time |
+|:-------:|:--------:|:------------:|
 | PG → MySQL | 95% | 0.5s |
 | MySQL → Oracle | 93% | 0.6s |
 | Oracle → SQLite | 91% | 0.4s |
 
+## 🖥️ Demo
 
-<span id="-demo"></span>
-## 🖥️ 功能演示
+<p align="center">
+  <i>TODO: Add interface preview image</i>
+</p>
 
-TODO: 添加界面预览图
-![Web界面预览](./docs/images/web-preview.png)
+![Web Interface Preview](./docs/images/web-preview.png)
 
+## 🚀 Quick Start
 
-<span id="-quickstart"></span>
-## 🚀 快速开始
-
-### 方式一：Docker
+### Method 1: Docker (Not supported yet)
 
 ```bash
-# 拉取镜像
+# Pull image
 docker pull cracksql:latest
-# 运行容器
+
+# Run container
 docker run -d -p 5173:5173 cracksql:latest
-# 访问 http://localhost:5173 即可使用Web界面
+
+# Visit http://localhost:5173 to use the Web interface
 ```
 
-### 方式二：源码安装
+### Method 2: Source Code Installation
 
-#### 1. 克隆仓库
+#### 1. Clone Repository
 ```bash
-# 
 git clone https://github.com/your-username/git
 ```
 
-
-#### 2. 可使用带前后端的应用
+#### 2. Use Frontend and Backend Application
 ```bash
-# 启动后端
+# Start backend
 cd CrackSQL/backend
-# 安装依赖
+
+# Install dependencies
 conda create -n CrackSQL python=3.10
 conda activate CrackSQL
 pip install -r requirements.txt
 
-# 初始化数据库
-flask db init  初始化
-flask db migrate  生成版本文件
-flask db upgrade  同步到数据库
+# Initialize database
+flask db init      # Initialize
+flask db migrate   # Generate version file
+flask db upgrade   # Synchronize to database
 
-# 可以启动后台服务
+# Initialize knowledge base (Optional, can be done manually in the frontend after starting the frontend project)
+# 1. First rename config/init_config.yaml.copy to config/init_config.yaml
+# 2. Modify the relevant information in config/init_config.yaml. If you want to initialize the knowledge base, Embedding Model is required
+python3 init_knowledge_base.py --init_all
+
+# Start backend service (The backend service port can also be modified in app.py, currently 30006)
 python app.py
 
-# 启动前端（需要安装nodejs，版本20.11.1+）
-# 进入前端目录
+# Start frontend (requires nodejs, version 20.11.1+)
 cd CrackSQL/webui
-# 安装依赖
+
+# Install dependencies
 yarn cache clean
 yarn install
-# 启动开发服务器
+
+# Start development server
 yarn dev
-访问 http://localhost:5003 即可使用Web界面
+
+# Visit http://localhost:50212 to use the Web interface
+
+# Tips: 
+# If you want to modify the frontend port number, you can modify it in webui/vite.config.js: port: 50212
+# If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file.
 ```
 
-#### 3. 命令行使用
+#### 3. Command Line Usage (Not supported yet)
 ```bash
-# 初始化
+# Initialize
 python script/init.py
-# 转换
-python script/convert.py --source postgresql --target mysql "SELECT * FROM users LIMIT 10" --source_db_type pg --target_db_type mysql --target_db_host localhost --target_db_port 3306 --target_db_user root --target_db_password 123456 --output_file output.json
+
+# Convert
+python script/convert.py --source postgresql --target mysql "SELECT * FROM users LIMIT 10" \
+  --source_db_type pg --target_db_type mysql \
+  --target_db_host localhost --target_db_port 3306 \
+  --target_db_user root --target_db_password 123456 \
+  --output_file output.json
 ```
 
+## 📎 Feature Extension
 
+### Add New Syntax
+<i>To be supplemented</i>
 
-<span id="-doc2knowledge"></span>
-## 📎 功能扩展
-### 增加新语法
-补充
+### Add New Database
+<i>Start from scratch</i>
 
-### 增加新数据库
-从头开始
+### Fine-tune Vector Model
+<i>To be supplemented</i>
 
-### 微调向量模型
+## 🤔 FAQ
 
-<span id="-FAQ"></span>
-## 🤔 常见问题
-TODO: 添加常见问题
+<i>TODO: Add frequently asked questions</i>
 
-## TODO
+## 📋 TODO
+
 - Python API
 
-<span id="-community"></span>
-👫 欢迎扫码加入微信群！
+## 👫 Community
 
+Welcome to scan the QR code to join the WeChat group!
 
-## 📒 引用
-论文
-Feel free to cite us (paper link) if you like this project.
+<p align="center">
+  <i>TODO: Add WeChat group QR code</i>
+</p>
+
+## 📒 Citation
+
+If you like this project, please cite our paper:
+
 ```
 @misc{zhou2023llm4diag,
       title={D-Bot: Database Diagnosis System using Large Language Models}, 
@@ -137,15 +163,15 @@ Feel free to cite us (paper link) if you like this project.
 }
 ```
 
-<span id="-contributors"></span>
-## 📧 贡献者
+## 📧 Contributors
+
 <a href="https://github.com/TsinghuaDatabaseGroup/DB-GPT/network/dependencies">
   <img src="https://contrib.rocks/image?repo=TsinghuaDatabaseGroup/DB-GPT" />
 </a>
 
+## 📝 License
 
-<span id="-license"></span>
-## 📝 开源协议
-TODO: 添加开源协议
-本项目采用 MIT 协议 - 详见 [LICENSE](LICENSE) 文件
+<i>TODO: Add open source license</i>
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
