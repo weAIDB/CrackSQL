@@ -34,8 +34,7 @@ KNOWLEDGE_BASES:
     kb_info: "MySQL数据库知识库，包含MySQL的关键字、函数、操作符等信息"  # Knowledge base description
     embedding_model: "text-embedding-ada-002"  # Embedding model to use
     knowledge_files:                        # Knowledge files to import
-      - "./scripts/example_knowledge.json"  # Knowledge file path
-      - "./sources/mysql_functions.json"    # Can add multiple knowledge files
+      - "./data/processed_document/mysql_8_kb.json"  # Knowledge file path
 
   # PostgreSQL knowledge base  
   - kb_name: "postgresql_knowledge"         # Knowledge base name
@@ -43,13 +42,12 @@ KNOWLEDGE_BASES:
     kb_info: "PostgreSQL数据库知识库，包含PostgreSQL的关键字、函数、操作符等信息"  # Knowledge base description
     embedding_model: "text-embedding-ada-002"  # Embedding model to use
     knowledge_files:                        # Knowledge files to import
-      - "./sources/postgresql_keywords.json"
-      - "./sources/postgresql_functions.json"
+      - "./data/processed_document/pg_14_kb.json"
 
   # Oracle knowledge base
   - kb_name: "oracle_knowledge"             # Knowledge base name
     db_type: "oracle"                       # Database type
-    kb_info: "Oracle数据库知识库，包含Oracle的关键字、函数、操作符等信息"  # Knowledge base description
+    kb_info: "Oracle 数据库知识库，包含Oracle的关键字、函数、操作符等信息"  # Knowledge base description
     embedding_model: "text-embedding-ada-002"  # Embedding model to use
     knowledge_files:                        # Knowledge files to import
-      - "./sources/oracle_keywords.json"
+      - "./data/processed_document/oracle_11_kb.json"
