@@ -9,7 +9,7 @@ from api.utils.core import JSONEncoder
 from api.utils.scheduler import scheduler_init
 from api.router import router
 from config.db_config import db
-import models  # 不能删除，给flask_migrate使用 ！！！
+import models  # Can not be deleted, used for flask_migrate ！！！
 from config.cache import cache
 from utils.public import read_yaml
 
@@ -29,50 +29,50 @@ def create_app(config_name, config_path=None):
             'Content-Disposition',
             'Access-Control-Allow-Origin'])
 
-    # 读取配置文件
+    # Read configuration file
     if not config_path:
         pwd = os.getcwd()
         config_path = os.path.join(pwd, 'config/config.yaml')
     if not config_name:
         config_name = 'PRODUCTION'
 
-    # 读取配置文件
+    # Read configuration file
     conf = read_yaml(config_name, config_path)
     app.config.update(conf)
 
-    # 注册接口
+    # Register interfaces
     register_api(app=app, routers=router)
 
-    # 返回json格式转换
+    # Return JSON format conversion
     app.json_encoder = JSONEncoder
 
-    # 日志文件目录
+    # Log file directory
     if not os.path.exists(app.config['LOGGING_PATH']):
         os.mkdir(app.config['LOGGING_PATH'])
 
-    # 日志设置
+    # Log settings
     with open(app.config['LOGGING_CONFIG_PATH'], 'r', encoding='utf-8') as f:
         dict_conf = yaml.safe_load(f.read())
     logging.config.dictConfig(dict_conf)
 
-    # 读取msg配置
+    # Read msg configuration
     with open(app.config['RESPONSE_MESSAGE'], 'r', encoding='utf-8') as f:
         msg = yaml.safe_load(f.read())
         app.config.update(msg)
 
-    # 注册数据库连接
+    # Register database connection
     db.app = app
     db.init_app(app)
     Migrate(app, db)
 
-    # 缓存
+    # Cache
     cache.init_app(app, {
         "DEBUG": app.config['DEBUG'],
         "CACHE_TYPE": "simple",
         "CACHE_DEFAULT_TIMEOUT": 300
     })
 
-    # 启动定时任务
+    # Start scheduled tasks
     if app.config.get("SCHEDULER_OPEN"):
         scheduler_init(app)
 

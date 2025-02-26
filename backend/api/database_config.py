@@ -14,7 +14,7 @@ bp = Blueprint("database_config", __name__, url_prefix='/api/database_config')
 
 @route(bp, '/support', methods=["GET"])
 def support_api():
-    """获取支持的数据库类型列表"""
+    """Get supported database types list"""
     res = ResMsg()
     res.update(data=get_support_database_options())
     return res.data
@@ -22,7 +22,7 @@ def support_api():
 
 @route(bp, '/list', methods=["POST"])
 def list_api():
-    """获取数据库配置列表"""
+    """Get database configuration list"""
     res = ResMsg()
     obj = request.get_json(force=True)
     limit = obj.get('page_size', 10)
@@ -35,18 +35,18 @@ def list_api():
 
 @route(bp, '/detail', methods=["POST"])
 def detail_api():
-    """获取数据库配置详情"""
+    """Get database configuration details"""
     res = ResMsg()
     obj = request.get_json(force=True)
     config_id = obj.get('id')
 
     if not config_id:
-        res.update(code=ResponseCode.InvalidParameter, msg="配置ID不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Configuration ID cannot be empty")
         return res.data
 
     data = get_database_config(id=config_id)
     if not data:
-        res.update(code=ResponseCode.Fail, msg="配置不存在")
+        res.update(code=ResponseCode.Fail, msg="Configuration does not exist")
         return res.data
 
     res.update(data=data)
@@ -55,7 +55,7 @@ def detail_api():
 
 @route(bp, '/types', methods=["GET"])
 def types_api():
-    """获取支持的数据库类型列表"""
+    """Get supported database types list"""
     res = ResMsg()
     res.update(data={'types': DatabaseType.choices()})
     return res.data
@@ -63,20 +63,20 @@ def types_api():
 
 @route(bp, '/create', methods=["POST"])
 def create_api():
-    """创建数据库配置"""
+    """Create database configuration"""
     res = ResMsg()
     obj = request.get_json(force=True)
 
-    # 必填字段验证
+    # Verify required fields
     required_fields = ['host', 'port', 'database', 'username', 'password', 'db_type']
     for field in required_fields:
         if not obj.get(field):
-            res.update(code=ResponseCode.InvalidParameter, msg=f"{field}不能为空")
+            res.update(code=ResponseCode.InvalidParameter, msg=f"{field} cannot be empty")
             return res.data
 
-    # 验证数据库类型是否有效
+    # Verify if the database type is valid
     if obj['db_type'] not in [t.value for t in DatabaseType]:
-        res.update(code=ResponseCode.InvalidParameter, msg="无效的数据库类型")
+        res.update(code=ResponseCode.InvalidParameter, msg="Invalid database type")
         return res.data
 
     result = insert_database_config(
@@ -90,7 +90,7 @@ def create_api():
     )
 
     if not result:
-        res.update(code=ResponseCode.Fail, msg="创建失败")
+        res.update(code=ResponseCode.Fail, msg="Create failed")
         return res.data
 
     res.update(data=result)
@@ -99,26 +99,26 @@ def create_api():
 
 @route(bp, '/update', methods=["POST"])
 def update_api():
-    """更新数据库配置"""
+    """Update database configuration"""
     res = ResMsg()
     obj = request.get_json(force=True)
 
-    # 验证ID
+    # Verify ID
     config_id = obj.get('id')
     if not config_id:
-        res.update(code=ResponseCode.InvalidParameter, msg="配置ID不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Configuration ID cannot be empty")
         return res.data
 
-    # 必填字段验证
+    # Verify required fields
     required_fields = ['host', 'port', 'database', 'username', 'password', 'db_type']
     for field in required_fields:
         if not obj.get(field):
-            res.update(code=ResponseCode.InvalidParameter, msg=f"{field}不能为空")
+            res.update(code=ResponseCode.InvalidParameter, msg=f"{field} cannot be empty")
             return res.data
 
-    # 验证数据库类型是否有效
+    # Verify if the database type is valid
     if obj['db_type'] not in [t.value for t in DatabaseType]:
-        res.update(code=ResponseCode.InvalidParameter, msg="无效的数据库类型")
+        res.update(code=ResponseCode.InvalidParameter, msg="Invalid database type")
         return res.data
 
     result = update_database_config(
@@ -142,18 +142,18 @@ def update_api():
 
 @route(bp, '/delete', methods=["POST"])
 def delete_api():
-    """删除数据库配置"""
+    """Delete database configuration"""
     res = ResMsg()
     obj = request.get_json(force=True)
     config_id = obj.get('id')
 
     if not config_id:
-        res.update(code=ResponseCode.InvalidParameter, msg="配置ID不能为空")
+        res.update(code=ResponseCode.InvalidParameter, msg="Configuration ID cannot be empty")
         return res.data
 
     result = delete_database_config(id=config_id)
     if not result:
-        res.update(code=ResponseCode.Fail, msg="删除失败")
+        res.update(code=ResponseCode.Fail, msg="Delete failed")
         return res.data
 
     res.update(data=result)

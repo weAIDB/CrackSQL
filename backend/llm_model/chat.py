@@ -13,22 +13,22 @@ async def chat_completion(
         **kwargs
 ) -> Dict[str, Any]:
     """
-    聊天完成接口
+    Chat completion interface
     Args:
-        model_name: 模型名称
-        messages: 消息列表，格式为[{"role": "system/user", "content": "消息内容"}]
-        stream: 是否使用流式输出
-        **kwargs: 其他参数
+        model_name: Model name
+        messages: Message list, format: [{"role": "system/user", "content": "message content"}]
+        stream: Whether to use streaming output
+        **kwargs: Other parameters
     Returns:
-        Dict[str, Any]: 返回结果
+        Dict[str, Any]: Return result
     """
     try:
-        # 获取模型实例
+        # Get model instance
         model = llm_manager.get_model(model_name)
         if not model:
-            raise ValueError(f"模型 {model_name} 不存在或未启用")
+            raise ValueError(f"Model {model_name} does not exist or is not enabled")
 
-        # 转换消息格式
+        # Convert message format
         formatted_messages = []
         for msg in messages:
             if msg["role"] == "system":
@@ -36,16 +36,16 @@ async def chat_completion(
             elif msg["role"] == "user":
                 formatted_messages.append(HumanMessage(content=msg["content"]))
             else:
-                logger.warning(f"未知的消息角色: {msg['role']}")
+                logger.warning(f"Unknown message role: {msg['role']}")
 
-        # 调用模型
+        # Call model
         response = await model.chat(
             messages=formatted_messages,
             stream=stream,
             **kwargs
         )
 
-        # 格式化返回结果
+        # Format return result
         if stream:
             return {
                 "status": "success",
@@ -75,29 +75,29 @@ async def generate_text(
         **kwargs
 ) -> Dict[str, Any]:
     """
-    文本生成接口
+    Text generation interface
     Args:
-        model_name: 模型名称
-        prompt: 提示词
-        stream: 是否使用流式输出
-        **kwargs: 其他参数
+        model_name: Model name
+        prompt: Prompt
+        stream: Whether to use streaming output
+        **kwargs: Other parameters
     Returns:
-        Dict[str, Any]: 返回结果
+        Dict[str, Any]: Return result
     """
     try:
-        # 获取模型实例
+        # Get model instance
         model = llm_manager.get_model(model_name)
         if not model:
-            raise ValueError(f"模型 {model_name} 不存在或未启用")
+            raise ValueError(f"Model {model_name} does not exist or is not enabled")
 
-        # 调用模型
+        # Call model
         response = await model.generate(
             prompt=prompt,
             stream=stream,
             **kwargs
         )
 
-        # 格式化返回结果
+        # Format return result
         if stream:
             return {
                 "status": "success",

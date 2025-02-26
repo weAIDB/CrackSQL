@@ -55,34 +55,34 @@ class Translate:
                  top_k: int,
                  history_id: str = None,
                  out_type: str = "db"):
-        """SQL方言转换器
+        """SQL dialect converter
         
-        该类用于将一种SQL方言转换为另一种SQL方言,支持检索增强和历史记录功能。
+        This class is used to convert one SQL dialect to another, supporting retrieval enhancement and history tracking.
         
         Args:
-            model_name: 使用的LLM模型名称,如 'gpt-3.5-turbo'
-            src_sql: 需要转换的源SQL语句
-            src_dialect: 源SQL方言,如 'mysql' 
-            tgt_dialect: 目标SQL方言,如 'postgresql'
-            tgt_db_config: 目标数据库配置,字典格式包含:
-                - host: 数据库主机地址
-                - port: 端口号
-                - user: 用户名
-                - password: 密码
-                - db_name: 数据库名
-            vector_config: 向量数据库配置,字典格式包含:
-                - src_kb_name: 源方言向量集合ID
-                - tgt_kb_name: 目标方言向量集合ID
-                - src_embedding_model_name: 源方言嵌入模型名称
-                - tgt_embedding_model_name: 目标方言嵌入模型名称
-            retrieval_on: 是否开启检索
-            top_k: 检索时返回的最相似结果数量
-            history_id: 历史记录ID,用于追踪转换过程
-            out_type: 输出类型,支持:
-                - "db": 结果保存到数据库
-                - "file": 结果保存到文件
+            model_name: The LLM model name used, such as 'gpt-3.5-turbo'
+            src_sql: Source SQL statement to be converted
+            src_dialect: Source SQL dialect, such as 'mysql'
+            tgt_dialect: Target SQL dialect, such as 'postgresql'
+            tgt_db_config: Target database configuration, dictionary format including:
+                - host: Database host address
+                - port: Port number
+                - user: Username
+                - password: Password
+                - db_name: Database name
+            vector_config: Vector database configuration, dictionary format including:
+                - src_kb_name: Source dialect vector collection ID
+                - tgt_kb_name: Target dialect vector collection ID
+                - src_embedding_model_name: Source dialect embedding model name
+                - tgt_embedding_model_name: Target dialect embedding model name
+            retrieval_on: Whether to enable retrieval
+            top_k: Number of most similar results to return during retrieval
+            history_id: History record ID, used to track the conversion process
+            out_type: Output type, supports:
+                - "db": Results saved to database
+                - "file": Results saved to file
         """
-        # 基础配置
+        # Basic configuration
         self.model_name = model_name
         self.src_sql = src_sql
         self.src_dialect = src_dialect
@@ -93,52 +93,53 @@ class Translate:
         if self.tgt_dialect == "postgresql":
             self.tgt_dialect = "pg"
 
-        # 目标数据库配置
+        # Target database configuration
         self.tgt_db_config = tgt_db_config
 
-        # 嵌入模型相关配置
-        self.src_kb_name = vector_config['src_kb_name']  # 源方言向量集合
-        self.tgt_kb_name = vector_config['tgt_kb_name']  # 目标方言向量集合
-        self.src_embedding_model_name = vector_config['src_embedding_model_name']  # 源方言嵌入模型
-        self.tgt_embedding_model_name = vector_config['tgt_embedding_model_name']  # 目标方言嵌入模型
+        # Embedding model related configuration
+        self.src_kb_name = vector_config['src_kb_name']  # Source dialect vector collection
+        self.tgt_kb_name = vector_config['tgt_kb_name']  # Target dialect vector collection
+        self.src_embedding_model_name = vector_config['src_embedding_model_name']  # Source dialect embedding model
+        self.tgt_embedding_model_name = vector_config['tgt_embedding_model_name']  # Target dialect embedding model
 
-        self.retrieval_on = retrieval_on  # 是否启用检索
-        self.top_k = top_k  # 检索TOP-K结果数
+        self.retrieval_on = retrieval_on  # Whether to enable retrieval
+        self.top_k = top_k  # Retrieval TOP-K results
 
-        # 其他配置
-        self.history_id = history_id  # 历史记录ID
-        self.out_type = out_type  # 输出类型
+        # Other configurations
+        self.history_id = history_id  # History record ID
+        self.out_type = out_type  # Output type
 
-        # 初始化核心组件
-        self.translator = LLMTranslator(model_name)  # 初始化LLM翻译器
-        self.vector_db = ChromaStore()  # 初始化向量数据库
+        # Initialize core components
+        self.translator = LLMTranslator(model_name)  # Initialize LLM translator
+        self.vector_db = ChromaStore()  # Initialize vector database
 
     def local_to_global_rewrite(self, max_retry_time=2):
-        """局部SQL改写方法
+        """Local SQL rewriting method
         
-        该方法通过逐步定位和改写SQL片段来完成整个SQL的转换。支持重试机制和提升操作。
+        This method completes the entire SQL conversion by gradually locating and rewriting SQL fragments. 
+        Supports retry mechanism and lift operations.
         
         Args:
-            max_retry_time: 最大重试次数,默认为2次。超过后会触发提升操作。
+            max_retry_time: Maximum retry times, default is 2. Exceeding this will trigger lift operation.
             
         Returns:
-            tuple: 包含以下元素:
-                - str: 转换后的SQL语句。如果转换失败则返回错误信息。
-                - list: 模型输出的历史记录列表。
-                - list: 已处理的SQL片段列表。
-                - list: 提升操作的历史记录列表。
+            tuple: Contains the following elements:
+                - str: Converted SQL statement. Returns error message if conversion fails.
+                - list: Model output history records.
+                - list: Processed SQL fragments.
+                - list: Lift operation history records.
                 
-        工作流程:
-            1. 解析源SQL获取语法树和所有片段
-            2. 规范化处理
-            3. 循环处理每个定位到的片段:
-                - 尝试直接转换
-                - 如果失败则使用检索增强
-                - 超过重试次数则进行提升操作
-            4. 记录转换过程和结果
+        Workflow:
+            1. Parse source SQL to get syntax tree and all fragments
+            2. Normalization processing
+            3. Loop through each located fragment:
+                - Try direct conversion
+                - Use retrieval enhancement if fails
+                - Perform lift operation if exceeds retry times
+            4. Record conversion process and results
         """
 
-        # 初始化结果列表
+        # Initialize result lists
         model_ans_list, sql_ans_list = list(), list()
         used_pieces, lift_histories = list(), list()
 
@@ -146,19 +147,19 @@ class Translate:
             # rule normalization
             # self.src_sql = self.rule_rewrite(self.src_sql, self.src_dialect, self.src_dialect)
 
-            # 解析SQL获取语法树和片段
+            # Parse SQL to get syntax tree and fragments
             root_node, all_pieces = self.do_query_segmentation()
-            # 规范化处理
+            # Normalization processing
             normalize(root_node, self.src_dialect, self.tgt_dialect)
             self.src_sql = str(root_node)
         except ValueError as ve:
-            # 解析失败处理
+            # Handle parsing failure
             traceback.print_exc()
             print(f"Antlr parse error: {self.src_sql}, translate cancelled, "
                   f"dialect: {self.src_dialect}\n{ve}", file=sys.stderr)
             return str(ve), model_ans_list, used_pieces, lift_histories
 
-        # 如果没有找到可处理的片段,直接返回源SQL
+        # If no processable fragments found, return source SQL directly
         if len(all_pieces) == 0:
             return self.src_sql, ['Warning: No piece find'], used_pieces, lift_histories
 
@@ -169,16 +170,16 @@ class Translate:
         # if piece is None:
         #     return current_sql, model_ans_list, used_pieces, lift_histories
 
-        # 初始化转换状态
+        # Initialize conversion state
         current_sql = self.src_sql
         ori_piece, last_time_piece = None, None
         err_msg_list, err_info_list = list(), list()
 
-        # 定位第一个需要处理的片段
+        # Locate first fragment to process
         piece, assist_info = locate_node_piece(current_sql, self.tgt_dialect, all_pieces,
                                                root_node, self.tgt_db_config)
 
-        # 如果没有定位到片段,使用模型判断
+        # If no fragment located, use model judgment
         if piece is None:
             history, sys_prompt, user_prompt = list(), None, None
             piece, assist_info, judge_raw = self.model_judge(root_node, all_pieces, self.src_sql, current_sql,
@@ -186,18 +187,18 @@ class Translate:
                                                              user_prompt)
             model_ans_list.append(judge_raw)
 
-        # 主循环:处理每个定位到的片段
+        # Main loop: process each located fragment
         while piece is not None:
-            # 更新错误信息列表
+            # Update error message list
             if assist_info not in err_msg_list:
                 err_msg_list.append(assist_info)
                 err_info_list = self.update_error_info_list(err_info_list, assist_info, piece)
 
-            # 检查是否需要恢复到之前的状态
+            # Check if need to restore to previous state
             if last_time_piece is not None:
                 back_flag = get_restore_piece_flag(assist_info, piece, last_time_piece, ori_piece)
                 if back_flag:
-                    # 恢复到之前的状态
+                    # Restore to previous state
                     replace_piece(last_time_piece, ori_piece)
                     all_pieces.remove(last_time_piece)
                     all_pieces.append(ori_piece)
@@ -210,13 +211,13 @@ class Translate:
                     else:
                         piece["Node"].father.replace_child(last_time_piece['Node'], ori_piece['Node'])
                 else:
-                    # 保存当前片段作为原始状态
+                    # Save current piece as original state
                     ori_piece = piece
                     err_msg_list, err_info_list = list(), list()
 
             node, tree_node = piece['Node'], piece['Tree']
 
-            # 检查是否需要提升操作
+            # Check if lift operation is needed
             if piece['Count'] > max_retry_time:
                 node = piece['Node']
                 if node == root_node:
@@ -234,35 +235,35 @@ class Translate:
                 })
                 piece['Count'] = 0
 
-            # 更新片段信息
+            # Update fragment information
             piece['Node'], piece['Tree'] = node, tree_node
             used_pieces.append({
                 "piece": str(piece['Node']),
                 "Keyword": piece['Keyword']
             })
 
-            # # 尝试转换当前片段
+            # # Try to convert current fragment
             # if piece["Count"] == 0:
             #     try:
-            #         # 首次尝试使用sqlglot直接转换
+            #         # First try using sqlglot for direct conversion
             #         ans_slice = self.rule_rewrite(str(piece['Node']), self.src_dialect, self.tgt_dialect)
             #         model_ans = {"role": "sqlglot", "content": ans_slice, "Action": "translate",
             #                      "Time": str(datetime.now())}
             #     except Exception as e:
-            #         # sqlglot转换失败,使用自定义转换方法
+            #         # If sqlglot conversion fails, use custom conversion method
             #         traceback.print_exc()
             #         ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
             # else:
-            #     # 非首次尝试,直接使用自定义转换方法
+            #     # For non-first attempts, directly use custom conversion method
             #     ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
-            # 非首次尝试,直接使用自定义转换方法
+            # For non-first attempts, directly use custom conversion method
             ans_slice, model_ans = self.rewrite_piece(piece, history=[], err_info_list=err_info_list)
 
-            # 处理SELECT语句的特殊情况
+            # Handle special case for SELECT statements
             if 'select' in ans_slice.lower() and 'select' not in str(piece['Node']).lower():
                 ans_slice = '(' + ans_slice + ')'
 
-            # 创建新的树节点并更新语法树
+            # Create new tree node and update syntax tree
             last_time_node = TreeNode(ans_slice, self.src_dialect, is_terminal=True, father=None,
                                       father_child_index=None, children=None, model_get=True)
             if piece['Node'] == root_node:
@@ -270,12 +271,12 @@ class Translate:
             else:
                 piece["Node"].father.replace_child(piece["Node"], last_time_node)
 
-            # 更新片段列表
+            # Update fragment list
             all_pieces.remove(piece)
             new_piece = {
                 "Node": last_time_node,
                 "Tree": None,
-                "Description": None,  # 设置为None,因为片段的具体含义未知
+                "Description": None,  # Set to None as the specific meaning of the fragment is unknown
                 "Keyword": piece['Keyword'],
                 "SubPieces": [],
                 "FatherPiece": piece['FatherPiece'],
@@ -292,48 +293,48 @@ class Translate:
             last_time_piece, ori_piece = new_piece, piece
             current_sql = str(root_node)
 
-            # 记录转换结果
+            # Record conversion result
             model_ans["Translated SQL"] = current_sql
             model_ans_list.append(model_ans)
 
-            # 定位下一个需要处理的片段
+            # Locate next fragment to process
             piece, assist_info = locate_node_piece(current_sql, self.tgt_dialect, all_pieces,
                                                    root_node, self.tgt_db_config)
             if piece is None:
-                # 检查是否出现重复结果
+                # Check for duplicate results
                 if current_sql in sql_ans_list:
                     return current_sql, model_ans_list, used_pieces, lift_histories
 
-                # 使用模型判断是否需要继续处理
+                # Use model to judge if need to continue processing
                 piece, assist_info, judge_raw = self.do_semantic_validation(self.src_sql, current_sql, root_node,
                                                                             all_pieces, last_time_piece, model_ans_list)
 
                 model_ans_list.append(judge_raw)
 
-            # 记录当前SQL结果
+            # Record current SQL result
             if current_sql not in sql_ans_list:
                 sql_ans_list.append(current_sql)
 
         return current_sql, model_ans_list, used_pieces, lift_histories
 
     def rewrite_piece(self, piece, history=list(), err_info_list=list()) -> [str, str]:
-        """SQL片段重写方法
+        """SQL fragment rewriting method
         
         Args:
-            piece: SQL片段,可以是字典(包含Node节点)或字符串
-            history: 历史转换记录列表
-            err_info_list: 错误信息列表
+            piece: SQL fragment, can be dict (contains Node) or str
+            history: History conversion record list
+            err_info_list: Error information list
         
         Returns:
-            tuple: (转换后的SQL, 模型响应的完整信息)
+            tuple: (Converted SQL, Complete model response information)
         """
-        # 处理输入SQL片段,支持字典或字符串格式
+        # Process input SQL fragment, support dict or str format
         if isinstance(piece, Dict):
             input_sql = str(piece['Node'])
         elif isinstance(piece, str):
             input_sql = piece
 
-        # 构建错误示例提示
+        # Build error example prompt
         example = str()
         for item in err_info_list:
             item['SQL Snippet'] = item['SQL Snippet'].strip('\n')
@@ -341,14 +342,14 @@ class Translate:
 
         example = example.strip("\n")
         if len(example) != 0:
-            # 将错误示例格式化到模板中
+            # Format error example into template
             example = EXAMPLE_PROMPT.format(example)
 
         hint = str()
-        if self.retrieval_on:  # 如果启用检索增强
-            # if piece['Count'] == 0:  # 首次尝试
-            if False:  # 首次尝试
-                # 使用基础转换提示模板
+        if self.retrieval_on:  # If retrieval enhancement is enabled
+            # if piece['Count'] == 0:  # First attempt
+            if False:  # First attempt
+                # Use basic conversion prompt template
                 sys_prompt = SYSTEM_PROMPT_SEG.format(
                     src_dialect=map_rep[self.src_dialect],
                     tgt_dialect=map_rep[self.tgt_dialect]
@@ -360,10 +361,10 @@ class Translate:
                     hint=hint,
                     example=example
                 ).strip("\n")
-            else:  # 非首次尝试,使用检索增强
-                # 获取相似案例描述
+            else:  # Not first attempt, use retrieval enhancement
+                # Get similar case description
                 document = self.get_document_description(piece)
-                # 使用检索增强提示模板
+                # Use retrieval enhanced prompt template
                 sys_prompt = SYSTEM_PROMPT_RET.format(
                     src_dialect=map_rep[self.src_dialect],
                     tgt_dialect=map_rep[self.tgt_dialect]
@@ -376,8 +377,8 @@ class Translate:
                     example=example,
                     document=document
                 ).strip("\n")
-        else:  # 不启用检索增强
-            # 使用普通转换提示模板
+        else:  # Retrieval enhancement not enabled
+            # Use normal conversion prompt template
             sys_prompt = SYSTEM_PROMPT_NA.format(
                 src_dialect=map_rep[self.src_dialect],
                 tgt_dialect=map_rep[self.tgt_dialect]
@@ -389,9 +390,9 @@ class Translate:
                 example=example
             ).strip("\n")
 
-        # 调用翻译器进行转换
+        # Call translator for conversion
         self.add_process(content=process_history_text(user_prompt, role="user", action="translate"),
-                         step_name="改写结果", sql=input_sql, role="user", is_success=True, error=None)
+                         step_name="Rewrite result", sql=input_sql, role="user", is_success=True, error=None)
         answer_raw = self.translator.trans_func(
             history,
             sys_prompt,
@@ -399,94 +400,94 @@ class Translate:
             out_json=True
         )
 
-        # 使用正则表达式解析模型回答
+        # Parse model answer using regex
         pattern = TRANSLATION_ANSWER_PATTERN
         res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
         self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="translate"),
-                         step_name="改写结果", sql=res["Answer"], role="assistant", is_success=True, error=None)
+                         step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
 
         answer_raw["Answer"] = res["Answer"]
 
-        # 添加额外信息到响应中
-        answer_raw["Action"] = "translate"  # 动作类型
-        answer_raw["Time"] = str(datetime.now())  # 执行时间
-        answer_raw["SYSTEM_PROMPT"] = sys_prompt  # 系统提示
-        answer_raw["USER_PROMPT"] = user_prompt  # 用户提示
+        # Add extra information to response
+        answer_raw["Action"] = "translate"  # Action type
+        answer_raw["Time"] = str(datetime.now())  # Execution time
+        answer_raw["SYSTEM_PROMPT"] = sys_prompt  # System prompt
+        answer_raw["USER_PROMPT"] = user_prompt  # User prompt
 
         return answer_raw["Answer"], answer_raw
 
     def do_query_segmentation(self):
-        """获取SQL语句的所有片段
+        """Get all segments of the SQL statement
         
-        该方法将SQL语句解析为语法树，并提取所有可处理的SQL片段。
+        This method parses the SQL statement into a syntax tree and extracts all processable SQL segments.
         
         Returns:
-            tuple: (根节点, 所有片段列表)
-                - root_node: SQL语法树的根节点
-                - all_pieces: 包含所有SQL片段的列表，每个片段是一个字典
+            tuple: (root node, list of all segments)
+                - root_node: Root node of the SQL syntax tree
+                - all_pieces: List containing all SQL segments, each segment is a dictionary
         
         Raises:
-            ValueError: 当SQL解析失败时抛出异常
+            ValueError: Exception thrown when SQL parsing fails
         """
-        # 使用ANTLR解析器解析SQL语句
+        # Use ANTLR parser to parse SQL statement
         root_node, line, col, msg = parse_tree(self.src_sql, self.src_dialect)
         if root_node is None:
-            # 解析失败时抛出异常
+            # Throw exception when parsing fails
             raise ValueError(f"Parse error when executing ANTLR parser of {self.src_dialect}.\n"
                              f"The sql is {self.src_sql}")
 
-        # 获取所有SQL片段
+        # Get all SQL segments
         all_pieces, root_node = get_all_piece(root_node, self.src_kb_name, self.src_dialect)
         all_pieces = [piece for piece in all_pieces if piece["Type"] != "type"]
 
-        # 检查根节点是否已经在片段列表中
+        # Check if root node is already in segment list
         flag = True
         for piece in all_pieces:
             if root_node == piece['Node']:
                 flag = False
                 break
 
-        # 如果根节点不在片段列表中，创建根片段并添加到列表
+        # If root node is not in segment list, create root segment and add to list
         if flag:
-            # 创建根片段字典
+            # Create root segment dictionary
             root_piece = {
-                "Node": root_node,  # 语法树节点
-                "Tree": root_node,  # 完整语法树
+                "Node": root_node,  # Syntax tree node
+                "Tree": root_node,  # Complete syntax tree
                 "Description": "The whole SQL snippet above.",
-                "Keyword": '',  # 关键字（根节点为空）
-                "SubPieces": [piece for piece in all_pieces],  # 子片段列表
-                "FatherPiece": None,  # 父片段（根节点无父片段）
-                "Count": 0,  # 处理计数器
-                'TrackPieces': [],  # 追踪片段列表
+                "Keyword": '',  # Keyword (empty for root node)
+                "SubPieces": [piece for piece in all_pieces],  # List of sub-segments
+                "FatherPiece": None,  # Parent segment (none for root node)
+                "Count": 0,  # Processing counter
+                'TrackPieces': [],  # Tracking segment list
                 "Type": None,
                 "Detail": None
             }
 
-            # 更新所有没有父片段的片段，将其父片段设置为根片段
+            # Update all segments without parent segment, set their parent to root segment
             for piece in all_pieces:
                 if piece['FatherPiece'] is None:
                     piece['FatherPiece'] = root_piece
 
-            # 将根片段添加到片段列表
+            # Add root segment to segment list
             all_pieces.append(root_piece)
 
         return root_node, all_pieces
 
     def get_document_description(self, piece):
-        """获取SQL片段的相关文档描述
+        """Get related document description for SQL segment
         
-        该方法通过向量检索获取与当前SQL片段相关的参考文档。
+        This method retrieves reference documents related to current SQL segment through vector search.
         
         Args:
-            piece: SQL片段字典，包含关键字和描述信息
+            piece: SQL segment dictionary containing keyword and description information
         
         Returns:
-            str: JSON格式的文档描述
+            str: Document description in JSON format
         """
-        # 收集源SQL片段的关键字和描述
+        # Collect keywords and descriptions from source SQL segment
         src_key = [str(piece['Keyword'])]
         src_detail = [{"Description": piece['Description'], "Type": piece['Type'], "Detail": piece['Detail']}]
-        # 收集子片段的关键字和描述
+        # Collect keywords and descriptions from sub-segments
         for sub_piece in piece['SubPieces']:
             if sub_piece['Description'] is not None and sub_piece['Keyword'] is not None \
                     and sub_piece['Keyword'] not in src_key:
@@ -497,22 +498,22 @@ class Translate:
 
         print("src_key", src_key)
 
-        # 存储检索到的文档信息
+        # Store retrieved document information
         document = list()
 
-        # 处理每个关键字和描述对
+        # Process each keyword and description pair
         for key, detail in zip(src_key, src_detail):
             # desc = detail['Description']
             desc = f"{key}--separator--{detail['Detail']}{detail['Description']}"
 
-            # 跳过无效或根节点描述
+            # Skip invalid or root node descriptions
             if desc is None or desc == "The whole SQL snippet above.":
                 continue
 
-            # 存储检索结果
+            # Store search results
             results = list()
             if self.model_name == "cross-lingual":
-                # 跨语言模型：使用关键字和描述的组合进行检索
+                # Cross-lingual model: use combination of keyword and description for search
                 query_embedding = asyncio.run(get_embeddings(
                     str(key) + '--separator--' + str(desc),
                     self.tgt_embedding_model_name
@@ -521,7 +522,7 @@ class Translate:
                                 self.vector_db.search(self.tgt_kb_name, query_embedding.tolist(),
                                                       content_type="function", top_k=self.top_k)])
             else:
-                # 普通模型：仅使用描述进行检索
+                # Regular model: use only description for search
                 query_embedding = asyncio.run(get_embeddings(
                     desc,
                     self.tgt_embedding_model_name
@@ -531,7 +532,7 @@ class Translate:
                                                      content_type=detail['Type'], top_k=self.top_k)]
                 results.extend(topk_result)
 
-            # 去重处理：确保每个关键字只出现一次
+            # Deduplication: ensure each keyword appears only once
             results_key, results_pre = set(), list()
             for ite in results:
                 ite = eval(json.loads(ite["metadata"]['content']))
@@ -540,68 +541,68 @@ class Translate:
                     results_pre.append(f"{ite['description']}{ite['detail']}")
             # results_pre = results
 
-            # 处理目标关键字：移除多余的分隔符
+            # Process target keywords: remove extra separators
             # tgt_key = [re.sub(r'(<sep>)(\1){2,}', r'\1', ite.metadata["KEYWORD"]) for ite in results_pre]
             # tgt_key = [re.sub(r'(<sep>)(\1){2,}', r'\1', ite) for ite in results_pre]
             tgt_key = results_key
             tgt_desc = results_pre
 
-            # 构建文档描述
+            # Build document description
             document.append({
-                # 源方言片段描述
+                # Source dialect segment description
                 f"{map_rep[self.src_dialect]} snippet": (
                     f"`{key}`: {desc.split('--separator--')[-1][:CHUNK_SIZE]}..."
                 ),
-                # 目标方言片段描述
+                # Target dialect segment description
                 f"{map_rep[self.tgt_dialect]} snippet": [
                     f"`{tk}`: {tdesc[:CHUNK_SIZE]}" for tk, tdesc in zip(tgt_key, tgt_desc)
                 ]
             })
 
-        # 转换为格式化的JSON字符串
+        # Convert to formatted JSON string
         document = json.dumps(document, indent=4)
 
         return document
 
     def update_error_info_list(self, err_info_list, assist_info, piece):
-        """更新错误信息列表
+        """Update error information list
         
-        该方法根据不同的目标数据库方言处理错误信息，并更新错误信息列表。
+        This method processes error information according to different target database dialects and updates the error information list.
         
         Args:
-            err_info_list: 现有的错误信息列表
-            assist_info: 辅助信息（错误消息）
-            piece: SQL片段字典
+            err_info_list: Existing error information list
+            assist_info: Assistance information (error message)
+            piece: SQL segment dictionary
         
         Returns:
-            list: 更新后的错误信息列表
+            list: Updated error information list
         """
-        # Oracle数据库的特殊错误处理
+        # Special error handling for Oracle database
         if self.tgt_dialect == "oracle":
-            # 初始化错误信息前缀
+            # Initialize error information prefix
             assist_info_pre = f"Some error occurs near the snippet:"
 
             try:
-                # 处理Oracle特定错误
-                # 跳过'ORA-00933'错误（SQL命令未正确结束），处理其他ERROR信息
+                # Handle Oracle specific errors
+                # Skip 'ORA-00933' error (SQL command not properly ended), handle other ERROR information
                 if 'ORA-00933: SQL command not properly ended' not in assist_info \
                         and 'ERROR' in assist_info:
-                    # 定位ERROR关键字位置
+                    # Locate ERROR keyword position
                     err_pos = assist_info.index("ERROR")
-                    # 添加错误位置后的信息
+                    # Add information after error position
                     assist_info_pre += assist_info[err_pos:]
 
-                # 处理错误消息格式
+                # Process error message format
                 assist_info_pre = process_err_msg(assist_info_pre)
 
-                # 添加到错误信息列表
+                # Add to error information list
                 err_info_list.append({
-                    "Error": assist_info_pre,  # 处理后的错误信息
-                    "SQL Snippet": str(piece["Node"])  # 相关的SQL片段
+                    "Error": assist_info_pre,  # Processed error information
+                    "SQL Snippet": str(piece["Node"])  # Related SQL segment
                 })
 
             except Exception as e:
-                # 异常处理：记录异常并添加基础错误信息
+                # Exception handling: log exception and add basic error information
                 traceback.print_exc()
                 assist_info_pre = process_err_msg(assist_info_pre)
                 err_info_list.append({
@@ -609,8 +610,8 @@ class Translate:
                     "SQL Snippet": str(piece["Node"])
                 })
         else:
-            # 非Oracle数据库的错误处理
-            # 直接处理错误消息并添加到列表
+            # Error handling for non-Oracle databases
+            # Directly process error message and add to list
             assist_info = process_err_msg(assist_info)
             err_info_list.append({
                 "Error": assist_info,
@@ -621,56 +622,56 @@ class Translate:
 
     def do_semantic_validation(self, src_sql, current_sql, root_node,
                                all_pieces, last_time_piece, model_ans_list):
-        """处理语法正确的SQL片段
+        """Process syntactically correct SQL segments
         
-        该方法处理已经通过语法检查的SQL片段，判断是否需要进一步优化或修改。
+        This method processes SQL segments that have passed syntax check, determining whether further optimization or modification is needed.
         
         Args:
-            src_sql: 原始SQL语句
-            current_sql: 当前转换后的SQL语句
-            root_node: SQL语法树的根节点
-            all_pieces: 所有SQL片段列表
-            last_time_piece: 上一次处理的片段
-            model_ans_list: 模型回答历史列表
+            src_sql: Original SQL statement
+            current_sql: Currently converted SQL statement
+            root_node: Root node of SQL syntax tree
+            all_pieces: List of all SQL segments
+            last_time_piece: Last processed segment
+            model_ans_list: Model answer history list
         
         Returns:
             tuple: (piece, assist_info, judge_raw)
-                - piece: 需要进一步处理的SQL片段
-                - assist_info: 辅助信息
-                - judge_raw: 模型判断的原始输出
+                - piece: SQL segment that needs further processing
+                - assist_info: Assistance information
+                - judge_raw: Raw output of model judgment
         """
-        # 初始化历史记录和提示信息
+        # Initialize history and prompt information
         history, sys_prompt, user_prompt = list(), None, None
 
-        # 如果存在模型回答历史
+        # If model answer history exists
         if len(model_ans_list) > 0:
-            # 查找最近一次包含系统提示的回答
+            # Find the most recent answer containing system prompt
             no = -1
             for i in range(len(model_ans_list) - 1, 0, -1):
                 if "SYSTEM_PROMPT" in model_ans_list[i].keys():
                     no = i
                     break
 
-            # 复制模型消息以避免修改原始数据
+            # Copy model message to avoid modifying original data
             model_message = copy.deepcopy(model_ans_list[no])
 
-            # 移除动作标记
+            # Remove action marker
             model_message.pop("Action")
 
-            # 提取系统提示和用户提示
+            # Extract system prompt and user prompt
             sys_prompt = None
             if "SYSTEM_PROMPT" in model_message.keys():
                 sys_prompt = model_message.pop("SYSTEM_PROMPT")
                 user_prompt = model_message.pop("USER_PROMPT")
 
-            # 构建对话历史
+            # Build dialog history
             history.append({
                 "role": "user",
                 "content": user_prompt
             })
             history.append(model_message)
 
-            # 构建新的用户提示，用于反思和评估当前转换结果
+            # Build new user prompt for reflection and evaluation of current conversion result
             user_prompt = USER_PROMPT_REFLECT.format(
                 src_dialect=map_rep[self.src_dialect],
                 tgt_dialect=map_rep[self.tgt_dialect],
@@ -679,56 +680,56 @@ class Translate:
                 snippet=f"`{str(last_time_piece['Node'])}`"
             ).strip("\n")
 
-        # 调用模型进行判断
+        # Call model for judgment
         piece, assist_info, judge_raw = self.model_judge(
-            root_node,  # 语法树根节点
-            all_pieces,  # 所有SQL片段
-            src_sql,  # 源SQL
-            current_sql,  # 当前SQL
-            last_time_piece,  # 上一次处理的片段
-            history,  # 对话历史
-            sys_prompt,  # 系统提示
-            user_prompt  # 用户提示
+            root_node,  # Root node of SQL syntax tree
+            all_pieces,  # List of all SQL segments
+            src_sql,  # Source SQL
+            current_sql,  # Current SQL
+            last_time_piece,  # Last processed segment
+            history,  # Dialog history
+            sys_prompt,  # System prompt
+            user_prompt  # User prompt
         )
 
         return piece, assist_info, judge_raw
 
     def model_judge(self, root_node, all_pieces, src_sql, current_sql, ans_slice,
                     history=list(), sys_prompt=None, user_prompt=None):
-        """模型判断方法
+        """Model judgment method
         
-        使用LLM模型判断SQL转换的质量，并识别需要进一步优化的片段。
+        This method uses LLM to judge the quality of SQL conversion and identify segments that need further optimization.
         
         Args:
-            root_node: SQL语法树的根节点
-            all_pieces: 所有SQL片段列表
-            src_sql: 源SQL语句
-            current_sql: 当前转换后的SQL语句
-            ans_slice: 上一次处理的片段
-            history: 对话历史记录，默认为空列表
-            sys_prompt: 系统提示，默认为None
-            user_prompt: 用户提示，默认为None
+            root_node: Root node of SQL syntax tree
+            all_pieces: List of all SQL segments
+            src_sql: Source SQL statement
+            current_sql: Currently converted SQL statement
+            ans_slice: Last processed segment
+            history: Dialog history record, default empty list
+            sys_prompt: System prompt, default None
+            user_prompt: User prompt, default None
         
         Returns:
             tuple: (piece, assist_info, answer_raw)
-                - piece: 需要进一步处理的SQL片段
-                - assist_info: 辅助信息
-                - answer_raw: 模型的原始回答
+                - piece: SQL segment that needs further processing
+                - assist_info: Assistance information
+                - answer_raw: Raw output of model judgment
         """
-        # 确定要分析的片段
+        # Determine the fragment to analyze
         if ans_slice is None:
-            snippet = "all snippets"  # 分析所有片段
+            snippet = "all snippets"  # Analyze all segments
         else:
-            snippet = f"`{str(ans_slice['Node'])}`"  # 分析特定片段
+            snippet = f"`{str(ans_slice['Node'])}`"  # Analyze specific segment
 
-        # 如果没有提供系统提示，使用默认的判断提示模板
+        # If system prompt is not provided, use default judgment prompt template
         if sys_prompt is None:
             sys_prompt = SYSTEM_PROMPT_JUDGE.format(
                 src_dialect=self.src_dialect,
                 tgt_dialect=self.tgt_dialect
             ).strip("\n")
 
-        # 如果没有提供用户提示，使用默认的判断提示模板
+        # If user prompt is not provided, use default judgment prompt template
         if user_prompt is None:
             user_prompt = USER_PROMPT_JUDGE.format(
                 src_dialect=self.src_dialect,
@@ -738,44 +739,44 @@ class Translate:
                 snippet=snippet
             ).strip("\n")
 
-        # 调用翻译器获取模型判断结果
+        # Call translator to get model judgment result
         self.add_process(content=process_history_text(user_prompt, role="user", action="judge"),
-                         step_name="改写结果", sql=current_sql, role="user", is_success=True, error=None)
+                         step_name="Rewrite result", sql=current_sql, role="user", is_success=True, error=None)
 
         answer_raw = self.translator.trans_func(history, sys_prompt, user_prompt)
 
-        # 使用正则表达式解析模型回答
+        # Use regular expression to parse model answer
         pattern = JUDGE_ANSWER_PATTERN
         res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
         self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="judge"),
-                         step_name="改写结果", sql=res["Answer"], role="assistant", is_success=True, error=None)
+                         step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
 
         snippet = res["Answer"]
 
-        # 添加额外信息到回答中
-        answer_raw["Action"] = "judge"  # 动作类型
-        answer_raw["Time"] = str(datetime.now())  # 执行时间
-        answer_raw["SYSTEM_PROMPT"] = sys_prompt  # 系统提示
-        answer_raw["USER_PROMPT"] = user_prompt  # 用户提示
+        # Add additional information to answer
+        answer_raw["Action"] = "judge"  # Action type
+        answer_raw["Time"] = str(datetime.now())  # Execution time
+        answer_raw["SYSTEM_PROMPT"] = sys_prompt  # System prompt
+        answer_raw["USER_PROMPT"] = user_prompt  # User prompt
 
-        # 初始化返回值
+        # Initialize return values
         piece, assist_info = None, None
 
-        # 判断是否需要进一步处理
-        # 当模型认为不需要修改或置信度低时，直接返回
+        # Determine if further processing is needed
+        # When the model believes no modification is needed or the confidence is low, return directly
         if "NONE" in snippet or "almost equivalent" in str(answer_raw) \
                 or (isinstance(res['Confidence'], float) and res['Confidence'] < 0.8):
             return piece, assist_info, answer_raw
 
-        # 构建辅助信息，包含需要检查的片段和模型的推理过程
+        # Build auxiliary information, including the fragment to check and the model's reasoning process
         assist_info = JUDGE_INFO_PROMPT.format(snippet=snippet, reasoning=res['Reasoning'])
 
-        # 在当前SQL中定位需要处理的片段
+        # Locate the fragment to process in the current SQL
         column = current_sql.find(snippet)
         if column != -1:
-            # 找到对应的语法树节点
+            # Find the corresponding syntax tree node
             node, _ = TreeNode.locate_node(root_node, column, current_sql)
-            # 在所有片段中找到对应的片段
+            # Find the corresponding fragment in all segments
             piece = find_piece(all_pieces, node)
 
         return piece, assist_info, answer_raw
@@ -811,18 +812,18 @@ class Translate:
 
         model_ans_list.append(answer_raw)
 
-        self.add_process(content="SQL改写完成", step_name="改写结果", sql=current_sql,
+        self.add_process(content="SQL rewrite completed", step_name="Rewrite result", sql=current_sql,
                          role="assistant", is_success=True, error=None)
 
         return current_sql, model_ans_list
 
     def add_process(self, content, step_name, sql, role, is_success, error):
         if self.out_type == "file":
-            # 添加到文件
+            # Add to file
             pass
         elif self.out_type == "db":
-            # 添加到数据库 
-            # 添加改写结果记录
+            # Add to database
+            # Add rewrite result record
             from api.services.rewrite import RewriteService
             RewriteService.add_rewrite_process(
                 history_id=self.history_id,
@@ -835,29 +836,29 @@ class Translate:
             )
 
     def update_rewrite_status(self, status, sql, error):
-        """更新SQL重写状态
+        """Update SQL rewrite status
         
-        该方法用于更新数据库中SQL重写任务的状态信息。
+        This method is used to update the status information of the SQL rewrite task in the database.
         
         Args:
-            status: 重写任务的状态
-                可能的值包括：
-                - 'success': 重写成功
-                - 'failed': 重写失败
-                - 'processing': 正在处理中
-            sql: 重写后的SQL语句或中间结果
-            error: 错误信息（如果有的话）
+            status: The status of the rewrite task
+                Possible values include:
+                - 'success': Rewrite successful
+                - 'failed': Rewrite failed
+                - 'processing': Processing
+            sql: The rewritten SQL statement or intermediate result
+            error: Error information (if any)
         
         Note:
-            该方法依赖于RewriteService服务类来实际执行数据库更新操作
+            This method depends on the RewriteService service class to actually execute the database update operation.
         """
-        # 导入RewriteService服务类
+        # Import RewriteService service class
         from api.services.rewrite import RewriteService
 
-        # 调用服务类的更新方法
+        # Call the update method of the service class
         RewriteService.update_rewrite_status(
-            history_id=self.history_id,  # 历史记录ID
-            status=status,  # 重写状态
-            sql=sql,  # SQL语句
-            error=error  # 错误信息
+            history_id=self.history_id,  # History record ID
+            status=status,  # Rewrite status
+            sql=sql,  # SQL statement
+            error=error  # Error information
         )

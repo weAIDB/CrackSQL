@@ -1,37 +1,37 @@
-COMMON: &common #标识
+COMMON: &common # Identifier
   DEBUG: False
   SECRET_KEY: "fHoNCXiQeSCqGcZ*"
 
-  # 页码设置
+  # Page settings
   DEFAULT_PAGE_INDEX: 1
   DEFAULT_PAGE_SIZE: 10
 
-  # 文件配置
+  # File configuration
   UPLOAD_FOLDER: './sources/'
 
-  # 业务数据库连接
+  # Business database connection
   SQLALCHEMY_DATABASE_URI: 'sqlite:///info.db'
   SQLALCHEMY_TRACK_MODIFICATIONS: False
   SQLALCHEMY_ECHO: False
   SQLALCHEMY_POOL_RECYCLE: 8
-  # 日志配置文件路径
+  # Log configuration file path
   LOGGING_CONFIG_PATH: ./config/logging.yaml
-  # 日志文件存放位置
+  # Log file storage location
   LOGGING_PATH: ./logs
 
-  # 响应消息
+  # Response message
   RESPONSE_MESSAGE: ./config/msg.yaml
 
-  # 是否开启定时任务,默认不开启
+  # Whether to enable scheduled tasks, default is not enabled
   SCHEDULER_OPEN: True
 
-  # 定时任务配置
+  # Scheduled task configuration
   SCHEDULER_API_ENABLED: True
   SCHEDULER_TIMEZONE: 'Asia/Shanghai'
 
 
 DEVELOPMENT: &development
-  <<: *common # 继承common，没有重新定义的变量，使用common变量值
+  <<: *common # Inherit common, variables not redefined use common variable values
   DEBUG: True
   SQLALCHEMY_ECHO: False
 
