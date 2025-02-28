@@ -174,7 +174,7 @@ def upload_json_file(kb_name: str, file) -> Dict:
         raise
 
 
-def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
+def get_json_items(kb_name: str, page: int = 1, page_size: int = 10, all_item: bool = False) -> Dict:
     """Get JSON records"""
     try:
         # Get knowledge base
@@ -187,6 +187,8 @@ def get_json_items(kb_name: str, page: int = 1, page_size: int = 10) -> Dict:
 
         # Get total
         total = query.count()
+        if all_item:
+            return query.all()
 
         # Ensure page number and page size are integers
         try:
@@ -279,7 +281,7 @@ def add_kb_items(kb_name: str, items: List[Dict]) -> Dict:
             if 'tree' not in item.keys():
                 raise ValueError("Data item must contain tree field")
             
-            # Get and verify embedding text keyword--separator--detaildescription
+            # Get and verify embedding text keyword--separator--detail description
             embedding_text = f"{item.get('keyword')}--separator--{item.get('detail')}{item.get('description')}"
 
             # Calculate content hash

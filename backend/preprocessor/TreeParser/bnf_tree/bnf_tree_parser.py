@@ -1,7 +1,5 @@
-from typing import List
-
-from preprocessor.TreeParser.bnf_tree.bnf_tree_node import *
 from utils.tools import self_split, split2wordlist
+from preprocessor.TreeParser.bnf_tree.bnf_tree_node import *
 
 
 def parse_bnf(terms: List, node: BnfRuleNode, index: int, index_end: int) -> int:
@@ -80,7 +78,7 @@ def parse_bnf(terms: List, node: BnfRuleNode, index: int, index_end: int) -> int
                     node.add_child(cur_node)
                     cur_node = BnfRuleNode('keywords', NodeType.WORDS, RepeatType.NONE, node)
                 i = i + 1
-        
+
         else:
             node1 = BnfRuleNode(temp_str, NodeType.KEYWORD, RepeatType.NONE, node)
             cur_node.add_child(node1)

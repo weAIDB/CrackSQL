@@ -4,7 +4,6 @@
 # @Author: xxxx
 # @Time: 2024/10/6 22:19
 
-import json
 from typing import List
 
 from preprocessor.antlr_parser.parse_tree import parse_tree
@@ -118,14 +117,17 @@ def child_value_list_compare(root_node: TreeNode, child_list: List[str]) -> bool
 
 def add_quote_oracle(root_node: TreeNode, quote_type: str):
     if (father_value_list_compare(root_node, ['id_expression', 'general_element_part']) and
-            not child_value_list_compare(root_node, ['non_reserved_keywords_pre12c', ['NULLIF', 'SYSDATE', "ROWNUM", "TRUNC"]])):
+            not child_value_list_compare(root_node,
+                                         ['non_reserved_keywords_pre12c', ['NULLIF', 'SYSDATE', "ROWNUM", "TRUNC"]])):
         add_quote_to_bot_node(root_node, quote_type)
     elif father_value_list_compare(root_node, ['regular_id', 'id_expression', 'identifier',
                                                'tableview_name', 'dml_table_expression_clause',
                                                'table_ref_aux_internal',
                                                'table_ref_aux', 'table_ref']) and not root_node.value == 'dual':
         add_quote_to_bot_node(root_node, quote_type)
-    elif father_value_list_compare(root_node, ['id_expression', 'identifier', 'tableview_name']) and not child_value_list_compare(root_node, ['dual']):
+    elif father_value_list_compare(root_node,
+                                   ['id_expression', 'identifier', 'tableview_name']) and not child_value_list_compare(
+            root_node, ['dual']):
         add_quote_to_bot_node(root_node, quote_type)
     elif father_value_list_compare(root_node, ['id_expression', 'identifier', 'table_alias']):
         add_quote_to_bot_node(root_node, quote_type)

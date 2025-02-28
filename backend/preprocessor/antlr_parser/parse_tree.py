@@ -12,7 +12,7 @@ from preprocessor.antlr_parser.mysql_parser.MySqlLexer import MySqlLexer
 from preprocessor.antlr_parser.oracle_parser.PlSqlParser import PlSqlParser
 from preprocessor.antlr_parser.oracle_parser.PlSqlLexer import PlSqlLexer
 
-from utils.constants import map_parser
+from utils.constants import PARSER_LIST
 
 
 class CustomErrorListener(ErrorListener):
@@ -28,7 +28,7 @@ def parse_tree(src_sql: str, dialect: str) -> (str, int, int, str):
     elif dialect == 'oracle':
         return parse_oracle_tree(src_sql)
     else:
-        raise ValueError("use one of" + str(map_parser) + " as argument")
+        raise ValueError("use one of" + str(PARSER_LIST) + " as argument")
 
 
 def parse_pg_tree(src_sql: str) -> (str, int, int, str):
@@ -65,7 +65,6 @@ def parse_mysql_tree(src_sql: str):
         raise e
 
 
-
 def parse_oracle_tree(src_sql: str):
     try:
         input_stream = InputStream(src_sql)
@@ -98,7 +97,7 @@ def get_parser(dialect: str):
         stream = CommonTokenStream(lexer)
         return PlSqlParser(stream)
     else:
-        raise ValueError(f"Only support {map_parser}")
+        raise ValueError(f"Only support {PARSER_LIST}")
 
 
 class SelfParseError(Exception):

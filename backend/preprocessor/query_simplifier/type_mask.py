@@ -4,7 +4,8 @@ from preprocessor.query_simplifier.Tree import TreeNode
 from preprocessor.query_simplifier.normalize import father_value_list_compare
 
 
-def mask_column(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
+def mask_column(root_node: TreeNode, ori_node: TreeNode,
+                src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
     flag = False
     if src_dialect == 'oracle':
         if root_node.value == 'general_element':
@@ -32,7 +33,8 @@ def mask_column(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_d
     return res, index
 
 
-def mask_table(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
+def mask_table(root_node: TreeNode, ori_node: TreeNode,
+               src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
     flag = False
     if src_dialect == 'oracle':
         if root_node.value == 'tableview_name':
@@ -58,7 +60,8 @@ def mask_table(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_di
     return res, index
 
 
-def mask_sub_query(root_node: TreeNode, ori_node: TreeNode, src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
+def mask_sub_query(root_node: TreeNode, ori_node: TreeNode,
+                   src_dialect: str, tgt_dialect: str, index: int) -> tuple[Dict, int]:
     flag = False
     if src_dialect == 'oracle':
         if ((root_node.value == 'dml_table_expression_clause' and

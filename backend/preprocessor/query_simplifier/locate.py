@@ -4,22 +4,18 @@
 # @Author: xxxx
 # @Time: 2024/9/25 12:35
 
-import os.path
 import re
-import sqlglot
 import json
+import os.path
 from typing import List, Dict
 
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode
 from utils.constants import oracle_locate_open
 from utils.db_connector import sql_execute
-from utils.tools import load_config, remove_all_space, print_err, get_proj_root_path, reformat_sql
+from utils.tools import remove_all_space, get_proj_root_path
 
 pg_func_name = set()
-
-# config = load_config()
-# oracle_locate_open = config['oracle_locate_open']
 
 
 def load_pg_func_name():
@@ -33,6 +29,31 @@ def load_pg_func_name():
                 name = table[i]['Function'][:table[i]['Function'].find('(')]
                 pg_func_name.add(name.upper())
                 i = i + 1
+
+
+def get_pg_location(line_string: str, col: int, ori_sql: str):
+    if line_string.startswith('LINE 1: ...'):
+        sub_str = line_string[len('LINE 1: ...'):-3]
+        if sub_str.endswith('...'):
+            sub_str = sub_str[:-3]
+        ori_loc = ori_sql.find(sub_str)
+        return ori_loc + col - len('LINE 1: ...')
+    elif line_string.startswith('LINE 1: '):
+        sub_str = line_string[len('LINE 1: '):]
+        ori_loc = ori_sql.find(sub_str)
+        return ori_loc + col - len('LINE 1: ') + 1
+    else:
+        print(line_string)
+        return None
+
+
+def get_oracle_location(line_string: str, col: int, ori_sql: str):
+    assert ori_sql[0] != ' ' and ori_sql[0] != '\n'
+    i = 0
+    while line_string[i] != ori_sql[0]:
+        i = i + 1
+    res = col - i
+    return res
 
 
 def locate_function(error_info: str, dialect: str, sql: str):
@@ -119,26 +140,6 @@ def locate_function(error_info: str, dialect: str, sql: str):
             return error_info, None, None
 
 
-def find_piece(all_pieces: List[Dict], locate_node: TreeNode):
-    # print("locate_node", locate_node)
-    now_node = locate_node
-    while True:
-        for piece in all_pieces:
-            if piece['Node'] == now_node:
-                return piece
-        if now_node.father is not None:
-            now_node = now_node.father
-        else:
-            return None
-
-
-def get_func_name(func: str):
-    if func.find('(') != -1:
-        return func[:func.find('(')]
-    else:
-        return func.lower()
-
-
 def find_function(func_name, all_pieces, root_node, sql, location=None):
     if location is not None:
         ori_node, _ = TreeNode.locate_node(root_node, location, sql)
@@ -210,6 +211,25 @@ def locate_node_piece(sql, tgt_dialect, all_pieces, root_node, tgt_db_config):
         return find_piece(all_pieces, node), msg
 
 
+def find_piece(all_pieces: List[Dict], locate_node: TreeNode):
+    now_node = locate_node
+    while True:
+        for piece in all_pieces:
+            if piece['Node'] == now_node:
+                return piece
+        if now_node.father is not None:
+            now_node = now_node.father
+        else:
+            return None
+
+
+def get_func_name(func: str):
+    if func.find('(') != -1:
+        return func[:func.find('(')]
+    else:
+        return func.lower()
+
+
 def replace_piece(piece, new_piece):
     assert piece['FatherPiece'] == new_piece['FatherPiece']
     father_piece = piece['FatherPiece']
@@ -222,43 +242,6 @@ def replace_piece(piece, new_piece):
         for sub_piece in new_piece['SubPieces']:
             father_piece['SubPieces'].append(sub_piece)
         father_piece = father_piece['FatherPiece']
-
-
-def get_pg_location(line_string: str, col: int, ori_sql: str):
-    if line_string.startswith('LINE 1: ...'):
-        sub_str = line_string[len('LINE 1: ...'):-3]
-        if sub_str.endswith('...'):
-            sub_str = sub_str[:-3]
-        ori_loc = ori_sql.find(sub_str)
-        return ori_loc + col - len('LINE 1: ...')
-    elif line_string.startswith('LINE 1: '):
-        sub_str = line_string[len('LINE 1: '):]
-        ori_loc = ori_sql.find(sub_str)
-        return ori_loc + col - len('LINE 1: ') + 1
-    else:
-        print(line_string)
-        return None
-
-
-def get_oracle_location(line_string: str, col: int, ori_sql: str):
-    assert ori_sql[0] != ' ' and ori_sql[0] != '\n'
-    i = 0
-    while line_string[i] != ori_sql[0]:
-        i = i + 1
-    res = col - i
-    return res
-
-
-def find_all_subpiece(node, all_pieces, node2piece):
-    res = []
-    if node in node2piece:
-        return node2piece[node]['SubPieces']
-    else:
-        for child in node.children:
-            res = res + find_all_subpiece(child, all_pieces, node2piece)
-            if child in node2piece:
-                res.append(node2piece[node])
-        return res
 
 
 def find_piece_dfs(node: TreeNode, node_set: set, node2piece: Dict) -> List[Dict]:

@@ -2,8 +2,8 @@ import sys
 
 from antlr4.tree.Tree import TerminalNodeImpl
 
-from preprocessor.antlr_parser.parse_tree import get_parser, parse_tree
 from utils.tools import self_split, remove_all_space
+from preprocessor.antlr_parser.parse_tree import get_parser
 
 parser_map = {}
 

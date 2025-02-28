@@ -1,13 +1,13 @@
+import os
+import re
+import hashlib
 import chromadb
 from chromadb.config import Settings
-from typing import List, Dict, Optional, Any
-import os
+from typing import List, Dict, Optional
+
 from config.logging_config import logger
 from chromadb.api.models.Collection import Collection
 from api.utils.retry import retry_on_error
-import time
-import hashlib
-import re
 
 
 def convert_distance_to_score(distance: float) -> float:
@@ -212,7 +212,7 @@ class ChromaStore:
             except Exception as e:
                 logger.error(f"Search failed: {str(e)}")
                 raise
-        
+
         # Sort by score
         results_all.sort(key=lambda x: x['score'], reverse=True)
 
