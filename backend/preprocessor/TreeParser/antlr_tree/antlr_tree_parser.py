@@ -41,8 +41,8 @@ def split_name_repre(g4_str: str):
     return name.strip(), repre.strip()
 
 
-def parse_g4(terms: List, node: AntlrRuleNode, node_map: dict[str, AntlrRuleNode], index: int, index_end: int,
-             root_node: AntlrRuleNode):
+def parse_g4(terms: List, node: AntlrRuleNode, node_map: dict[str, AntlrRuleNode],
+             index: int, index_end: int, root_node: AntlrRuleNode):
     i = index
     cur_node = AntlrRuleNode('keywords', NodeType.WORDS, RepeatType.NONE, node)
     last_node = None

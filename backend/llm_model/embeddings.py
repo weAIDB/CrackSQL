@@ -1,12 +1,12 @@
-from typing import List, Union
 import numpy as np
+import logging
+from typing import List, Union, Optional, Dict
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from tenacity import retry, stop_after_attempt, wait_random_exponential
-from config.db_config import db, db_session_manager
+
 from models import LLMModel
-import logging
-from typing import Optional, Dict
+from config.db_config import db, db_session_manager
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,9 @@ class EmbeddingManager:
         """
         Get Embedding model configuration
         """
-        config = db.session.query(LLMModel).filter_by(name=model_name, category='embedding', is_active=True).first()
+        config = db.session.query(LLMModel).filter_by(name=model_name,
+                                                      category='embedding',
+                                                      is_active=True).first()
         return {
             'name': config.name,
             'model_path': config.path,
@@ -53,7 +55,8 @@ class EmbeddingManager:
 
     def release_all_embeddings(self):
         """Release all Embedding models"""
-        model_names = list(self._embeddings.keys())  # Create a copy to avoid modifying dictionary during iteration
+        # Create a copy to avoid modifying dictionary during iteration
+        model_names = list(self._embeddings.keys())
         for model_name in model_names:
             self.release_embedding(model_name)
 

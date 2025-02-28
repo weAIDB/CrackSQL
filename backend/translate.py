@@ -1,8 +1,7 @@
-import asyncio
 import re
 import sys
+import asyncio
 
-import torch
 import json
 import copy
 import traceback
@@ -10,37 +9,24 @@ import sqlglot
 from typing import Dict
 from datetime import datetime
 
-from utils.constants import map_rep, FAILED_TEMPLATE, CHUNK_SIZE, TRANSLATION_ANSWER_PATTERN, JUDGE_ANSWER_PATTERN
+from utils.constants import DIALECT_MAP, FAILED_TEMPLATE, CHUNK_SIZE, TRANSLATION_ANSWER_PATTERN, JUDGE_ANSWER_PATTERN
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode, lift_node
 from preprocessor.query_simplifier.rewrite import get_all_piece
 from preprocessor.query_simplifier.locate import locate_node_piece, replace_piece, get_func_name, find_piece
 from preprocessor.query_simplifier.normalize import normalize
-from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
-    SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_RET, USER_PROMPT_RET, USER_PROMPT_DIR, EXAMPLE_PROMPT, \
-    JUDGE_INFO_PROMPT
-from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
+
 from translator.llm_translator import LLMTranslator
-from llm_model.embeddings import embedding_manager, get_embeddings
+from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
+    SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_RET, USER_PROMPT_RET, EXAMPLE_PROMPT, JUDGE_INFO_PROMPT
+from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
+
+from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
 from utils.tools import parse_llm_answer_v2, process_err_msg, process_history_text
 
 
-def get_restore_piece_flag(assist_info, piece, last_time_piece, ori_piece):
-    back_flag = False
-    if assist_info is not None and assist_info.endswith("translate error"):
-        match = re.search(r'Function\s+(\w+)\s+translate\s+error', assist_info)
-        if match:
-            back_flag = True
-            func_name = match.group(1)
-            assert func_name.lower() == get_func_name(ori_piece['Keyword'])
-        else:
-            raise Exception("Error occurs while parsing Function messages")
-
-    elif last_time_piece is not None and last_time_piece['Node'] == piece['Node']:
-        back_flag = True
-
-    return back_flag
+# rule translation
 
 
 class Translate:
@@ -196,7 +182,7 @@ class Translate:
 
             # Check if need to restore to previous state
             if last_time_piece is not None:
-                back_flag = get_restore_piece_flag(assist_info, piece, last_time_piece, ori_piece)
+                back_flag = self.get_restore_piece_flag(assist_info, piece, last_time_piece, ori_piece)
                 if back_flag:
                     # Restore to previous state
                     replace_piece(last_time_piece, ori_piece)
@@ -351,12 +337,12 @@ class Translate:
             if False:  # First attempt
                 # Use basic conversion prompt template
                 sys_prompt = SYSTEM_PROMPT_SEG.format(
-                    src_dialect=map_rep[self.src_dialect],
-                    tgt_dialect=map_rep[self.tgt_dialect]
+                    src_dialect=DIALECT_MAP[self.src_dialect],
+                    tgt_dialect=DIALECT_MAP[self.tgt_dialect]
                 ).strip("\n")
                 user_prompt = USER_PROMPT_SEG.format(
-                    src_dialect=map_rep[self.src_dialect],
-                    tgt_dialect=map_rep[self.tgt_dialect],
+                    src_dialect=DIALECT_MAP[self.src_dialect],
+                    tgt_dialect=DIALECT_MAP[self.tgt_dialect],
                     sql=input_sql,
                     hint=hint,
                     example=example
@@ -366,12 +352,12 @@ class Translate:
                 document = self.get_document_description(piece)
                 # Use retrieval enhanced prompt template
                 sys_prompt = SYSTEM_PROMPT_RET.format(
-                    src_dialect=map_rep[self.src_dialect],
-                    tgt_dialect=map_rep[self.tgt_dialect]
+                    src_dialect=DIALECT_MAP[self.src_dialect],
+                    tgt_dialect=DIALECT_MAP[self.tgt_dialect]
                 ).strip("\n")
                 user_prompt = USER_PROMPT_RET.format(
-                    src_dialect=map_rep[self.src_dialect],
-                    tgt_dialect=map_rep[self.tgt_dialect],
+                    src_dialect=DIALECT_MAP[self.src_dialect],
+                    tgt_dialect=DIALECT_MAP[self.tgt_dialect],
                     sql=input_sql,
                     hint=hint,
                     example=example,
@@ -380,12 +366,12 @@ class Translate:
         else:  # Retrieval enhancement not enabled
             # Use normal conversion prompt template
             sys_prompt = SYSTEM_PROMPT_NA.format(
-                src_dialect=map_rep[self.src_dialect],
-                tgt_dialect=map_rep[self.tgt_dialect]
+                src_dialect=DIALECT_MAP[self.src_dialect],
+                tgt_dialect=DIALECT_MAP[self.tgt_dialect]
             ).strip("\n")
             user_prompt = USER_PROMPT_NA.format(
-                src_dialect=map_rep[self.src_dialect],
-                tgt_dialect=map_rep[self.tgt_dialect],
+                src_dialect=DIALECT_MAP[self.src_dialect],
+                tgt_dialect=DIALECT_MAP[self.tgt_dialect],
                 sql=input_sql,
                 example=example
             ).strip("\n")
@@ -473,6 +459,22 @@ class Translate:
 
         return root_node, all_pieces
 
+    def get_restore_piece_flag(self, assist_info, piece, last_time_piece, ori_piece):
+        back_flag = False
+        if assist_info is not None and assist_info.endswith("translate error"):
+            match = re.search(r'Function\s+(\w+)\s+translate\s+error', assist_info)
+            if match:
+                back_flag = True
+                func_name = match.group(1)
+                assert func_name.lower() == get_func_name(ori_piece['Keyword'])
+            else:
+                raise Exception("Error occurs while parsing Function messages")
+
+        elif last_time_piece is not None and last_time_piece['Node'] == piece['Node']:
+            back_flag = True
+
+        return back_flag
+
     def get_document_description(self, piece):
         """Get related document description for SQL segment
         
@@ -550,11 +552,11 @@ class Translate:
             # Build document description
             document.append({
                 # Source dialect segment description
-                f"{map_rep[self.src_dialect]} snippet": (
+                f"{DIALECT_MAP[self.src_dialect]} snippet": (
                     f"`{key}`: {desc.split('--separator--')[-1][:CHUNK_SIZE]}..."
                 ),
                 # Target dialect segment description
-                f"{map_rep[self.tgt_dialect]} snippet": [
+                f"{DIALECT_MAP[self.tgt_dialect]} snippet": [
                     f"`{tk}`: {tdesc[:CHUNK_SIZE]}" for tk, tdesc in zip(tgt_key, tgt_desc)
                 ]
             })
@@ -673,8 +675,8 @@ class Translate:
 
             # Build new user prompt for reflection and evaluation of current conversion result
             user_prompt = USER_PROMPT_REFLECT.format(
-                src_dialect=map_rep[self.src_dialect],
-                tgt_dialect=map_rep[self.tgt_dialect],
+                src_dialect=DIALECT_MAP[self.src_dialect],
+                tgt_dialect=DIALECT_MAP[self.tgt_dialect],
                 src_sql=src_sql,
                 tgt_sql=current_sql,
                 snippet=f"`{str(last_time_piece['Node'])}`"
@@ -799,8 +801,8 @@ class Translate:
         history, model_ans_list = list(), list()
 
         sys_prompt = None
-        user_prompt = USER_PROMPT_DIR.format(src_dialect=map_rep[self.src_dialect],
-                                             tgt_dialect=map_rep[self.tgt_dialect], sql=self.src_sql).strip("\n")
+        user_prompt = USER_PROMPT_DIR.format(src_dialect=DIALECT_MAP[self.src_dialect],
+                                             tgt_dialect=DIALECT_MAP[self.tgt_dialect], sql=self.src_sql).strip("\n")
 
         answer = translator.trans_func(history, sys_prompt, user_prompt, out_json=True)
         current_sql = answer["Answer"]

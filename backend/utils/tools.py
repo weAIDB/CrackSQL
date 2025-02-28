@@ -3,7 +3,6 @@ import re
 import sys
 import traceback
 
-from typing import List
 import os
 import openai
 import configparser
@@ -13,6 +12,7 @@ import logging
 import argparse
 
 import sqlglot
+from typing import List
 
 tf_step = 0
 summary_writer = None
@@ -50,8 +50,8 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description="A Cross-lingual Embedding Model.")
 
-    parser.add_argument("--exp_id", type=str, default="exp_func_v2")
-    parser.add_argument("--cache_dir", type=str, default="/data/huggingface")
+    parser.add_argument("--exp_id", type=str, default="exp_id")
+    parser.add_argument("--cache_dir", type=str, default="/data/")
 
     parser.add_argument("--epoch", type=int, default=50)
     parser.add_argument("--lr", type=float, default=0.001)
@@ -152,27 +152,6 @@ def send_request(history: [], sys_prompt, prompt, model="gpt-4-turbo"):
         return response_dict['choices'][0]['message']['content']
 
 
-async def async_send_request(history: [], sys_prompt, prompt):
-    os.environ["OPENAI_API_BASE"] = "your api base for GPT"
-    os.environ["OPENAI_API_KEY"] = "your api key for GPT"
-
-    openai.api_base = os.getenv('OPENAI_API_BASE')
-    async_client = openai.AsyncOpenAI(api_key=os.getenv('OPENAI_API_KEY'),
-                                      base_url=os.getenv('OPENAI_API_BASE'))
-
-    messages = [{"role": "system", "content": sys_prompt}]
-    for message in history:
-        messages.append(message)
-    messages.append({"role": "user", "content": prompt})
-    completion = await async_client.chat.completions.create(
-        model="gpt-4-turbo",
-        messages=messages,
-        temperature=1
-    )
-    await async_client.close()
-    return completion.choices[0].message.content
-
-
 def split2wordlist(terms) -> List[str]:
     """
     """
@@ -232,38 +211,14 @@ def extract_json(bnf: str) -> List[str]:
     return [match.strip() for match in matches]
 
 
-def remove_quotes(s):
-    """
-    """
-    quotes = ['"', "'"]
-    while s and s[0] in quotes and s[0] == s[-1]:
-        s = s[1:-1]
-    return s
-
-
 def remove_comments(code):
     code = re.sub(r'//.*?\n', '\n', code)
     code = re.sub(r'/\*.*?\*/', '', code, flags=re.DOTALL)
     return code.strip()
 
 
-def is_non_terminal(word: str) -> bool:
-    for i in range(len(word)):
-        if word[i] == '_' or ('z' >= word[i] >= 'a'):
-            continue
-        else:
-            return False
-    return True
-
-
 def print_err(word: str):
     print(word, file=sys.stderr)
-
-
-def get_lexer_parser(dialect: str):
-    directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                  'data', 'revised_g4doc', dialect)
-    return os.path.join(directory_path, 'lexer'), os.path.join(directory_path, 'parser')
 
 
 def get_proj_root_path():
@@ -313,13 +268,6 @@ def remove_all_space(ori_str: str):
     return res
 
 
-def only_lower_under_score_digit(word: str):
-    for i in range(len(word)):
-        if not ('z' >= word[i] >= 'a' or '9' >= word[i] >= '0') and word[i] != '_':
-            return False
-    return True
-
-
 def parse_llm_answer(answer, pattern):
     try:
         match = re.search(pattern, answer, re.DOTALL)
@@ -346,9 +294,7 @@ def parse_llm_answer(answer, pattern):
 def parse_llm_answer_v2(model_id, answer_raw, pattern):
     if "gpt-" in model_id.lower():
         answer = answer_raw['choices'][0]['message']['content']
-    elif "llama" in model_id.lower():
-        answer = answer_raw['content']
-    elif "qwen" in model_id.lower():
+    else:
         answer = answer_raw['content']
 
     try:
@@ -412,35 +358,6 @@ def process_history_text(text, role, action):
             text = f"```json\n{text}\n```"
 
     return text
-
-
-def reformat_sql(ori_sql: str):
-    new_sql = sqlglot.parse_one(ori_sql).sql()
-    i = 0
-    j = 0
-    res = ''
-    while i < len(ori_sql):
-        if ori_sql[i] == ' ' or ori_sql[i] == '\t' or ori_sql[i] == '\n':
-            i = i + 1
-        if new_sql[j] == ' ' or new_sql[j] == '\n' or new_sql[j] == '\t':
-            res = res + ' '
-            j = j + 1
-        i2 = i
-        while i2 < len(ori_sql) and ori_sql[i2] != ' ' and ori_sql[i2] != '\t' and ori_sql[i2] != '\n':
-            i2 = i2 + 1
-        j2 = j
-        while j2 < len(new_sql) and new_sql[j2] != ' ' and new_sql[j2] != '\t' and ori_sql[j2] != '\n':
-            j2 = j2 + 1
-        if new_sql[j: j2].startswith(ori_sql[i: i2]):
-            res = res + ori_sql[i: i2]
-            j = j + len(ori_sql[i: i2])
-        else:
-            res = res + " " + ori_sql[i: i2] + " "
-        i = i2 + 1
-    final_res = ''
-    for split_slice in res.strip().split():
-        final_res = final_res + split_slice + " "
-    return final_res.strip()
 
 
 def process_err_msg(msg):

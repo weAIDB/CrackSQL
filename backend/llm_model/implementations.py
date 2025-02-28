@@ -1,5 +1,9 @@
 # backend/llm_model/implementations.py
+import json
 from typing import Dict, Any, List, Union, AsyncGenerator
+
+import requests
+
 from .base import BaseLLM
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
@@ -15,13 +19,14 @@ class CloudLLM(BaseLLM):
 
     def __init__(self, model_config: Dict[str, Any]):
         super().__init__(model_config)  # Call parent constructor first
-        self.llm = ChatOpenAI(
-            model_name=self.model_config.get('name'),
-            openai_api_key=self.model_config.get('api_key'),
-            openai_api_base=self.model_config.get('api_base'),
-            temperature=self.model_config.get('temperature', 0.7),
-            max_tokens=self.model_config.get('max_tokens', 32000)
-        )
+        if 'gpt' in self.model_config.get('name'):
+            self.llm = ChatOpenAI(
+                model_name=self.model_config.get('name'),
+                openai_api_key=self.model_config.get('api_key'),
+                openai_api_base=self.model_config.get('api_base'),
+                temperature=self.model_config.get('temperature', 0.01),
+                max_tokens=self.model_config.get('max_tokens', 32000)
+            )
 
     def validate_config(self) -> bool:
         """Validate model configuration"""
@@ -36,9 +41,16 @@ class CloudLLM(BaseLLM):
                    **kwargs) -> str:
         """Chat using LangChain's ChatOpenAI"""
         try:
-            # Use ainvoke for asynchronous call
-            response = await self.llm.ainvoke(messages)
-            return response.content
+            if 'gpt' in self.model_config.get('name'):
+                # 使用 ainvoke 进行异步调用
+                response = await self.llm.ainvoke(messages)
+                return response.content
+            else:
+                print(self.model_config.get('api_base'))
+                response = requests.request(method="POST", url=self.model_config.get('api_base'),
+                                            data=json.dumps({"messages": messages}))
+                print(response)
+                return json.loads(response.text)
         except Exception as e:
             logger.error(f"Cloud LLM chat error: {str(e)}")
             raise

@@ -23,7 +23,7 @@ class LLMTranslator:
                 messages.append(message)
         messages.append({"role": "user", "content": user_prompt})
 
-        # 使用 asyncio.run() 运行异步调用
+        # use `asyncio.run()` for asynchronous running
         response = asyncio.run(self.model.chat(messages))
 
         # if out_json:
@@ -33,19 +33,19 @@ class LLMTranslator:
         return response
 
     def _extract_json(self, response: str):
-        """从AI回答中提取JSON内容
-        
+        """
+        Extract the desired answer from raw LLM response.
+
         Args:
-            response: AI返回的原始响应
+            response: raw response returned from LLM
             
         Returns:
-            Any: 解析后的JSON对象
+            Any: JSON object after raw response parsing
             
         Raises:
-            ValueError: JSON解析失败
+            ValueError: JSON object parsing failure
         """
         try:
-            # 先尝试直接解析JSON
             try:
                 result = json.loads(response)
             except json.JSONDecodeError:
@@ -53,7 +53,6 @@ class LLMTranslator:
                     response = response.replace("“", '"').replace("”", '"')
                     result = json.loads(response)
                 except json.JSONDecodeError:
-                    # JSON解析失败,尝试使用正则匹配
                     import re
                     pattern = r'```json\s*({[\s\S]*?})\s*```|({[\s\S]*})'
                     match = re.search(pattern, response)
@@ -61,7 +60,6 @@ class LLMTranslator:
                     if not match:
                         raise ValueError("未找到有效的JSON内容")
 
-                    # 获取第一个非None的组
                     json_str = next(group for group in match.groups() if group is not None)
                     result = json.loads(json_str)
             return result

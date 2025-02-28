@@ -14,7 +14,6 @@ from config.cache import cache
 from utils.public import read_yaml
 
 
-
 def create_app(config_name, config_path=None):
     app = Flask(__name__)
 
@@ -129,4 +128,3 @@ def register_api(app, routers):
                         ])
             except Exception as e:
                 raise ValueError(e)
-

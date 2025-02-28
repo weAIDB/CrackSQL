@@ -19,7 +19,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from llama_index.core.node_parser import SimpleFileNodeParser
 
 import sys
-
 sys.path.append("/data/xxxx/index/sql_convertor/LLM4DB")
 
 from retriever.vector_db import VectorDB

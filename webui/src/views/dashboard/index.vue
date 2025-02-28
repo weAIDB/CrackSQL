@@ -24,6 +24,22 @@
           <el-icon class="feature-icon">
             <Document/>
           </el-icon>
+          <h3>PostgreSQL Translate to MySQL</h3>
+          <div class="sql-compare">
+            <div class="sql-block source" @click="useExample(sqlExamples.postgresToMysql.source)">
+              <div class="label">PostgreSQL</div>
+              <code v-html="sqlExamples.postgresToMysql.sourceDisplay || sqlExamples.postgresToMysql.source"></code>
+            </div>
+            <div class="sql-block target">
+              <div class="label">MySQL</div>
+              <code>{{ sqlExamples.postgresToMysql.target }}</code>
+            </div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <el-icon class="feature-icon">
+            <Document/>
+          </el-icon>
           <h3>Oracle Translate to MySQL</h3>
           <div class="sql-compare">
             <div class="sql-block source" @click="useExample(sqlExamples.oracleToMysql.source)">
@@ -274,6 +290,11 @@ const router = useRouter()
 
 // SQL示例数据
 const sqlExamples = reactive({
+  postgresToMysql: {
+    source: 'SELECT DISTINCT "t1"."id" , EXTRACT(YEAR FROM CURRENT_TIMESTAMP) - EXTRACT(YEAR FROM CAST( "t1"."birthday" AS TIMESTAMP )) FROM "patient" AS "t1" INNER JOIN "examination" AS "t2" ON "t1"."id" = "t2"."id" WHERE "t2"."rvvt" = \'+\'',
+    target: "SELECT DISTINCT t1.id , DATE_FORMAT( CAST( CURRENT_TIMESTAMP( ) AS DATETIME ) , '%Y' ) - DATE_FORMAT( CAST( t1.birthday AS DATETIME ) , '%Y' ) FROM patient AS t1 INNER JOIN examination AS t2 ON t1.id = t2.id WHERE t2.rvvt = '+'",
+    sourceDisplay: 'SELECT DISTINCT "t1"."id" , EXTRACT(YEAR FROM CURRENT_TIMESTAMP) - EXTRACT(YEAR FROM CAST( "t1"."birthday" AS TIMESTAMP )) FROM "patient" AS "t1" INNER JOIN "examination" AS "t2" ON "t1"."id" = "t2"."id" WHERE "t2"."rvvt" = \'+\''
+  },
   oracleToMysql: {
     source: "SELECT NVL(employee_name, 'Unknown') as name, TO_CHAR(hire_date, 'YYYY-MM-DD') as hire_date FROM employees WHERE department_id = 10 AND ROWNUM <= 100",
     target: "SELECT IFNULL(employee_name, 'Unknown') as name, DATE_FORMAT(hire_date, '%Y-%m-%d') as hire_date FROM employees WHERE department_id = 10 LIMIT 100",

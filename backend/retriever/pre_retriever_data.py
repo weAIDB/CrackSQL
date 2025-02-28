@@ -281,8 +281,6 @@ def pre_coarse_data():
     with open(data_save, "w") as wf:
         json.dump(all_data, wf, indent=2)
 
-    print(1)
-
 
 def merge_lists(lists):
     lis = list()
@@ -478,8 +476,6 @@ def pre_func_fine_data_model():
                             if func_name.split("(")[0].lower() in all_data[d_temp].keys():
                                 # all_function
                                 all_data[db][key].extend(all_data[d_temp][func_name.split("(")[0].lower()])
-
-                            print(1)
 
 
                 elif db == "oracle":

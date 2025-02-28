@@ -1,7 +1,4 @@
 import re
-import subprocess
-import sys
-
 import time
 
 import func_timeout
@@ -10,21 +7,14 @@ from func_timeout import func_set_timeout
 import paramiko
 import pymysql
 from pymysql.err import Error
-
 import psycopg2
 from psycopg2 import Error
-
 import cx_Oracle
 
-# from utils.tools import load_config
 from utils.constants import oracle_locate_open
 
 mysql_conn_map = {}
 mysql_cursor_map = {}
-
-
-# config = load_config()
-# oracle_locate_open = config['oracle_locate_open']
 
 
 def sql_execute(dialect: str, tgt_db_config: dict, sql: str):
