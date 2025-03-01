@@ -75,7 +75,6 @@ def create_app(config_name, config_path=None):
     if app.config.get("SCHEDULER_OPEN"):
         scheduler_init(app)
 
-    print(type(models))
     app.app_context().push()
     return app
 

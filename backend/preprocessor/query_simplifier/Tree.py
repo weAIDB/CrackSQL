@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from antlr4.tree.Tree import TerminalNodeImpl
@@ -230,7 +231,7 @@ class TreeNode:
                 node_stack[len(node_stack) - 1].add_child(cur_node)
             i = i + 1
         if len(node_stack) != 0:
-            print("error when parse to antlr Tree", file=sys.stderr)
+            logging.error("error when parse to antlr Tree", file=sys.stderr)
         TreeNode.clean_node(res, res.dialect)
         return res
 

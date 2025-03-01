@@ -21,3 +21,10 @@ DIALECT_MAP = {
     'mysql': "MySQL 8.4",
     'oracle': "Oracle 11g"
 }
+
+TRANSLATION_RESULT_TEMP = r"""
+The translated SQL is:
+```sql
+{translated_sql}
+```
+"""

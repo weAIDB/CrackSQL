@@ -1,3 +1,4 @@
+import logging
 import re
 import time
 
@@ -42,7 +43,7 @@ def mysql_db_connect(db_config):
         if connection.open:
             return connection, cursor
     except Error as e:
-        print(f"Error while connecting to MySQL: {e}")
+        logging.error(f"Error while connecting to MySQL: {e}")
 
 
 def mysql_sql_execute(db_config: dict, sql):
@@ -67,7 +68,7 @@ def close_mysql_connnect(dbname: str):
     if connection.is_connected():
         cursor.close()
         connection.close()
-        print("MySQL connection is closed")
+        logging.info("MySQL connection is closed")
 
 
 pg_conn_map = {}
@@ -91,7 +92,7 @@ def pg_db_connect(db_config):
             return connection, cursor
 
     except (Exception, Error) as error:
-        print(f"Error while connecting to PostgreSQL: {error}")
+        logging.error(f"Error while connecting to PostgreSQL: {error}")
 
 
 def pg_sql_execute(db_config: dict, sql):
@@ -119,7 +120,7 @@ def close_pg_connect(db_name: str):
     if connection:
         cursor.close()
         connection.close()
-        print("PostgreSQL connection is closed")
+        logging.info("PostgreSQL connection is closed")
 
 
 oracle_conn_map = {}
@@ -207,4 +208,4 @@ def close_oracle_connect(db_name: str):
     if connection:
         cursor.close()
         connection.close()
-        print("Oracle connection is closed")
+        logging.info("Oracle connection is closed")

@@ -1,11 +1,10 @@
-import json
 from typing import Dict
 
-from preprocessor.query_simplifier.Tree import TreeNode
-from preprocessor.TreeParser.antlr_tree.antlr_tree_parser import parse_antlr
-from utils.tools import *
 from preprocessor.TreeParser.antlr_tree.antlr_tree_node import *
+from preprocessor.TreeParser.antlr_tree.antlr_tree_parser import parse_antlr
 from preprocessor.antlr_parser.parse_tree import parse_tree
+from preprocessor.query_simplifier.Tree import TreeNode
+from utils.tools import *
 
 """
 Used to generate a syntax tree for a given keyword
@@ -46,8 +45,6 @@ banned_none_key_word = {
 
     }
 }
-
-# dbg = (load_config())['dbg']
 
 un_reach = -200
 
@@ -99,10 +96,7 @@ def make_trees_up_to_down(keywords: str, src: str, dialect: str):
             paths[nodes[i].value] = paths[nodes[i].value][k - 1:]
             paths[nodes[i].value][len(paths[nodes[i].value]) - 1] = rep2keyword[
                 paths[nodes[i].value][len(paths[nodes[i].value]) - 1]]
-    # if dbg:
-    #     print('public_route:' + str(public_route))
-    #     for key, value in paths.items():
-    #         print(str(key) + " route:" + str(value))
+
     return focus_keywords, public_route, paths, rep2keyword, keyword2rep, grammar_rule_name
 
 
@@ -153,14 +147,14 @@ def make_trees_revised(keywords: str, src: str, dialect: str):
                 nodes.append(mask)
     if cnt_keyword == 0:
         return None, None, ''
-        
+
     """for each keyword find the path from root to it"""
     visit = set()
     interval_dfs(root_node, visit, {}, {}, {},
                  [], banned_none_key_word[dialect])
     if len(final_paths) == 0:
         print('err in find ' + keywords)
-        
+
     best_road_len = 1 << 20
     best_max_len = 1 << 20
     best_min_len = 1 << 20
@@ -220,6 +214,7 @@ def make_trees_revised(keywords: str, src: str, dialect: str):
             best_min_len = min_len
             best_min_nodes = len(nodes_num)
     return best_pub_road, best_paths, get_str_rep(best_pub_road, best_paths)
+
 
 def get_str_rep(pub_road, paths):
     res_str = ''
@@ -353,7 +348,7 @@ class PosRes:
 
         def sort_key(item):
             left, right, path = item
-            
+
             path_str = ''.join(map(str, path))
             return (left, right, path_str)
 
@@ -363,7 +358,7 @@ class PosRes:
         self.check_correct()
 
     def __dedup(self):
-        
+
         res_left = []
         res_right = []
         res_paths = []
@@ -374,7 +369,7 @@ class PosRes:
             res_right.append(self.right[0])
             res_paths.append(self.paths[0])
         while j < len(self.left) and i < len(self.left):
-            
+
             while (j < len(self.left) and self.left[j] == res_left[i]
                    and self.right[j] == res_right[i] and paths_equal(self.paths[j], res_paths[i]) == 0):
                 j = j + 1
@@ -395,7 +390,7 @@ class PosRes:
 
         def sort_key(item):
             left, right, path = item
-            
+
             path_str = ''.join(map(str, path))
             return (left, right, path_str)
 
@@ -405,7 +400,7 @@ class PosRes:
         self.check_correct()
 
     def is_equal(self, pos_res):
-        
+
         if len(self.left) != len(pos_res.left):
             return False
         self.sort_left()
@@ -555,8 +550,8 @@ def interval_dfs(node0: AntlrRuleNode, visit: set, prefix_word: Dict[str, PosRes
                 body.add_new_keyword(i, temp_idx)
                 body.can_blank = False
                 postfix.add_new_keyword(i, temp_idx)
-                if dbg:
-                    print('find ' + node0.value + " " + str(cur_path))
+                # if dbg:
+                #     print('find ' + node0.value + " " + str(cur_path))
         cur_path.pop()
     elif node0.node_type == NodeType.NONE_KEYWORD or node0.node_type == NodeType.ROOT_NONE_KEYWORD:
         can_empty = True
@@ -619,22 +614,22 @@ def interval_dfs(node0: AntlrRuleNode, visit: set, prefix_word: Dict[str, PosRes
     if can_empty:
         body.add_empty()
 
-    if dbg:
-        print("VAL-----:" + node0.value)
-        print(prefix)
-        print(body)
-        print(postfix)
+    # if dbg:
+    #     print("VAL-----:" + node0.value)
+    #     print(prefix)
+    #     print(body)
+    #     print(postfix)
     return prefix, body, postfix
 
 
 def check_fit(postfix: PosRes, prefix: PosRes):
     postfix.sort_right()
     prefix.sort_left()
-    if dbg:
-        print("in_check_fit")
-        print("~check")
-        print(postfix)
-        print(prefix)
+    # if dbg:
+    #     print("in_check_fit")
+    #     print("~check")
+    #     print(postfix)
+    #     print(prefix)
     pre_len = 1 if nodes[0] == mask else 0
     post_len = len(nodes) - 1 if nodes[len(nodes) - 1] == mask else len(nodes)
     if pre_len == post_len - 1:
@@ -642,14 +637,14 @@ def check_fit(postfix: PosRes, prefix: PosRes):
             if postfix.left[i] == pre_len and postfix.right[i] == pre_len + 1:
                 res_path = [postfix.paths[i][0]]
                 final_paths.append(res_path)
-                if dbg:
-                    print("find_way")
+                # if dbg:
+                #     print("find_way")
         for i in range(len(prefix.left)):
             if prefix.left[i] == pre_len and prefix.right[i] == pre_len + 1:
                 res_path = [prefix.paths[i][0]]
                 final_paths.append(res_path)
-                if dbg:
-                    print("find_way")
+                # if dbg:
+                #     print("find_way")
     else:
         for i in range(len(postfix.left)):
             for j in range(len(prefix.left)):
@@ -663,18 +658,18 @@ def check_fit(postfix: PosRes, prefix: PosRes):
                         if prefix.paths[j][i2] != un_reach:
                             res_path[i2] = prefix.paths[j][i2]
                     final_paths.append(res_path)
-                    if dbg:
-                        print("find_way")
-    if dbg:
-        print("~endcheck")
+    #                 if dbg:
+    #                     print("find_way")
+    # if dbg:
+    #     print("~endcheck")
 
 
 def update_body(body: PosRes, child_body: PosRes, flag: bool):
     updated_body = PosRes(body.length)
-    if dbg:
-        print("enter---body")
-        print(body)
-        print(child_body)
+    # if dbg:
+    #     print("enter---body")
+    #     print(body)
+    #     print(child_body)
     if body.can_blank or flag:
         # Add all of child_body
         for i in range(len(child_body.left)):
@@ -702,17 +697,17 @@ def update_body(body: PosRes, child_body: PosRes, flag: bool):
     body.right = updated_body.right
     body.paths = updated_body.paths
     body.can_blank = body.can_blank and child_body.can_blank
-    if dbg:
-        print(body)
-        print("end---body")
+    # if dbg:
+    #     print(body)
+    #     print("end---body")
 
 
 def update_prefix(prefix: PosRes, body: PosRes, child_prefix: PosRes, flag: bool):
-    if dbg:
-        print("enter---prefix")
-        print(prefix)
-        print(body)
-        print(child_prefix)
+    # if dbg:
+    #     print("enter---prefix")
+    #     print(prefix)
+    #     print(body)
+    #     print(child_prefix)
     if body.can_blank or flag:
         # Add all the information in child_prefix
         for i in range(len(child_prefix.left)):
@@ -727,17 +722,17 @@ def update_prefix(prefix: PosRes, body: PosRes, child_prefix: PosRes, flag: bool
             if can_merge(body, i, child_prefix, j):
                 prefix.add_merge(body, i, child_prefix, j)
     prefix.sort_left()
-    if dbg:
-        print(prefix)
-        print("end---prefix")
+    # if dbg:
+    #     print(prefix)
+    #     print("end---prefix")
 
 
 def update_postfix(postfix: PosRes, child_body: PosRes, child_postfix: PosRes):
-    if dbg:
-        print("enter---postfix")
-        print(postfix)
-        print(child_body)
-        print(child_postfix)
+    # if dbg:
+    #     print("enter---postfix")
+    #     print(postfix)
+    #     print(child_body)
+    #     print(child_postfix)
     updated_postfix = PosRes(postfix.length)
     if child_body.can_blank:
         # Clear the previous postfix
@@ -757,9 +752,9 @@ def update_postfix(postfix: PosRes, child_body: PosRes, child_postfix: PosRes):
     postfix.right = updated_postfix.right
     postfix.paths = updated_postfix.paths
     postfix.sort_left()
-    if dbg:
-        print(postfix)
-        print("end---postfix")
+    # if dbg:
+    #     print(postfix)
+    #     print("end---postfix")
 
 
 def dfs(node0: AntlrRuleNode, visit: Dict, left: int,
@@ -777,10 +772,10 @@ def dfs(node0: AntlrRuleNode, visit: Dict, left: int,
             for j in range(len(cur_path)):
                 route_path.append(cur_path[j])
             route_path.append(node0.value)
-            print('find: ' + str(route_path))
+            # print('find: ' + str(route_path))
             paths[node0.value] = route_path
         else:
-            
+
             ans_left = roll_back(left, node0)
             ans_right = right
     elif node0.node_type == NodeType.NONE_KEYWORD or node0.node_type == NodeType.ROOT_NONE_KEYWORD:
@@ -877,8 +872,8 @@ def interval_tree_node_dfs(node0: TreeNode, visit: set, cur_path: list) -> tuple
                 prefix.add_new_keyword(i, temp_idx)
                 body.add_new_keyword(i, temp_idx)
                 postfix.add_new_keyword(i, temp_idx)
-                if dbg:
-                    print('find ' + node0.value + " " + str(cur_path))
+                # if dbg:
+                #     print('find ' + node0.value + " " + str(cur_path))
         cur_path.pop()
     else:
         flag = True
@@ -891,11 +886,11 @@ def interval_tree_node_dfs(node0: TreeNode, visit: set, cur_path: list) -> tuple
             update_postfix(postfix, child_body, child_postfix)
             flag = False
         cur_path.pop()
-    if dbg:
-        print("VAL-----:" + node0.value)
-        print(prefix)
-        print(body)
-        print(postfix)
+    # if dbg:
+    #     print("VAL-----:" + node0.value)
+    #     print(prefix)
+    #     print(body)
+    #     print(postfix)
     return prefix, body, postfix
 
 
@@ -920,7 +915,7 @@ def make_tree_gpt(keywords: str, description: str, dialect: str):
 
     if cnt_keyword == 0:
         return '', ''
-        
+
     """for each keyword find the path from root to it"""
     visit = set()
     example = give_example(keywords, description, dialect)
@@ -1024,7 +1019,7 @@ def make_tree_demo(keywords: str, dialect: str, example_demo):
 
     if cnt_keyword == 0:
         return ''
-        
+
     """for each keyword find the path from root to it"""
     visit = set()
     final_example = example_demo

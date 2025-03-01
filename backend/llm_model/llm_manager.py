@@ -5,7 +5,6 @@ from models import LLMModel
 import logging
 from config.db_config import db_session_manager
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -40,7 +39,6 @@ class LLMManager:
         except Exception as e:
             logger.error(f"Failed to load model {model_config['name']}: {str(e)}")
             return None
-    
 
     @db_session_manager
     def get_model_config_from_db(self, name: str) -> Optional[Dict]:
@@ -66,7 +64,6 @@ class LLMManager:
 
         return model_config
 
-
     def reload_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
         """
         Reload model
@@ -85,7 +82,6 @@ class LLMManager:
         # Reload model
         return self.get_model(name, config)
 
-
     def get_model(self, name: str, config: Optional[Dict] = None) -> Optional[BaseLLM]:
         """Get model instance
         Args:
@@ -102,7 +98,8 @@ class LLMManager:
                     return None
             else:
                 # Use dictionary access method
-                if config['deployment_type'] == 'cloud' and (config.get('api_base') is None or config.get('api_key') is None):
+                if config['deployment_type'] == 'cloud' and (
+                        config.get('api_base') is None or config.get('api_key') is None):
                     logger.error(f"Model configuration parameters are incomplete: {config['name']}")
                     return None
                 elif config['deployment_type'] == 'local' and config.get('model_path') is None:
@@ -110,7 +107,6 @@ class LLMManager:
                     return None
             return self.load_model(config)
         return self._models.get(name)
-
 
     def release_model(self, model_name: str):
         """Release model"""
@@ -123,6 +119,7 @@ class LLMManager:
         for model_name in self._models:
             self._models[model_name].release()
         self._models.clear()
+
 
 # Global LLM manager instance
 llm_manager = LLMManager()

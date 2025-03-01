@@ -3,7 +3,6 @@ import json
 
 def remove_redundant_paren(target_str: str) -> str:
     terms = target_str.split()
-    print(terms)
     res = ""
     left_paren = 0
     for term in terms:
@@ -22,7 +21,6 @@ def remove_redundant_paren(target_str: str) -> str:
 
 def remake_paren(target_str: str):
     terms = target_str.split()
-    print(terms)
     res = ""
     i = 0
     while i < len(terms):
@@ -47,7 +45,6 @@ def all_r_bracket(term):
 
 def remake_r_paren(target_str: str):
     terms = target_str.split()
-    print(terms)
     res = ""
     i = 0
     while i < len(terms):
