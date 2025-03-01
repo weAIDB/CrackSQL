@@ -23,7 +23,7 @@ from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER
 
 from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
-from utils.tools import parse_llm_answer_v2, process_err_msg, process_history_text
+from utils.tools import process_err_msg, process_history_text
 
 
 # rule translation
@@ -382,13 +382,12 @@ class Translate:
         answer_raw = self.translator.trans_func(
             history,
             sys_prompt,
-            user_prompt,
-            out_json=True
+            user_prompt
         )
 
         # Parse model answer using regex
         pattern = TRANSLATION_ANSWER_PATTERN
-        res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
+        res = self.translator.parse_llm_answer(answer_raw, pattern)
         self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="translate"),
                          step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
 
@@ -497,8 +496,6 @@ class Translate:
                 src_detail.append({"Description": sub_piece['Description'],
                                    "Type": sub_piece['Type'],
                                    "Detail": sub_piece['Detail']})
-
-        print("src_key", src_key)
 
         # Store retrieved document information
         document = list()
@@ -749,7 +746,7 @@ class Translate:
 
         # Use regular expression to parse model answer
         pattern = JUDGE_ANSWER_PATTERN
-        res = parse_llm_answer_v2(self.translator.model_name, answer_raw, pattern)
+        res = self.translator.parse_llm_answer(answer_raw, pattern)
         self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="judge"),
                          step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
 
@@ -800,11 +797,11 @@ class Translate:
         translator = LLMTranslator(self.model_name)
         history, model_ans_list = list(), list()
 
-        sys_prompt = None
-        user_prompt = USER_PROMPT_DIR.format(src_dialect=DIALECT_MAP[self.src_dialect],
-                                             tgt_dialect=DIALECT_MAP[self.tgt_dialect], sql=self.src_sql).strip("\n")
+        sys_prompt = SYSTEM_PROMPT_NA
+        user_prompt = USER_PROMPT_NA.format(src_dialect=DIALECT_MAP[self.src_dialect],
+                                            tgt_dialect=DIALECT_MAP[self.tgt_dialect], sql=self.src_sql).strip("\n")
 
-        answer = translator.trans_func(history, sys_prompt, user_prompt, out_json=True)
+        answer = translator.trans_func(history, sys_prompt, user_prompt)
         current_sql = answer["Answer"]
         answer_raw = {}
         answer_raw["Action"] = "translate"

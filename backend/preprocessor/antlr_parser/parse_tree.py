@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from antlr4 import *
@@ -44,7 +45,7 @@ def parse_pg_tree(src_sql: str) -> (str, int, int, str):
     except SelfParseError as e:
         return None, e.line, e.column, e.msg
     except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
+        logging.error(f"An error occurred: {e}", file=sys.stderr)
         raise e
 
 
@@ -61,7 +62,7 @@ def parse_mysql_tree(src_sql: str):
     except SelfParseError as e:
         return None, e.line, e.column, e.msg
     except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
+        logging.error(f"An error occurred: {e}", file=sys.stderr)
         raise e
 
 
@@ -78,7 +79,7 @@ def parse_oracle_tree(src_sql: str):
     except SelfParseError as e:
         return None, e.line, e.column, e.msg
     except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
+        logging.error(f"An error occurred: {e}", file=sys.stderr)
         return None, -1, -1, ''
 
 

@@ -1,3 +1,5 @@
+import logging
+
 from api.utils.response import ResMsg
 from api.utils.util import route
 from flask import Blueprint, request
@@ -149,7 +151,7 @@ def load_llm_model():
     """Load model"""
     res = ResMsg()
     data = request.get_json()
-    print("load_model", data.get('model_name'))
+    logging.info("load_model", data.get('model_name'))
     if not data.get('model_name'):
         res.update(code=400, msg="Missing model name")
         return res.data

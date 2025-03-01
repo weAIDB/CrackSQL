@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 from config.logging_config import logger
-from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, OUT_TYPE, RETRIEVAL_ON
+from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, OUT_TYPE, RETRIEVAL_ON, TRANSLATION_RESULT_TEMP
 
 
 # TODO:
@@ -54,13 +54,12 @@ class RewriteService:
                 engine.dispose()
 
     @staticmethod
-    def create_history(source_db_type: str, original_sql: str, source_kb_id: int, target_kb_id: int, target_db_id: int,
-                       llm_model_name: str) -> dict:
+    def create_history(source_db_type: str, original_sql: str, source_kb_id: int,
+                       target_kb_id: int, target_db_id: int, llm_model_name: str) -> dict:
         """Create rewrite history"""
 
         # Validate target database connection
         try:
-
             target_db = DatabaseConfig.query.get(target_db_id)
             if not target_db:
                 raise ValueError(f"Target database does not exist: {target_db_id}")
@@ -126,12 +125,12 @@ class RewriteService:
             'error_message': history.error_message,
             'rewritten_sql': history.rewritten_sql
         }
-        
+
         # 计算持续时间
         if history.created_at and history.updated_at:
             # 计算时间差（秒）
             time_diff = (history.updated_at - history.created_at).total_seconds()
-            
+
             # 格式化持续时间
             if time_diff < 60:
                 duration = f"{int(time_diff)}秒"
@@ -147,7 +146,7 @@ class RewriteService:
                 days = int(time_diff // 86400)
                 hours = int((time_diff % 86400) // 3600)
                 duration = f"{days}天{hours}小时"
-            
+
             history_dict['duration'] = duration
         else:
             history_dict['duration'] = "未知"
@@ -258,7 +257,10 @@ class RewriteService:
                 raise ValueError(f"Rewrite history does not exist: {history_id}")
             try:
                 from translate import Translate
-                # Original SQL, source database type, source database knowledge base, target database type, target database knowledge base, target database Host, target database Port, target database User, target database Password, LLM-Model-Name
+                # Original SQL, source database type, source database knowledge base,
+                # target database type, target database knowledge base,
+                # target database Host, target database Port, target database User,
+                # target database Password, LLM-Model-Name
                 target_db = DatabaseConfig.query.get(history.target_db_id)
                 target_db_config = {
                     "host": target_db.host,
@@ -274,21 +276,23 @@ class RewriteService:
                     "tgt_embedding_model_name": history.original_kb.embedding_model_name,
                 }
 
-                translate = Translate(model_name=history.llm_model_name, src_sql=history.original_sql,
-                                      src_dialect=history.source_db_type.lower(),
-                                      tgt_dialect=history.target_db.db_type.lower(),
-                                      tgt_db_config=target_db_config, vector_config=vector_config,
-                                      history_id=history_id, out_type=OUT_TYPE, retrieval_on=RETRIEVAL_ON, top_k=TOP_K)
-                current_sql, model_ans_list, \
-                    used_pieces, lift_histories = translate.local_to_global_rewrite(max_retry_time=MAX_RETRY_TIME)
+                translator = Translate(model_name=history.llm_model_name, src_sql=history.original_sql,
+                                       src_dialect=history.source_db_type.lower(),
+                                       tgt_dialect=history.target_db.db_type.lower(),
+                                       tgt_db_config=target_db_config, vector_config=vector_config,
+                                       history_id=history_id, out_type=OUT_TYPE, retrieval_on=RETRIEVAL_ON, top_k=TOP_K)
+                translated_sql, model_ans_list, \
+                    used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=MAX_RETRY_TIME)
 
-                if current_sql != FAILED_TEMPLATE:
+                if translated_sql != FAILED_TEMPLATE:
+                    content = TRANSLATION_RESULT_TEMP.format(translated_sql=translated_sql)
+
                     RewriteService.add_rewrite_process(
                         history_id=history_id,
-                        content=f"The translated SQL is:\n ```{current_sql}```",
-                        step_name="Error Message",
+                        content=content,
+                        step_name="Rewrite result",
                         role='assistant',
-                        is_success=False
+                        is_success=True
                     )
                     RewriteService.update_rewrite_status(
                         history_id=history_id,
@@ -339,16 +343,16 @@ class RewriteService:
         history = db.session.query(RewriteHistory).get(history_id)
         if not history:
             raise ValueError(f"Rewrite history does not exist: {history_id}")
-            
+
         # Check if the history is in processing status
         if history.status == RewriteStatus.PROCESSING:
             raise ValueError("Cannot delete history in processing status")
-            
+
         # Delete associated processes first
         db.session.query(RewriteProcess).filter_by(history_id=history_id).delete()
-        
+
         # Delete the history record
         db.session.delete(history)
         db.session.commit()
-        
+
         return {"success": True, "message": "History deleted successfully"}

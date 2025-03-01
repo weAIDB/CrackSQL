@@ -1,5 +1,7 @@
-import json
+import re
 import asyncio
+import traceback
+
 from llm_model.llm_manager import llm_manager
 
 
@@ -10,7 +12,7 @@ class LLMTranslator:
         self.model = llm_manager.get_model(self.model_name, self.model_conf)
         self.trans_func = self.chat
 
-    def chat(self, history: [], sys_prompt, user_prompt, out_json=False):
+    def chat(self, history: [], sys_prompt, user_prompt):
         if sys_prompt is not None:
             messages = [{"role": "system", "content": sys_prompt}]
         else:
@@ -26,43 +28,38 @@ class LLMTranslator:
         # use `asyncio.run()` for asynchronous running
         response = asyncio.run(self.model.chat(messages))
 
-        # if out_json:
-        #     # return self._extract_json(response)
-        #     response_parsed = parse_llm_answer_v2(self.model_name, response, TRANSLATION_FORMAT)
-
         return response
 
-    def _extract_json(self, response: str):
-        """
-        Extract the desired answer from raw LLM response.
+    def parse_llm_answer(self, answer_raw, pattern):
+        if "choices" in answer_raw.keys():
+            answer = answer_raw['choices'][0]['message']['content']
+        else:
+            answer = answer_raw['content']
 
-        Args:
-            response: raw response returned from LLM
-            
-        Returns:
-            Any: JSON object after raw response parsing
-            
-        Raises:
-            ValueError: JSON object parsing failure
-        """
         try:
-            try:
-                result = json.loads(response)
-            except json.JSONDecodeError:
+            match = re.search(pattern, answer, re.DOTALL)
+            if match:
+                answer_extract = match.group(1).strip('"').replace('\\\"', '\"')
+                reasoning = match.group(2).strip('"').replace('\\\"', '\"')
+                confidence = match.group(3).strip('"').replace('\\\"', '\"')
                 try:
-                    response = response.replace("“", '"').replace("”", '"')
-                    result = json.loads(response)
-                except json.JSONDecodeError:
-                    import re
-                    pattern = r'```json\s*({[\s\S]*?})\s*```|({[\s\S]*})'
-                    match = re.search(pattern, response)
+                    confidence = eval(confidence)
+                except Exception as e:
+                    confidence = 0.01
+                    traceback.print_exc()
 
-                    if not match:
-                        raise ValueError("未找到有效的JSON内容")
+                json_content_reflect = {
+                    "Answer": answer_extract,
+                    "Reasoning": reasoning,
+                    "Confidence": confidence
+                }
+                res = json_content_reflect
+            else:
+                res = {"Answer": "Answer not returned in the given format!",
+                       "Reasoning": "Error occurs!",
+                       "Confidence": 0}
 
-                    json_str = next(group for group in match.groups() if group is not None)
-                    result = json.loads(json_str)
-            return result
-
+            return res
         except Exception as e:
-            raise ValueError(f"JSON解析失败: {str(e)}")
+            traceback.print_exc()
+            return {"Answer": str(e), "Reasoning": "Error occurs!", "Confidence": 0}

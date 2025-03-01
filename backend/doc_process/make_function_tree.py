@@ -116,8 +116,6 @@ def mark_pg_tree(tree_rep: str, func_name: str, bracket_flag):
         ans = ans + " ( ))"
     else:
         ans = ans + ")"
-    print(tree_rep)
-    print(ans)
     return ans
 
 
@@ -142,7 +140,6 @@ def make_pg_func_tree():
             i = 1
             while i < len(table):
                 name = table[i]['Function']
-                print(name)
                 temp_func = {}
                 for j in range(len(table_header)):
                     if table_header[j] in table[i]:
@@ -201,7 +198,6 @@ def make_pg_func_tree():
         json.dump(pg_func_res, file, indent=4)
     with open('pg_14_function_todo.json', 'w') as file:
         json.dump(todo_func_res, file, indent=4)
-    print(set1)
 
 
 make_pg_func_tree()

@@ -1,18 +1,15 @@
+import argparse
+import configparser
 import json
+import logging
+import os
 import re
 import sys
 import traceback
-
-import os
-import openai
-import configparser
-import requests
-
-import logging
-import argparse
-
-import sqlglot
 from typing import List
+
+import openai
+import requests
 
 tf_step = 0
 summary_writer = None
@@ -289,41 +286,6 @@ def parse_llm_answer(answer, pattern):
     except Exception as e:
         traceback.print_exc()
         return str(e)
-
-
-def parse_llm_answer_v2(model_id, answer_raw, pattern):
-    if "gpt-" in model_id.lower():
-        answer = answer_raw['choices'][0]['message']['content']
-    else:
-        answer = answer_raw['content']
-
-    try:
-        match = re.search(pattern, answer, re.DOTALL)
-        if match:
-            answer_extract = match.group(1).strip('"').replace('\\\"', '\"')
-            reasoning = match.group(2).strip('"').replace('\\\"', '\"')
-            confidence = match.group(3).strip('"').replace('\\\"', '\"')
-            try:
-                confidence = eval(confidence)
-            except Exception as e:
-                confidence = 0.8
-                traceback.print_exc()
-
-            json_content_reflect = {
-                "Answer": answer_extract,
-                "Reasoning": reasoning,
-                "Confidence": confidence
-            }
-            res = json_content_reflect
-        else:
-            res = {"Answer": "Answer not returned in the given format!",
-                   "Reasoning": "Error occurs!",
-                   "Confidence": 0}
-
-        return res
-    except Exception as e:
-        traceback.print_exc()
-        return {"Answer": str(e), "Reasoning": "Error occurs!", "Confidence": 0}
 
 
 def process_history_text(text, role, action):

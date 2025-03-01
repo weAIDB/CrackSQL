@@ -46,10 +46,8 @@ class CloudLLM(BaseLLM):
                 response = await self.llm.ainvoke(messages)
                 return response.content
             else:
-                print(self.model_config.get('api_base'))
                 response = requests.request(method="POST", url=self.model_config.get('api_base'),
                                             data=json.dumps({"messages": messages}))
-                print(response)
                 return json.loads(response.text)
         except Exception as e:
             logger.error(f"Cloud LLM chat error: {str(e)}")
@@ -70,7 +68,7 @@ class CloudLLM(BaseLLM):
                           messages: List[Union[SystemMessage, HumanMessage]],
                           **kwargs) -> AsyncGenerator[str, None]:
         """Stream chat using LangChain's ChatOpenAI"""
-        print(f"Local LLM chat stream prompt: {messages}")
+        logging.info(f"Local LLM chat stream prompt: {messages}")
         try:
             async for chunk in self.llm.astream(messages):
                 if chunk.content:
@@ -126,7 +124,7 @@ class LocalLLM(BaseLLM):
             # Save configuration
             self.device = device
             self.max_tokens = self.model_config.get('max_tokens', 2000)
-            self.temperature = self.model_config.get('temperature', 0.7)
+            self.temperature = self.model_config.get('temperature', 0.01)
             self.streamer = TextIteratorStreamer(self.tokenizer)
 
             # Set model to evaluation mode
@@ -177,7 +175,7 @@ class LocalLLM(BaseLLM):
                 assistant_response = full_response
 
             logger.info(f"Local LLM chat response: {assistant_response}")
-            print(f"Local LLM chat response: {assistant_response}")
+            logging.info(f"Local LLM chat response: {assistant_response}")
             return response.generations[0][0].text.strip()
         except Exception as e:
             logger.error(f"Local LLM chat error: {str(e)}")
@@ -250,9 +248,6 @@ class LocalLLM(BaseLLM):
 
             thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
             thread.start()
-
-            found_assistant = False
-            current_response = ""
 
             for new_text in self.streamer:
                 yield new_text.strip()
