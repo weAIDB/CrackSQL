@@ -5,6 +5,7 @@ from sqlalchemy import or_
 from llm_model.llm_manager import llm_manager
 from llm_model.embeddings import embedding_manager
 
+
 class LLMModelService:
     """LLM model service"""
 
@@ -148,7 +149,6 @@ class LLMModelService:
             'is_active': model.is_active
         } for model in models], total
 
-
     @staticmethod
     def release_all_llm_models():
         """Release all models"""
@@ -178,4 +178,3 @@ class LLMModelService:
     def release_embedding(model_name: str):
         """Release Embedding model"""
         embedding_manager.release_embedding(model_name)
-        

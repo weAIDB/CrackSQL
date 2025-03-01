@@ -1,15 +1,15 @@
 # backend/llm_model/implementations.py
-import json
-from typing import Dict, Any, List, Union, AsyncGenerator
 
-import requests
+import json
+import openai
+
+import logging
+from threading import Thread
+from typing import Dict, Any, List, Union, AsyncGenerator
+from langchain.schema import SystemMessage, HumanMessage
 
 from .base import BaseLLM
-from langchain.schema import SystemMessage, HumanMessage
-from langchain_openai import ChatOpenAI
-import logging
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
-from threading import Thread
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +19,15 @@ class CloudLLM(BaseLLM):
 
     def __init__(self, model_config: Dict[str, Any]):
         super().__init__(model_config)  # Call parent constructor first
-        if 'gpt' in self.model_config.get('name'):
-            self.llm = ChatOpenAI(
-                model_name=self.model_config.get('name'),
-                openai_api_key=self.model_config.get('api_key'),
-                openai_api_base=self.model_config.get('api_base'),
-                temperature=self.model_config.get('temperature', 0.01),
-                max_tokens=self.model_config.get('max_tokens', 32000)
-            )
+        # self.llm = ChatOpenAI(
+        #     model_name=self.model_config.get('name'),
+        #     openai_api_key=self.model_config.get('api_key'),
+        #     openai_api_base=self.model_config.get('api_base'),
+        #     temperature=self.model_config.get('temperature', 0.01),
+        #     max_tokens=self.model_config.get('max_tokens', 32000)
+        # )
+        self.llm = openai.OpenAI(api_key=self.model_config.get('api_key'),
+                                 base_url=self.model_config.get('api_base'))
 
     def validate_config(self) -> bool:
         """Validate model configuration"""
@@ -36,19 +37,23 @@ class CloudLLM(BaseLLM):
                 raise ValueError(f"Missing required configuration item: {field}")
         return True
 
-    async def chat(self,
-                   messages: List[Union[SystemMessage, HumanMessage]],
-                   **kwargs) -> str:
-        """Chat using LangChain's ChatOpenAI"""
+    def chat(self, messages: List[Dict], **kwargs) -> str:
         try:
-            if 'gpt' in self.model_config.get('name'):
-                # 使用 ainvoke 进行异步调用
-                response = await self.llm.ainvoke(messages)
-                return response.content
-            else:
-                response = requests.request(method="POST", url=self.model_config.get('api_base'),
-                                            data=json.dumps({"messages": messages}))
-                return json.loads(response.text)
+            # response = await self.llm.ainvoke(messages)
+            # return response.content
+            completion = self.llm.chat.completions.create(
+                model=self.model_config.get('name'),
+                messages=messages,
+                max_tokens=self.model_config.get('max_tokens', 32000),
+                temperature=self.model_config.get('temperature', 0.01)
+            )
+            response = json.loads(completion.to_json())
+            response_format = {
+                "role": response['choices'][0]['message']['role'],
+                "content": response['choices'][0]['message']['content'],
+                "raw": response
+            }
+            return response_format
         except Exception as e:
             logger.error(f"Cloud LLM chat error: {str(e)}")
             raise
@@ -87,7 +92,7 @@ class CloudLLM(BaseLLM):
         except Exception as e:
             logger.error(f"Cloud LLM generate stream error: {str(e)}")
             raise
-    
+
     def release(self):
         """Release model resources"""
         # ChatOpenAI doesn't need special release operations
@@ -133,7 +138,7 @@ class LocalLLM(BaseLLM):
         except Exception as e:
             logger.error(f"Failed to load local model: {str(e)}")
             raise
-    
+
     def release(self):
         """Release model resources"""
         if hasattr(self, 'model'):
@@ -141,11 +146,11 @@ class LocalLLM(BaseLLM):
             import torch
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-            
+
             # Delete model reference
             del self.model
             self.model = None
-            
+
         if hasattr(self, 'tokenizer'):
             del self.tokenizer
             self.tokenizer = None
@@ -268,5 +273,3 @@ class LocalLLM(BaseLLM):
         except Exception as e:
             logger.error(f"Local LLM generate stream error: {str(e)}")
             raise
-
-

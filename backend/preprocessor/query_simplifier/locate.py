@@ -11,7 +11,7 @@ from typing import List, Dict
 
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode
-from utils.constants import oracle_locate_open
+from utils.constants import ORACLE_COMMAND_OPEN
 from utils.db_connector import sql_execute
 from utils.tools import remove_all_space, get_proj_root_path
 
@@ -112,7 +112,7 @@ def locate_function(error_info: str, dialect: str, sql: str):
         else:
             return error_info, None, pg_location
     elif dialect == 'oracle':
-        if oracle_locate_open:
+        if ORACLE_COMMAND_OPEN:
             i = 0
             error_lines = error_info.split('\n')
             flag = False

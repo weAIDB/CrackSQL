@@ -13,7 +13,7 @@ from preprocessor.antlr_parser.mysql_parser.MySqlLexer import MySqlLexer
 from preprocessor.antlr_parser.oracle_parser.PlSqlParser import PlSqlParser
 from preprocessor.antlr_parser.oracle_parser.PlSqlLexer import PlSqlLexer
 
-from utils.constants import PARSER_LIST
+from utils.constants import DIALECT_LIST
 
 
 class CustomErrorListener(ErrorListener):
@@ -29,7 +29,7 @@ def parse_tree(src_sql: str, dialect: str) -> (str, int, int, str):
     elif dialect == 'oracle':
         return parse_oracle_tree(src_sql)
     else:
-        raise ValueError("use one of" + str(PARSER_LIST) + " as argument")
+        raise ValueError("use one of" + str(DIALECT_LIST) + " as argument")
 
 
 def parse_pg_tree(src_sql: str) -> (str, int, int, str):
@@ -98,7 +98,7 @@ def get_parser(dialect: str):
         stream = CommonTokenStream(lexer)
         return PlSqlParser(stream)
     else:
-        raise ValueError(f"Only support {PARSER_LIST}")
+        raise ValueError(f"Only support {DIALECT_LIST}")
 
 
 class SelfParseError(Exception):

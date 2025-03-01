@@ -1,7 +1,7 @@
+import os
+import yaml
 import logging
 import logging.config
-import yaml
-import os
 from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_migrate import Migrate

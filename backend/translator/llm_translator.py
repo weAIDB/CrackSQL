@@ -26,16 +26,11 @@ class LLMTranslator:
         messages.append({"role": "user", "content": user_prompt})
 
         # use `asyncio.run()` for asynchronous running
-        response = asyncio.run(self.model.chat(messages))
+        response = self.model.chat(messages)
 
         return response
 
-    def parse_llm_answer(self, answer_raw, pattern):
-        if "choices" in answer_raw.keys():
-            answer = answer_raw['choices'][0]['message']['content']
-        else:
-            answer = answer_raw['content']
-
+    def parse_llm_answer(self, answer, pattern):
         try:
             match = re.search(pattern, answer, re.DOTALL)
             if match:

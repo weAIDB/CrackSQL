@@ -1,6 +1,6 @@
-import logging
 import re
 import time
+import logging
 
 import func_timeout
 from func_timeout import func_set_timeout
@@ -12,7 +12,7 @@ import psycopg2
 from psycopg2 import Error
 import cx_Oracle
 
-from utils.constants import oracle_locate_open
+from utils.constants import ORACLE_COMMAND_OPEN
 
 mysql_conn_map = {}
 mysql_cursor_map = {}
@@ -55,7 +55,7 @@ def mysql_sql_execute(db_config: dict, sql):
     try:
         cursor.execute(sql)
         rows = cursor.fetchall()
-        connection.commit()
+        connection.rollback()
         return True, rows
     except pymysql.Error as e:
         connection.rollback()
@@ -107,7 +107,7 @@ def pg_sql_execute(db_config: dict, sql):
             rows = cursor.fetchall()
         else:
             rows = None
-        connection.commit()
+        connection.rollback()
         return True, rows
     except (Exception, Error) as error:
         connection.rollback()
@@ -169,11 +169,11 @@ def oracle_sql_execute(db_config: dict, sql, flag=False):
     try:
         cursor.execute(sql.strip(';'))
         rows = cursor.fetchall()
-        connection.commit()
+        connection.rollback()
         return True, rows
     except (Exception, Error) as error:
         connection.rollback()
-        if oracle_locate_open:
+        if ORACLE_COMMAND_OPEN:
             ssh = paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
