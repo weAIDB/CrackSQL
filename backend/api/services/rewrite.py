@@ -4,11 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 from config.logging_config import logger
-from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, OUT_TYPE, RETRIEVAL_ON, TRANSLATION_RESULT_TEMP
-
-
-# TODO:
-# out_type
+from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, RETRIEVAL_ON, TRANSLATION_RESULT_TEMP
 
 
 class RewriteService:
@@ -256,7 +252,7 @@ class RewriteService:
             if not history:
                 raise ValueError(f"Rewrite history does not exist: {history_id}")
             try:
-                from translate import Translate
+                from translate import Translator
                 # Original SQL, source database type, source database knowledge base,
                 # target database type, target database knowledge base,
                 # target database Host, target database Port, target database User,
@@ -272,15 +268,14 @@ class RewriteService:
                 vector_config = {
                     "src_kb_name": history.original_kb.kb_name,
                     "tgt_kb_name": history.target_kb.kb_name,
-                    "src_embedding_model_name": history.original_kb.embedding_model_name,
-                    "tgt_embedding_model_name": history.original_kb.embedding_model_name,
+                    "tgt_embedding_model_name": history.target_kb.embedding_model_name,
                 }
 
-                translator = Translate(model_name=history.llm_model_name, src_sql=history.original_sql,
-                                       src_dialect=history.source_db_type.lower(),
-                                       tgt_dialect=history.target_db.db_type.lower(),
-                                       tgt_db_config=target_db_config, vector_config=vector_config,
-                                       history_id=history_id, out_type=OUT_TYPE, retrieval_on=RETRIEVAL_ON, top_k=TOP_K)
+                translator = Translator(model_name=history.llm_model_name, src_sql=history.original_sql,
+                                        src_dialect=history.source_db_type.lower(),
+                                        tgt_dialect=history.target_db.db_type.lower(),
+                                        tgt_db_config=target_db_config, vector_config=vector_config,
+                                        history_id=history_id, out_type="db", retrieval_on=RETRIEVAL_ON, top_k=TOP_K)
                 translated_sql, model_ans_list, \
                     used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=MAX_RETRY_TIME)
 

@@ -1,35 +1,40 @@
+import argparse
+import asyncio
+import copy
+import json
+import os
 import re
 import sys
-import asyncio
-
-import json
-import copy
 import traceback
-import sqlglot
-from typing import Dict
 from datetime import datetime
+from typing import Dict
 
-from utils.constants import DIALECT_MAP, FAILED_TEMPLATE, CHUNK_SIZE, TRANSLATION_ANSWER_PATTERN, JUDGE_ANSWER_PATTERN
+import sqlglot
+from tqdm import tqdm
+
+from app_factory import create_app
+from config.db_config import db_session_manager
+from llm_model.embeddings import get_embeddings
+from models import DatabaseConfig
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode, lift_node
-from preprocessor.query_simplifier.rewrite import get_all_piece
 from preprocessor.query_simplifier.locate import locate_node_piece, replace_piece, get_func_name, find_piece
 from preprocessor.query_simplifier.normalize import normalize
-
+from preprocessor.query_simplifier.rewrite import get_all_piece
+from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
 from translator.llm_translator import LLMTranslator
 from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
     SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_RET, USER_PROMPT_RET, EXAMPLE_PROMPT, JUDGE_INFO_PROMPT
-from translator.judge_prompt import SYSTEM_PROMPT_JUDGE, USER_PROMPT_JUDGE, USER_PROMPT_REFLECT
-
-from llm_model.embeddings import get_embeddings
-from vector_store.chroma_store import ChromaStore
+from utils.constants import DIALECT_MAP, FAILED_TEMPLATE, CHUNK_SIZE, TRANSLATION_ANSWER_PATTERN, \
+    JUDGE_ANSWER_PATTERN, DIALECT_LIST
 from utils.tools import process_err_msg, process_history_text
+from vector_store.chroma_store import ChromaStore
 
 
 # rule translation
 
 
-class Translate:
+class Translator:
     def __init__(self,
                  model_name: str,
                  src_sql: str,
@@ -40,7 +45,8 @@ class Translate:
                  retrieval_on: bool,
                  top_k: int,
                  history_id: str = None,
-                 out_type: str = "db"):
+                 out_type: str = "db",
+                 out_dir: str = None):
         """SQL dialect converter
         
         This class is used to convert one SQL dialect to another, supporting retrieval enhancement and history tracking.
@@ -59,7 +65,6 @@ class Translate:
             vector_config: Vector database configuration, dictionary format including:
                 - src_kb_name: Source dialect vector collection ID
                 - tgt_kb_name: Target dialect vector collection ID
-                - src_embedding_model_name: Source dialect embedding model name
                 - tgt_embedding_model_name: Target dialect embedding model name
             retrieval_on: Whether to enable retrieval
             top_k: Number of most similar results to return during retrieval
@@ -67,6 +72,7 @@ class Translate:
             out_type: Output type, supports:
                 - "db": Results saved to database
                 - "file": Results saved to file
+            out_dir: Output Directory to dump result
         """
         # Basic configuration
         self.model_name = model_name
@@ -85,7 +91,6 @@ class Translate:
         # Embedding model related configuration
         self.src_kb_name = vector_config['src_kb_name']  # Source dialect vector collection
         self.tgt_kb_name = vector_config['tgt_kb_name']  # Target dialect vector collection
-        self.src_embedding_model_name = vector_config['src_embedding_model_name']  # Source dialect embedding model
         self.tgt_embedding_model_name = vector_config['tgt_embedding_model_name']  # Target dialect embedding model
 
         self.retrieval_on = retrieval_on  # Whether to enable retrieval
@@ -94,11 +99,13 @@ class Translate:
         # Other configurations
         self.history_id = history_id  # History record ID
         self.out_type = out_type  # Output type
+        self.out_dir = out_dir  # Output directory
 
         # Initialize core components
         self.translator = LLMTranslator(model_name)  # Initialize LLM translator
         self.vector_db = ChromaStore()  # Initialize vector database
 
+    @db_session_manager
     def local_to_global_rewrite(self, max_retry_time=2):
         """Local SQL rewriting method
         
@@ -387,7 +394,7 @@ class Translate:
 
         # Parse model answer using regex
         pattern = TRANSLATION_ANSWER_PATTERN
-        res = self.translator.parse_llm_answer(answer_raw, pattern)
+        res = self.translator.parse_llm_answer(answer_raw["content"], pattern)
         self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="translate"),
                          step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
 
@@ -746,7 +753,7 @@ class Translate:
 
         # Use regular expression to parse model answer
         pattern = JUDGE_ANSWER_PATTERN
-        res = self.translator.parse_llm_answer(answer_raw, pattern)
+        res = self.translator.parse_llm_answer(answer_raw["content"], pattern)
         self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="judge"),
                          step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
 
@@ -763,7 +770,7 @@ class Translate:
 
         # Determine if further processing is needed
         # When the model believes no modification is needed or the confidence is low, return directly
-        if "NONE" in snippet or "almost equivalent" in str(answer_raw) \
+        if "NONE" in snippet.upper() or "almost equivalent" in str(answer_raw) \
                 or (isinstance(res['Confidence'], float) and res['Confidence'] < 0.8):
             return piece, assist_info, answer_raw
 
@@ -818,21 +825,36 @@ class Translate:
 
     def add_process(self, content, step_name, sql, role, is_success, error):
         if self.out_type == "file":
-            # Add to file
-            pass
+            # Add rewrite result record to file
+            if not os.path.exists(self.out_dir):
+                os.makedirs(self.out_dir)
+
+            res_data = list()
+            file_load = os.path.join(self.out_dir, "single_translation_result.json")
+            if os.path.exists(file_load):
+                with open(file_load, "r") as rf:
+                    res_data = json.load(rf)
+            res_data.append({
+                "role": role, "sql": sql, "content": content,
+                "step_name": step_name, "is_success": is_success,
+                "error": error
+            })
+            with open(file_load, "w") as wf:
+                json.dump(res_data, wf, indent=4)
+
         elif self.out_type == "db":
-            # Add to database
-            # Add rewrite result record
+            # Add rewrite result record to database
             from api.services.rewrite import RewriteService
-            RewriteService.add_rewrite_process(
-                history_id=self.history_id,
-                content=content,
-                step_name=step_name,
-                sql=sql,
-                role=role,
-                is_success=is_success,
-                error=error
-            )
+            if self.history_id is not None:
+                RewriteService.add_rewrite_process(
+                    history_id=self.history_id,
+                    content=content,
+                    step_name=step_name,
+                    sql=sql,
+                    role=role,
+                    is_success=is_success,
+                    error=error
+                )
 
     def update_rewrite_status(self, status, sql, error):
         """Update SQL rewrite status
@@ -861,3 +883,105 @@ class Translate:
             sql=sql,  # SQL statement
             error=error  # Error information
         )
+
+
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description='Run Local to Global Dialect Translation.')
+
+    parser.add_argument('--config_name', type=str,
+                        default='PRODUCTION', help='Configuration app name')
+    parser.add_argument('--config_file', type=str,
+                        default='./config/config.yaml', help='Configuration file path')
+
+    parser.add_argument('--src_dialect', type=str,
+                        help='Source database dialect', choices=DIALECT_LIST)
+    parser.add_argument('--tgt_dialect', type=str,
+                        help='Target database dialect', choices=DIALECT_LIST)
+    parser.add_argument('--src_sql', type=str,
+                        help='Source SQL to be translated or file including multiple Source SQLs')
+
+    parser.add_argument('--src_kb_name', type=str,
+                        help='Source specification base or its file path')
+    parser.add_argument('--tgt_kb_name', type=str,
+                        help='Target specification base or its file path')
+
+    parser.add_argument('--llm_model_name', type=str,
+                        help='LLM for dialect translation')
+    parser.add_argument('--tgt_kb_embedding_model_name', type=str,
+                        help='Target embedding model for dialect translation')
+
+    parser.add_argument('--retrieval_on', action='store_true',
+                        help='Employ specification retrieval for dialect translation')
+    parser.add_argument('--top_k', type=int, default=3,
+                        help='Number of retrieved specification')
+    parser.add_argument('--max_retry_time', type=int, default=2,
+                        help='Maximal translation attempts for one segment')
+
+    parser.add_argument('--out_dir', type=str,
+                        help='Output directory to dump translation result')
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    translated_sql_total, model_ans_list_total = list(), list()
+    used_pieces_total, lift_histories_total = list(), list()
+
+    app = create_app(config_name=args.config_name, config_path=args.config_file)
+    with app.app_context():
+        tgt_db = DatabaseConfig.query.get(1)
+
+        tgt_db_config = {
+            "host": tgt_db.host,
+            "port": tgt_db.port,
+            "user": tgt_db.username,
+            "password": tgt_db.password,
+            "db_name": tgt_db.database
+        }
+        vector_config = {
+            "src_kb_name": args.src_kb_name,
+            "tgt_kb_name": args.tgt_kb_name,
+            "tgt_embedding_model_name": args.tgt_kb_embedding_model_name
+        }
+
+        if os.path.isfile(args.src_sql):
+            with open(args.src_sql, "r") as rf:
+                sql_list = rf.readlines()
+        else:
+            sql_list = [args.src_sql]
+
+        for no, src_sql in tqdm(enumerate(sql_list)):
+            translator = Translator(model_name=args.llm_model_name, src_sql=src_sql,
+                                    src_dialect=args.src_dialect, tgt_dialect=args.tgt_dialect,
+                                    tgt_db_config=tgt_db_config, vector_config=vector_config,
+                                    history_id=None, out_type="file", out_dir=args.out_dir,
+                                    retrieval_on=args.retrieval_on, top_k=args.top_k)
+
+            translated_sql, model_ans_list, \
+            used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=args.max_retry_time)
+
+            translated_sql_total.append(translated_sql)
+            with open(os.path.join(args.out_dir, "translated_sql_total.json"), "w") as wf:
+                json.dump(translated_sql_total, wf, indent=4)
+
+            model_ans_list_total.append(model_ans_list)
+            with open(os.path.join(args.out_dir, "model_ans_list_total.json"), "w") as wf:
+                json.dump(model_ans_list_total, wf, indent=4)
+
+            used_pieces_total.append(used_pieces)
+            with open(os.path.join(args.out_dir, "used_pieces_total.json"), "w") as wf:
+                json.dump(used_pieces_total, wf, indent=4)
+
+            lift_histories_total.append(lift_histories)
+            with open(os.path.join(args.out_dir, "lift_histories_total.json"), "w") as wf:
+                json.dump(lift_histories_total, wf, indent=4)
+
+            print(f"The translated SQL is: {translated_sql}")
+            print(model_ans_list)
+
+
+if __name__ == "__main__":
+    main()

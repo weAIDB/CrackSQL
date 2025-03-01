@@ -6,15 +6,14 @@ Used to create knowledge base and import knowledge files
 """
 
 import os
-import sys
 import json
-import argparse
 import yaml
-from pathlib import Path
-import subprocess
 import time
+import argparse
+import subprocess
 
 # Add project root directory to system path
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import application context
@@ -475,7 +474,7 @@ def main():
     args = parse_args()
 
     # Create application context
-    app = create_app(config_name='PRODUCTION')
+    app = create_app(config_name='PRODUCTION', config_path=args.config_file)
     with app.app_context():
         # Check if database exists
         try:

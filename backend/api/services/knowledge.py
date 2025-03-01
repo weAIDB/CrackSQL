@@ -467,3 +467,7 @@ def delete_knowledge_base(kb_name: str) -> Dict:
         logger.error(f"delete_knowledge_base error: {e}")
         db.session.rollback()
         raise
+
+
+if __name__ == "__main__":
+    get_json_items(kb_name="MySQL")
