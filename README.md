@@ -153,20 +153,20 @@ Welcome to scan the QR code to join the WeChat group!
 If you like this project, please cite our paper:
 
 ```
-@misc{zhou2023llm4diag,
-      title={D-Bot: Database Diagnosis System using Large Language Models}, 
-      author={Xuanhe Zhou, Guoliang Li, Zhaoyan Sun, Zhiyuan Liu, Weize Chen, Jianming Wu, Jiesi Liu, Ruohang Feng, Guoyang Zeng},
-      year={2023},
-      eprint={2312.01454},
-      archivePrefix={arXiv},
-      primaryClass={cs.DB}
+@misc{zhou2025cracksql,
+      title={Cracking SQL Barriers: An LLM-based Dialect Transaltion System}, 
+      author={Wei Zhou, Yuyang Gao, Xuanhe Zhou, and Guoliang Li},
+      year={2025},
+      journal={Proc. {ACM} Manag. Data},
+      volume={3},
+      number={2},
 }
 ```
 
 ## 📧 Contributors
 
-<a href="https://github.com/TsinghuaDatabaseGroup/DB-GPT/network/dependencies">
-  <img src="https://contrib.rocks/image?repo=TsinghuaDatabaseGroup/DB-GPT" />
+<a href="https://github.com/code4DB/CrackSQL/network/dependencies">
+  <img src="https://contrib.rocks/image?repo=code4DB/CrackSQL" />
 </a>
 
 ## 📝 License

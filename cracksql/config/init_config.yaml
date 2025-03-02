@@ -1,0 +1,52 @@
+# 知识库初始化配置文件, 用于初始化知识库和Embedding模型, 该文件只在初始化时使用。 后续修改可直接在数据库中修改。
+
+# LLM模型配置
+LLM_MODELS:
+  - name: "Llama3.1-8B"
+    deployment_type: "cloud"  # cloud 或 local
+    category: "llm"
+    api_base: "http://localhost:30005/v1/"
+    api_key: "sk-1234"  # Please replace with your actual API key
+    path: ""  # Local model path
+    description: "DeepSeek-R1-Distill-Qwen-1.5B LLM model"
+    temperature: 0.0
+    max_tokens: 4096
+
+
+# Embedding model configuration
+EMBEDDING_MODELS:
+  # OpenAI Embedding model
+  - name: "all-MiniLM-L6-v2"
+    deployment_type: "local"  # cloud 或 local
+    category: "embedding"
+    api_base: ""
+    api_key: ""  # Please replace with your actual API key
+    path: "/data/wei/index/CrackSQL_pypi/data/pretrained_model/all-MiniLM-L6-v2"  # Local model path
+    dimension: 384
+    description: "Embedding model, used to generate text vectors"
+
+# Knowledge base configuration
+KNOWLEDGE_BASES:
+  # MySQL knowledge base
+  - kb_name: "MySQL"
+    db_type: "mysql"
+    kb_info: "MySQL knowledge base, contains MySQL keywords, functions, operators, etc."
+    embedding_model: "all-MiniLM-L6-v2"  # Use the Embedding model defined above
+    knowledge_files:
+      - "/data/wei/index/CrackSQL_pypi/data/processed_document/mysql_8_kb.json"
+
+  # PostgreSQL knowledge base
+  - kb_name: "PostgreSQL"
+    db_type: "postgresql"
+    kb_info: "PostgreSQL knowledge base, contains PostgreSQL keywords, functions, operators, etc."
+    embedding_model: "all-MiniLM-L6-v2"
+    knowledge_files:
+      - "/data/wei/index/CrackSQL_pypi/data/processed_document/pg_14_kb.json"
+
+  # Oracle knowledge base
+  - kb_name: "Oracle"
+    db_type: "oracle"
+    kb_info: "Oracle knowledge base, contains Oracle keywords, functions, operators, etc."
+    embedding_model: "all-MiniLM-L6-v2"
+    knowledge_files:
+      - "/data/wei/index/CrackSQL_pypi/data/processed_document/oracle_11_kb.json"
