@@ -267,8 +267,7 @@ class RewriteService:
                 }
                 vector_config = {
                     "src_kb_name": history.original_kb.kb_name,
-                    "tgt_kb_name": history.target_kb.kb_name,
-                    "tgt_embedding_model_name": history.target_kb.embedding_model_name,
+                    "tgt_kb_name": history.target_kb.kb_name
                 }
 
                 translator = Translator(model_name=history.llm_model_name, src_sql=history.original_sql,

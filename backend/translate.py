@@ -15,7 +15,7 @@ from tqdm import tqdm
 from app_factory import create_app
 from config.db_config import db_session_manager
 from llm_model.embeddings import get_embeddings
-from models import DatabaseConfig
+from models import DatabaseConfig, KnowledgeBase
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode, lift_node
 from preprocessor.query_simplifier.locate import locate_node_piece, replace_piece, get_func_name, find_piece
@@ -65,7 +65,6 @@ class Translator:
             vector_config: Vector database configuration, dictionary format including:
                 - src_kb_name: Source dialect vector collection ID
                 - tgt_kb_name: Target dialect vector collection ID
-                - tgt_embedding_model_name: Target dialect embedding model name
             retrieval_on: Whether to enable retrieval
             top_k: Number of most similar results to return during retrieval
             history_id: History record ID, used to track the conversion process
@@ -91,7 +90,8 @@ class Translator:
         # Embedding model related configuration
         self.src_kb_name = vector_config['src_kb_name']  # Source dialect vector collection
         self.tgt_kb_name = vector_config['tgt_kb_name']  # Target dialect vector collection
-        self.tgt_embedding_model_name = vector_config['tgt_embedding_model_name']  # Target dialect embedding model
+        self.tgt_embedding_model_name = KnowledgeBase.query.filter_by(
+            kb_name=vector_config['tgt_kb_name']).first().embedding_model_name
 
         self.retrieval_on = retrieval_on  # Whether to enable retrieval
         self.top_k = top_k  # Retrieval TOP-K results
@@ -829,18 +829,18 @@ class Translator:
             if not os.path.exists(self.out_dir):
                 os.makedirs(self.out_dir)
 
-            res_data = list()
-            file_load = os.path.join(self.out_dir, "single_translation_result.json")
-            if os.path.exists(file_load):
-                with open(file_load, "r") as rf:
-                    res_data = json.load(rf)
-            res_data.append({
-                "role": role, "sql": sql, "content": content,
-                "step_name": step_name, "is_success": is_success,
-                "error": error
-            })
-            with open(file_load, "w") as wf:
-                json.dump(res_data, wf, indent=4)
+            # res_data = list()
+            # file_load = os.path.join(self.out_dir, "single_translation_result.json")
+            # if os.path.exists(file_load):
+            #     with open(file_load, "r") as rf:
+            #         res_data = json.load(rf)
+            # res_data.append({
+            #     "role": role, "sql": sql, "content": content,
+            #     "step_name": step_name, "is_success": is_success,
+            #     "error": error
+            # })
+            # with open(file_load, "w") as wf:
+            #     json.dump(res_data, wf, indent=4)
 
         elif self.out_type == "db":
             # Add rewrite result record to database
@@ -908,8 +908,6 @@ def parse_args():
 
     parser.add_argument('--llm_model_name', type=str,
                         help='LLM for dialect translation')
-    parser.add_argument('--tgt_kb_embedding_model_name', type=str,
-                        help='Target embedding model for dialect translation')
 
     parser.add_argument('--retrieval_on', action='store_true',
                         help='Employ specification retrieval for dialect translation')
@@ -943,8 +941,7 @@ def main():
         }
         vector_config = {
             "src_kb_name": args.src_kb_name,
-            "tgt_kb_name": args.tgt_kb_name,
-            "tgt_embedding_model_name": args.tgt_kb_embedding_model_name
+            "tgt_kb_name": args.tgt_kb_name
         }
 
         if os.path.isfile(args.src_sql):

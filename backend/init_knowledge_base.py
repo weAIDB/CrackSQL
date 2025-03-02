@@ -14,6 +14,7 @@ import subprocess
 
 # Add project root directory to system path
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import application context
@@ -355,9 +356,10 @@ def vectorize_pending_items(kb_name):
 
                 # Prepare metadata
                 metadata = {
-                    "content_id": item.id,
-                    "content_type": content_type,
-                    "token_count": item.token_count
+                    'content_id': str(item.id),
+                    'knowledge_base_id': str(kb.id),
+                    'content_type': item.content_type,
+                    'content': json.dumps(item.content)
                 }
                 metadatas.append(metadata)
                 ids.append(vector_id)
