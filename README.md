@@ -23,7 +23,7 @@
 CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs of different scenarios.
 
 > - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). More contributors are welcomed! :wave: 👫
-> - **02/2025:** Our paper, *Cracking SQL Barrier: An LLM-based Dialect Translation System*, has been accepted by SIGMOD 2025! :tada: :tada: :tada:
+> - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
 
 ## 📚 Features
 
