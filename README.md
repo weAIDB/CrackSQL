@@ -22,6 +22,9 @@
 
 CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs of different scenarios.
 
+> - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). More contributors are welcomed! :wave: 👫
+> - **02/2025:** Our paper, *Cracking SQL Barrier: An LLM-based Dialect Translation System*, has been accepted by SIGMOD 2025! :tada: :tada: :tada:
+
 ## 📚 Features
 
 - 🚀 **Multi-dialect Support**: Supports conversion between three mainstream database dialects: PostgreSQL, MySQL, and Oracle
@@ -45,7 +48,7 @@ CrackSQL is a tool focused on SQL dialect conversion, supporting precise convers
   <i>TODO: Add interface preview image</i>
 </p>
 
-![Web Interface Preview](./docs/images/web-preview.png)
+![Web Interface Preview](./data/images/demo.png)
 
 ## 🚀 Quick Start
 
@@ -108,17 +111,25 @@ yarn dev
 # If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file.
 ```
 
-#### 3. Command Line Usage (Not supported yet)
+#### 3. Command Line Usage
 ```bash
-# Initialize
-python script/init.py
+# Initialize knowledge base (Optional, can be done manually in the frontend after starting the frontend project)
+# 1. First rename config/init_config.yaml.copy to config/init_config.yaml
+# 2. Modify the relevant information in config/init_config.yaml. If you want to initialize the knowledge base, Embedding Model is required
+python init_knowledge_base.py --init_all
 
 # Convert
-python script/convert.py --source postgresql --target mysql "SELECT * FROM users LIMIT 10" \
-  --source_db_type pg --target_db_type mysql \
-  --target_db_host localhost --target_db_port 3306 \
-  --target_db_user root --target_db_password 123456 \
-  --output_file output.json
+python translate.py --src_dialect "source dialect"
+```
+
+### Method 3: PyPI Package Installation
+
+Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
+
+![Web Interface Preview](./data/images/pypi.png)
+
+```
+pip install cracksql==0.0.0b0
 ```
 
 ## 📎 Feature Extension
@@ -153,20 +164,20 @@ Welcome to scan the QR code to join the WeChat group!
 If you like this project, please cite our paper:
 
 ```
-@misc{zhou2023llm4diag,
-      title={D-Bot: Database Diagnosis System using Large Language Models}, 
-      author={Xuanhe Zhou, Guoliang Li, Zhaoyan Sun, Zhiyuan Liu, Weize Chen, Jianming Wu, Jiesi Liu, Ruohang Feng, Guoyang Zeng},
-      year={2023},
-      eprint={2312.01454},
-      archivePrefix={arXiv},
-      primaryClass={cs.DB}
+@misc{zhou2025cracksql,
+      title={Cracking SQL Barriers: An LLM-based Dialect Transaltion System}, 
+      author={Wei Zhou, Yuyang Gao, Xuanhe Zhou, and Guoliang Li},
+      year={2025},
+      journal={Proc. {ACM} Manag. Data},
+      volume={3},
+      number={2},
 }
 ```
 
 ## 📧 Contributors
 
-<a href="https://github.com/TsinghuaDatabaseGroup/DB-GPT/network/dependencies">
-  <img src="https://contrib.rocks/image?repo=TsinghuaDatabaseGroup/DB-GPT" />
+<a href="https://github.com/code4DB/CrackSQL/network/dependencies">
+  <img src="https://contrib.rocks/image?repo=code4DB/CrackSQL" />
 </a>
 
 ## 📝 License
