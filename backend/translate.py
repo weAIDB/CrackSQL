@@ -844,9 +844,6 @@ class Translator:
 
         elif self.out_type == "db":
             # Add rewrite result record to database
-
-            print("content", content)
-
             from api.services.rewrite import RewriteService
             if self.history_id is not None:
                 RewriteService.add_rewrite_process(
@@ -928,23 +925,6 @@ def parse_args():
 def main():
     args = parse_args()
 
-    args.src_dialect = "postgresql"
-    args.tgt_dialect = "mysql"
-    # args.src_sql = 'SELECT DISTINCT "t1"."id" , EXTRACT(YEAR FROM CURRENT_TIMESTAMP) - EXTRACT(YEAR FROM CAST( "t1"."birthday" AS TIMESTAMP )) FROM "patient" AS "t1" INNER JOIN "examination" AS "t2" ON "t1"."id" = "t2"."id" WHERE "t2"."rvvt" = \'+\''
-    args.src_sql = "/data/wei/index/CrackSQL/data/exp_res/pg_to_mysql_data.json"
-
-    args.src_kb_name = "PostgreSQL"
-    args.tgt_kb_name = "MySQL"
-
-    # args.llm_model_name = "deepseek-v3:671b"  # Llama3.1-8B, DeepSeek-R1:671B, deepseek-v3:671b
-    args.tgt_kb_embedding_model_name = "all-MiniLM-L6-v2"
-
-    args.out_dir = "/data/wei/index/CrackSQL"
-
-    args.retrieval_on = True
-    args.top_k = 3
-    args.max_retry_time = 2
-
     translated_sql_total, model_ans_list_total = list(), list()
     used_pieces_total, lift_histories_total = list(), list()
 
@@ -966,13 +946,11 @@ def main():
 
         if os.path.isfile(args.src_sql):
             with open(args.src_sql, "r") as rf:
-                sql_list = json.load(rf)
+                sql_list = rf.readlines()
         else:
             sql_list = [args.src_sql]
 
-        # for no, src_sql in tqdm(enumerate(sql_list)):
-        for no, item in tqdm(enumerate(sql_list)):
-            src_sql = item["pg"]
+        for no, src_sql in tqdm(enumerate(sql_list)):
             translator = Translator(model_name=args.llm_model_name, src_sql=src_sql,
                                     src_dialect=args.src_dialect, tgt_dialect=args.tgt_dialect,
                                     tgt_db_config=tgt_db_config, vector_config=vector_config,
@@ -982,30 +960,21 @@ def main():
             translated_sql, model_ans_list, \
             used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=args.max_retry_time)
 
-            # translated_sql_total.append(translated_sql)
-            # with open(os.path.join(args.out_dir, "translated_sql_total.json"), "w") as wf:
-            #     json.dump(translated_sql_total, wf, indent=4)
-            #
-            # model_ans_list_total.append(model_ans_list)
-            # with open(os.path.join(args.out_dir, "model_ans_list_total.json"), "w") as wf:
-            #     json.dump(model_ans_list_total, wf, indent=4)
-            #
-            # used_pieces_total.append(used_pieces)
-            # with open(os.path.join(args.out_dir, "used_pieces_total.json"), "w") as wf:
-            #     json.dump(used_pieces_total, wf, indent=4)
-            #
-            # lift_histories_total.append(lift_histories)
-            # with open(os.path.join(args.out_dir, "lift_histories_total.json"), "w") as wf:
-            #     json.dump(lift_histories_total, wf, indent=4)
+            translated_sql_total.append(translated_sql)
+            with open(os.path.join(args.out_dir, "translated_sql_total.json"), "w") as wf:
+                json.dump(translated_sql_total, wf, indent=4)
 
-            item[f"{args.llm_model_name}_translated_sql"] = translated_sql
-            item[f"{args.llm_model_name}_model_ans_list"] = model_ans_list
-            item[f"{args.llm_model_name}_used_pieces"] = used_pieces
-            item[f"{args.llm_model_name}_lift_histories"] = lift_histories
+            model_ans_list_total.append(model_ans_list)
+            with open(os.path.join(args.out_dir, "model_ans_list_total.json"), "w") as wf:
+                json.dump(model_ans_list_total, wf, indent=4)
 
-            with open(os.path.join(args.out_dir, os.path.basename(args.src_sql).replace(
-                    ".json", f"_{args.llm_model_name}.json")), "w") as wf:
-                json.dump(sql_list, wf, indent=4)
+            used_pieces_total.append(used_pieces)
+            with open(os.path.join(args.out_dir, "used_pieces_total.json"), "w") as wf:
+                json.dump(used_pieces_total, wf, indent=4)
+
+            lift_histories_total.append(lift_histories)
+            with open(os.path.join(args.out_dir, "lift_histories_total.json"), "w") as wf:
+                json.dump(lift_histories_total, wf, indent=4)
 
             print(f"The translated SQL is: {translated_sql}")
             print(model_ans_list)
