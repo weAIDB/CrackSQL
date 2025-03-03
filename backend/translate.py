@@ -48,9 +48,9 @@ class Translator:
                  out_type: str = "db",
                  out_dir: str = None):
         """SQL dialect converter
-        
+
         This class is used to convert one SQL dialect to another, supporting retrieval enhancement and history tracking.
-        
+
         Args:
             model_name: The LLM model name used, such as 'gpt-3.5-turbo'
             src_sql: Source SQL statement to be converted
@@ -108,20 +108,20 @@ class Translator:
     @db_session_manager
     def local_to_global_rewrite(self, max_retry_time=2):
         """Local SQL rewriting method
-        
-        This method completes the entire SQL conversion by gradually locating and rewriting SQL fragments. 
+
+        This method completes the entire SQL conversion by gradually locating and rewriting SQL fragments.
         Supports retry mechanism and lift operations.
-        
+
         Args:
             max_retry_time: Maximum retry times, default is 2. Exceeding this will trigger lift operation.
-            
+
         Returns:
             tuple: Contains the following elements:
                 - str: Converted SQL statement. Returns error message if conversion fails.
                 - list: Model output history records.
                 - list: Processed SQL fragments.
                 - list: Lift operation history records.
-                
+
         Workflow:
             1. Parse source SQL to get syntax tree and all fragments
             2. Normalization processing
@@ -312,12 +312,12 @@ class Translator:
 
     def rewrite_piece(self, piece, history=list(), err_info_list=list()) -> [str, str]:
         """SQL fragment rewriting method
-        
+
         Args:
             piece: SQL fragment, can be dict (contains Node) or str
             history: History conversion record list
             err_info_list: Error information list
-        
+
         Returns:
             tuple: (Converted SQL, Complete model response information)
         """
@@ -410,14 +410,14 @@ class Translator:
 
     def do_query_segmentation(self):
         """Get all segments of the SQL statement
-        
+
         This method parses the SQL statement into a syntax tree and extracts all processable SQL segments.
-        
+
         Returns:
             tuple: (root node, list of all segments)
                 - root_node: Root node of the SQL syntax tree
                 - all_pieces: List containing all SQL segments, each segment is a dictionary
-        
+
         Raises:
             ValueError: Exception thrown when SQL parsing fails
         """
@@ -483,12 +483,12 @@ class Translator:
 
     def get_document_description(self, piece):
         """Get related document description for SQL segment
-        
+
         This method retrieves reference documents related to current SQL segment through vector search.
-        
+
         Args:
             piece: SQL segment dictionary containing keyword and description information
-        
+
         Returns:
             str: Document description in JSON format
         """
@@ -572,14 +572,14 @@ class Translator:
 
     def update_error_info_list(self, err_info_list, assist_info, piece):
         """Update error information list
-        
+
         This method processes error information according to different target database dialects and updates the error information list.
-        
+
         Args:
             err_info_list: Existing error information list
             assist_info: Assistance information (error message)
             piece: SQL segment dictionary
-        
+
         Returns:
             list: Updated error information list
         """
@@ -629,9 +629,9 @@ class Translator:
     def do_semantic_validation(self, src_sql, current_sql, root_node,
                                all_pieces, last_time_piece, model_ans_list):
         """Process syntactically correct SQL segments
-        
+
         This method processes SQL segments that have passed syntax check, determining whether further optimization or modification is needed.
-        
+
         Args:
             src_sql: Original SQL statement
             current_sql: Currently converted SQL statement
@@ -639,7 +639,7 @@ class Translator:
             all_pieces: List of all SQL segments
             last_time_piece: Last processed segment
             model_ans_list: Model answer history list
-        
+
         Returns:
             tuple: (piece, assist_info, judge_raw)
                 - piece: SQL segment that needs further processing
@@ -703,9 +703,9 @@ class Translator:
     def model_judge(self, root_node, all_pieces, src_sql, current_sql, ans_slice,
                     history=list(), sys_prompt=None, user_prompt=None):
         """Model judgment method
-        
+
         This method uses LLM to judge the quality of SQL conversion and identify segments that need further optimization.
-        
+
         Args:
             root_node: Root node of SQL syntax tree
             all_pieces: List of all SQL segments
@@ -715,7 +715,7 @@ class Translator:
             history: Dialog history record, default empty list
             sys_prompt: System prompt, default None
             user_prompt: User prompt, default None
-        
+
         Returns:
             tuple: (piece, assist_info, answer_raw)
                 - piece: SQL segment that needs further processing
@@ -844,6 +844,9 @@ class Translator:
 
         elif self.out_type == "db":
             # Add rewrite result record to database
+
+            print("content", content)
+
             from api.services.rewrite import RewriteService
             if self.history_id is not None:
                 RewriteService.add_rewrite_process(
@@ -858,9 +861,9 @@ class Translator:
 
     def update_rewrite_status(self, status, sql, error):
         """Update SQL rewrite status
-        
+
         This method is used to update the status information of the SQL rewrite task in the database.
-        
+
         Args:
             status: The status of the rewrite task
                 Possible values include:
@@ -869,7 +872,7 @@ class Translator:
                 - 'processing': Processing
             sql: The rewritten SQL statement or intermediate result
             error: Error information (if any)
-        
+
         Note:
             This method depends on the RewriteService service class to actually execute the database update operation.
         """
@@ -925,6 +928,23 @@ def parse_args():
 def main():
     args = parse_args()
 
+    args.src_dialect = "postgresql"
+    args.tgt_dialect = "mysql"
+    # args.src_sql = 'SELECT DISTINCT "t1"."id" , EXTRACT(YEAR FROM CURRENT_TIMESTAMP) - EXTRACT(YEAR FROM CAST( "t1"."birthday" AS TIMESTAMP )) FROM "patient" AS "t1" INNER JOIN "examination" AS "t2" ON "t1"."id" = "t2"."id" WHERE "t2"."rvvt" = \'+\''
+    args.src_sql = "/data/wei/index/CrackSQL/data/exp_res/pg_to_mysql_data.json"
+
+    args.src_kb_name = "PostgreSQL"
+    args.tgt_kb_name = "MySQL"
+
+    # args.llm_model_name = "deepseek-v3:671b"  # Llama3.1-8B, DeepSeek-R1:671B, deepseek-v3:671b
+    args.tgt_kb_embedding_model_name = "all-MiniLM-L6-v2"
+
+    args.out_dir = "/data/wei/index/CrackSQL"
+
+    args.retrieval_on = True
+    args.top_k = 3
+    args.max_retry_time = 2
+
     translated_sql_total, model_ans_list_total = list(), list()
     used_pieces_total, lift_histories_total = list(), list()
 
@@ -946,11 +966,13 @@ def main():
 
         if os.path.isfile(args.src_sql):
             with open(args.src_sql, "r") as rf:
-                sql_list = rf.readlines()
+                sql_list = json.load(rf)
         else:
             sql_list = [args.src_sql]
 
-        for no, src_sql in tqdm(enumerate(sql_list)):
+        # for no, src_sql in tqdm(enumerate(sql_list)):
+        for no, item in tqdm(enumerate(sql_list)):
+            src_sql = item["pg"]
             translator = Translator(model_name=args.llm_model_name, src_sql=src_sql,
                                     src_dialect=args.src_dialect, tgt_dialect=args.tgt_dialect,
                                     tgt_db_config=tgt_db_config, vector_config=vector_config,
@@ -960,21 +982,30 @@ def main():
             translated_sql, model_ans_list, \
             used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=args.max_retry_time)
 
-            translated_sql_total.append(translated_sql)
-            with open(os.path.join(args.out_dir, "translated_sql_total.json"), "w") as wf:
-                json.dump(translated_sql_total, wf, indent=4)
+            # translated_sql_total.append(translated_sql)
+            # with open(os.path.join(args.out_dir, "translated_sql_total.json"), "w") as wf:
+            #     json.dump(translated_sql_total, wf, indent=4)
+            #
+            # model_ans_list_total.append(model_ans_list)
+            # with open(os.path.join(args.out_dir, "model_ans_list_total.json"), "w") as wf:
+            #     json.dump(model_ans_list_total, wf, indent=4)
+            #
+            # used_pieces_total.append(used_pieces)
+            # with open(os.path.join(args.out_dir, "used_pieces_total.json"), "w") as wf:
+            #     json.dump(used_pieces_total, wf, indent=4)
+            #
+            # lift_histories_total.append(lift_histories)
+            # with open(os.path.join(args.out_dir, "lift_histories_total.json"), "w") as wf:
+            #     json.dump(lift_histories_total, wf, indent=4)
 
-            model_ans_list_total.append(model_ans_list)
-            with open(os.path.join(args.out_dir, "model_ans_list_total.json"), "w") as wf:
-                json.dump(model_ans_list_total, wf, indent=4)
+            item[f"{args.llm_model_name}_translated_sql"] = translated_sql
+            item[f"{args.llm_model_name}_model_ans_list"] = model_ans_list
+            item[f"{args.llm_model_name}_used_pieces"] = used_pieces
+            item[f"{args.llm_model_name}_lift_histories"] = lift_histories
 
-            used_pieces_total.append(used_pieces)
-            with open(os.path.join(args.out_dir, "used_pieces_total.json"), "w") as wf:
-                json.dump(used_pieces_total, wf, indent=4)
-
-            lift_histories_total.append(lift_histories)
-            with open(os.path.join(args.out_dir, "lift_histories_total.json"), "w") as wf:
-                json.dump(lift_histories_total, wf, indent=4)
+            with open(os.path.join(args.out_dir, os.path.basename(args.src_sql).replace(
+                    ".json", f"_{args.llm_model_name}.json")), "w") as wf:
+                json.dump(sql_list, wf, indent=4)
 
             print(f"The translated SQL is: {translated_sql}")
             print(model_ans_list)

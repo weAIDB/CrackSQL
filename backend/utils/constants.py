@@ -1,6 +1,6 @@
 # TODO: 优化掉，用户自己填
 
-TOP_K = 1
+TOP_K = 3
 CHUNK_SIZE = 250
 
 RETRIEVAL_ON = True

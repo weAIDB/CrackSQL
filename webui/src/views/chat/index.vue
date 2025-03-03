@@ -55,12 +55,15 @@
     <!-- 消息列表 -->
     <div ref="messagesScrollDiv" class="messages-container">
       <!-- 用户输入的SQL -->
-      <chat-item
+      <sql-input
           :message="{
-            role: 'user',
-            content: formatUserMessage(historyDetail),
-            time: historyDetail.created_at,
-            loading: false
+            source_db_type: historyDetail.source_db_type,
+            original_sql: historyDetail.original_sql,
+            target_db: historyDetail.target_db,
+            created_at: historyDetail.created_at,
+            llm_model_name: historyDetail.llm_model_name,
+            original_kb: historyDetail.original_kb,
+            target_kb: historyDetail.target_kb
           }"
       />
 
@@ -82,6 +85,10 @@
 <script setup lang="ts">
 import {rewriteLatestReq} from '@/api/rewrite.js'
 import ChatItem from '@/components/ChatItem.vue'
+
+import ProcessItem from '@/components/ProcessItem.vue'
+import SqlInput from '@/components/SqlInput.vue'
+>>>>>>> 5b58557a830941018279c36ac0d9eca5912eda90
 import type {RewriteHistory} from '@/types/database'
 import {onMounted, ref, onUnmounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
@@ -155,6 +162,7 @@ onUnmounted(() => {
     width: 100%;
     overflow-y: auto;
     padding: 20px;
+    background-color: RGBA(22, 23, 36, 1.00);
   }
 }
 

@@ -637,7 +637,7 @@ const useExample = (exampleSql) => {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
         &::after {
-          content: '点击使用此示例';
+          content: 'Click to use this example';
           position: absolute;
           top: 0;
           right: 0;

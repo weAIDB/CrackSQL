@@ -1,98 +1,161 @@
 <template>
   <div class="chat-item-container">
-    <div :class="'rowSC ' + roleClass">
-      <img v-if="isUser" src="@/assets/chat-user.png" class="face"/>
-      <img v-else src="@/assets/chat-robot.png" class="face" />
-<!--      <span style="margin: 0 10px; color: red">abc</span>-->
-<!--      <span style="color: #2c59cb">sdada</span>-->
+    <div class="terminal-header">
+      <span class="prompt">$</span>
+      <span class="role">{{ message.role }}</span>
+      <span class="time">{{ message.time }}</span>
     </div>
-    <div :class="'rowSC ' + roleClass">
-      <div v-if="!message.loading" style="max-width: 100%" class="content" v-html="htmlContent" />
-      <div v-else>
-        <div class="content rowBC" style="padding: 10px 20px">
-          <el-icon class="is-loading" size="20" color="#333333">
-            <Loading />
-          </el-icon>
-        </div>
+    <div class="terminal-content">
+      <div v-if="!message.loading" v-html="htmlContent" />
+      <div v-else class="loading">
+        <el-icon class="is-loading" size="20">
+          <Loading />
+        </el-icon>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// 获取store和router
+import { computed } from 'vue'
 import marked from '../utils/markdownConfig.js'
+import { Loading } from '@element-plus/icons-vue'
+
+interface Message {
+  loading: boolean
+  content: string
+  role: string
+  time: string
+}
 
 const props = defineProps({
-  message: {required:true, type: Object, default: null }
+  message: {required:true, type: Object as () => Message, default: null }
 })
-
-const isUser = computed(() => props.message.role === 'user')
-
-const roleClass = computed(() => props.message.role === 'user' ? 'right' : 'left')
 
 const htmlContent = computed(() => {
   return marked.parse(props.message.content)
 })
-
-
 </script>
 
 <style>
 code {
   border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 2px 4px;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  color: #98C379;
+}
+
+think {
+  display: block;
+  border-radius: 4px;
+  color: #ABB2BF;
+  padding: 15px;
+  margin: 10px 0;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-left: 2px solid #61AFEF;
+}
+
+think:before {
+  content: '💡';
+  font-size: 24px;
+  position: absolute;
+  left: -13px;
+  top: -16px;
+}
+
+think pre code {
+  background: rgba(0, 0, 0, 0.2) !important;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #98C379;
 }
 </style>
 
 <style scoped lang="scss">
-
 .chat-item-container {
-  margin: 5px 0;
+  margin: 10px 0;
+  background-color: #282C34;
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+.terminal-header {
+  background-color: #21252B;
+  padding: 8px 12px;
   display: flex;
-  flex-direction: column;
-  width: 100%;
-}
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #181A1F;
 
-.face {
-  width: 36px;
-  height: 36px;
-  border-radius: 36px;
-}
+  .prompt {
+    color: #98C379;
+    font-weight: bold;
+  }
 
-.content {
-  color: #333333;
-  font-size: 15px;
-  min-height: 20px;
-  border-radius: 10px;
-  padding: 10px 15px 0 15px;
-  line-height: 1.4;
-  word-break: break-all;
-  word-wrap: break-word;
-  position: relative;
-  margin-top: 5px;
-  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.06);;
-}
+  .role {
+    color: #61AFEF;
+    font-weight: 500;
+  }
 
-.left {
-  margin: 0 10px;
-  .face {}
-  .content {
-    color: #333333;
-    border: 1px solid #eeeeee;
-    border-radius: 0 10px 10px 10px;
+  .time {
+    color: #5C6370;
+    font-size: 12px;
+    margin-left: auto;
   }
 }
 
-.right {
-  margin: 0 10px;
-  flex-direction: row-reverse;
-  .face {}
-  .content {
-    color: #41b584;
-    background-color: #ecf8f3;
-    border: 1px solid #41b584;
-    border-radius: 10px 0 10px 10px;
+.terminal-content {
+  padding: 15px;
+  color: #ABB2BF;
+  font-size: 14px;
+  line-height: 1.6;
+
+  :deep(p) {
+    margin: 8px 0;
+  }
+
+  :deep(pre) {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+
+  :deep(ul), :deep(ol) {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  :deep(li) {
+    margin: 4px 0;
+  }
+
+  :deep(a) {
+    color: #61AFEF;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  :deep(blockquote) {
+    border-left: 2px solid #61AFEF;
+    margin: 10px 0;
+    padding-left: 15px;
+    color: #5C6370;
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #61AFEF;
   }
 }
-
 </style>

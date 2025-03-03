@@ -108,7 +108,7 @@ yarn dev
 
 # Tips: 
 # If you want to modify the frontend port number, you can modify it in webui/vite.config.js: port: 50212
-# If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file.
+# If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file (if the file does not exist, you can rename webui/.env.serve-dev_copy to .env.serve-dev).
 ```
 
 #### 3. Command Line Usage

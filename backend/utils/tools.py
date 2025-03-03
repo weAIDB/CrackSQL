@@ -299,7 +299,8 @@ def process_history_text(text, role, action):
         text = f"{text.split(specification_section_start)[0]}{text.split(specification_section_end)[-1]}"
         text = text.replace("<< SPECIFICATION START >>", "").replace("<< SPECIFICATION END >>", "")
         text = text.replace("<< EXAMPLE START >>", "").replace("<< EXAMPLE END >>", "")
-        text = text.replace("<reflection>", "`").replace("</reflection>", "`")
+        # text = text.replace("<reflection>", "`").replace("</reflection>", "`")
+        # text = text.replace("<reflection>", "```").replace("</reflection>", "```")
 
         # 2. output process
         output_section = "## OUTPUT FORMAT ##"

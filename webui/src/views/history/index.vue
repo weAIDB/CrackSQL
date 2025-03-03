@@ -68,21 +68,41 @@
               confirm-button-type="danger"
             >
               <template #reference>
-                <el-button 
-                  type="danger" 
-                  :title="$t('history.list.delete')"
-                >
+                <el-button type="danger">
                   <el-icon><Delete /></el-icon>
                 </el-button>
               </template>
             </el-popconfirm>
-            <el-button type="primary" @click="showDetail(item)">
+            <el-button type="success" @click="showDetail(item)">
               {{ $t('history.list.detail') }}
+            </el-button>
+            <el-button 
+              type="primary" 
+              link
+              @click="toggleExpand(item.id)"
+              :title="expandedItems.has(item.id) ? $t('history.list.collapse') : $t('history.list.expand')"
+            >
+              <el-icon>
+                <component :is="expandedItems.has(item.id) ? ArrowUp : ArrowDown" />
+              </el-icon>
             </el-button>
           </div>
         </div>
-        <div class="sql-preview">
+        <div class="sql-preview" v-if="!expandedItems.has(item.id)">
           {{ item.original_sql.length > 100 ? item.original_sql.slice(0, 100) + '...' : item.original_sql }}
+        </div>
+        <div v-else class="expanded-sql">
+          <sql-input
+            :message="{
+              source_db_type: item.source_db_type,
+              original_sql: item.original_sql,
+              target_db: item.target_db,
+              created_at: item.created_at,
+              llm_model_name: item.llm_model_name,
+              original_kb: item.original_kb,
+              target_kb: item.target_kb
+            }"
+          />
         </div>
       </div>
     </div>
@@ -105,11 +125,13 @@
 <script setup lang="ts">
 import {rewriteListReq, deleteRewriteReq} from '@/api/rewrite.js'
 import type {RewriteHistory} from '@/types/database'
-import {Search, Document, Delete, Timer} from '@element-plus/icons-vue'
+import {Search, Document, Delete, Timer, ArrowDown, ArrowUp} from '@element-plus/icons-vue'
+
 import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useI18n} from '@/hooks/use-i18n'
 import { ElMessage } from 'element-plus'
+import SqlInput from '@/components/SqlInput.vue'
 
 const i18n = useI18n()
 const historyList = ref<RewriteHistory[]>([])
@@ -119,6 +141,7 @@ const pageSize = ref(10)
 const searchKeyword = ref('')
 const currentHistory = ref<RewriteHistory | null>(null)
 const router = useRouter()
+const expandedItems = ref<Set<string>>(new Set())
 
 // 获取历史列表
 const getHistoryList = async () => {
@@ -187,6 +210,15 @@ const confirmDelete = async (row: RewriteHistory) => {
   } catch (error) {
     console.error('删除历史记录失败:', error)
     ElMessage.error(i18n.t('history.delete.error'))
+  }
+}
+
+// 处理展开/收起
+const toggleExpand = (id: string) => {
+  if (expandedItems.value.has(id)) {
+    expandedItems.value.delete(id)
+  } else {
+    expandedItems.value.add(id)
   }
 }
 
@@ -266,6 +298,20 @@ onMounted(() => {
           display: flex;
           align-items: center;
           gap: 10px;
+          .el-button.is-link {
+            padding: 4px;
+            height: 32px;
+            width: 32px;
+            border-radius: 4px;
+            
+            &:hover {
+              background-color: var(--el-color-primary-light-9);
+            }
+            
+            .el-icon {
+              font-size: 16px;
+            }
+          }
         }
       }
 
@@ -279,6 +325,47 @@ onMounted(() => {
         line-height: 1.5;
         white-space: pre-wrap;
       }
+
+      .expanded-sql {
+        margin-top: 12px;
+        
+        :deep(.sql-input-container) {
+          background-color: #ffffff;
+          margin: 0;
+          
+          .el-descriptions {
+            --el-text-color-regular: #333333;
+            --el-border-color: #e4e7ed;
+            --el-fill-color-blank: #ffffff;
+            
+            .el-descriptions__body {
+              .el-descriptions__table {
+                .el-descriptions__cell {
+                  background-color: #ffffff;
+                }
+                
+                .el-descriptions__label {
+                  color: #606266;
+                  background-color: #f5f7fa;
+                }
+                
+                .el-descriptions__content {
+                  color: #333333;
+                }
+              }
+            }
+          }
+
+          .connection-info {
+            color: #333333;
+            background-color: #f5f7fa;
+          }
+          .sql-section {
+            color: #333333 !important;
+          }
+        }
+      }
+>>>>>>> 5b58557a830941018279c36ac0d9eca5912eda90
     }
   }
 
