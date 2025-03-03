@@ -109,7 +109,7 @@ yarn dev
 
 # 提示: 
 # 如果想要修改前端端口号，可以在webui/vite.config.js中进行修改：port: 50212
-# 如果后端Api的端口号改了，或者想使用服务器的IP，可修改webui/.env.serve-dev文件中的VITE_APP_BASE_URL参数。
+# 如果后端Api的端口号改了，或者想使用服务器的IP，可修改webui/.env.serve-dev文件（该文件如果没有，可以将webui/.env.serve-dev_copy文件重命名为.env.serve-dev）中的VITE_APP_BASE_URL参数。
 ```
 
 #### 3. 命令行使用（暂不支持）

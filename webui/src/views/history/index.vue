@@ -68,10 +68,7 @@
               confirm-button-type="danger"
             >
               <template #reference>
-                <el-button 
-                  type="danger" 
-                  :title="$t('history.list.delete')"
-                >
+                <el-button type="danger">
                   <el-icon><Delete /></el-icon>
                 </el-button>
               </template>
@@ -362,6 +359,9 @@ onMounted(() => {
           .connection-info {
             color: #333333;
             background-color: #f5f7fa;
+          }
+          .sql-section {
+            color: #333333 !important;
           }
         }
       }

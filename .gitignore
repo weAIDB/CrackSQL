@@ -381,6 +381,8 @@ backend/config/init_config.py
 backend/local_models
 webui/node_modules
 webui/dist
+*.env.serve-dev
+*.env.build
 *.venv
 *.cursor
 *.cursorrules
