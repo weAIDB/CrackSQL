@@ -145,16 +145,18 @@ const props = defineProps({
 .connection-info {
   font-family: Monaco, Consolas, Courier New, monospace;
   color: rgba(255, 255, 255, 0.85);
-  padding: 4px 8px;
-  background-color: rgba(0, 0, 0, 0.2);
+  padding: 10px !important;
+  background-color: rgba(111, 111, 111, 0.1)!important;
   border-radius: 4px;
   display: inline-block;
 }
 
 .sql-section {
-  background-color: rgba(0, 0, 0, 0.2);
+  color: #333333;
+  background-color: rgba(111, 111, 111, 0.1) !important;
   border-radius: 8px;
   overflow: hidden;
+  padding: 10px !important;
 
   .sql-label {
     padding: 10px 15px;

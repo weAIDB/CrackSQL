@@ -363,17 +363,6 @@ onMounted(() => {
             color: #333333;
             background-color: #f5f7fa;
           }
-
-          .sql-section {
-            background-color: #f5f7fa;
-            border: 1px solid #e4e7ed;
-            
-            pre {
-              code {
-                color: #333333;
-              }
-            }
-          }
         }
       }
     }
