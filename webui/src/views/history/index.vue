@@ -69,7 +69,8 @@
             >
               <template #reference>
                 <el-button 
-                  type="danger"
+                  type="danger" 
+                  :title="$t('history.list.delete')"
                 >
                   <el-icon><Delete /></el-icon>
                 </el-button>
@@ -82,6 +83,7 @@
               type="primary" 
               link
               @click="toggleExpand(item.id)"
+              :title="expandedItems.has(item.id) ? $t('history.list.collapse') : $t('history.list.expand')"
             >
               <el-icon>
                 <component :is="expandedItems.has(item.id) ? ArrowUp : ArrowDown" />
