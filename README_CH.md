@@ -75,7 +75,7 @@ git clone https://github.com/your-username/git
 #### 2. 使用前后端应用
 ```bash
 # 启动后端
-cd CrackSQL/backend
+cd CrackSQL/cracksql
 
 # 安装依赖
 conda create -n CrackSQL python=3.10

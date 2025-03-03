@@ -11,12 +11,7 @@ import yaml
 import time
 import argparse
 import subprocess
-
-# Add project root directory to system path
 import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 # Import application context
 from app_factory import create_app
 from config.db_config import db
@@ -40,6 +35,8 @@ def parse_args():
     parser.add_argument('--init_kb', action='store_true', help='Initialize all knowledge bases')
 
     return parser.parse_args()
+
+
 
 
 def load_config(config_file_path):
@@ -471,17 +468,24 @@ def init_knowledge_base_from_config(kb_config):
     return success
 
 
-def main():
+def initialize_kb(config_file_path, init_all=False, init_llm=False, init_embedding=False, init_kb=False):
     """Main function"""
-    args = parse_args()
+
+    if not config_file_path:
+        logger.error("Configuration file path is required")
+        sys.exit(1)
+    if not init_all and not init_llm and not init_embedding and not init_kb:
+        logger.error("No operation specified, please specify an operation to perform, such as "
+                        "`--init_all, --init_llm, --init_embedding, --init_kb`, etc.")
+        sys.exit(1)
 
     # Create application context
-    app = create_app(config_name='PRODUCTION', config_path=args.config_file)
+    app = create_app(config_name='PRODUCTION')
     with app.app_context():
         # Check if database exists
         try:
             db_exists = check_database_exists(app)
-            if db_exists and not args.init_all and not args.init_llm:
+            if db_exists and not init_all and not init_llm:
                 logger.info("Database already exists, skipping database initialization")
                 return
             if not db_exists:
@@ -498,27 +502,27 @@ def main():
             sys.exit(1)
 
         # Load configuration file
-        config = load_config(args.config_file)
+        config = load_config(config_file_path)
         if not config:
-            logger.error(f"Failed to load configuration file: {args.config_file}")
+            logger.error(f"Failed to load configuration file: {config_file_path}")
             sys.exit(1)
 
         # Initialize LLM models
-        if args.init_all or args.init_llm:
+        if init_all or init_llm:
             if not init_llm_models(config.get('LLM_MODELS', [])):
                 logger.error("Failed to initialize LLM models")
-                if args.init_llm:  # If only initializing LLM models, exit on failure
+                if init_llm:  # If only initializing LLM models, exit on failure
                     sys.exit(1)
 
         # Initialize Embedding models
-        if args.init_all or args.init_embedding:
+        if init_all or init_embedding:
             if not init_embedding_models(config.get('EMBEDDING_MODELS', [])):
                 logger.error("Failed to initialize Embedding models")
-                if args.init_embedding:  # If only initializing Embedding models, exit on failure
+                if init_embedding:  # If only initializing Embedding models, exit on failure
                     sys.exit(1)
 
         # Initialize all knowledge bases
-        if args.init_all or args.init_kb:
+        if init_all or init_kb:
             kb_configs = config.get('KNOWLEDGE_BASES', [])
             if not kb_configs:
                 logger.warning("No knowledge base configuration found in configuration file")
@@ -536,17 +540,19 @@ def main():
             sys.exit(0 if success_count > 0 else 1)
 
         # If only initializing models, exit after completion
-        if args.init_llm or args.init_embedding:
+        if init_llm or init_embedding:
             sys.exit(0)
 
-        # If no operation specified, display help information
-        if not (args.init_all or args.init_llm or args.init_embedding or args.init_kb):
-            logger.error("Please specify an operation to perform, such as "
-                         "`--init_all, --init_llm, --init_embedding, --init_kb`, etc.")
-            parser = argparse.ArgumentParser(description='Knowledge Base Initialization Script')
-            parser.print_help()
-            sys.exit(1)
+
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    # If no operation specified, display help information
+    if not (args.init_all or args.init_llm or args.init_embedding or args.init_kb):
+        logger.error("Please specify an operation to perform, such as "
+                        "`--init_all, --init_llm, --init_embedding, --init_kb`, etc.")
+        parser = argparse.ArgumentParser(description='Knowledge Base Initialization Script')
+        parser.print_help()
+        sys.exit(1)
+    initialize_kb(config_file_path=args.config_file, init_all=args.init_all, init_llm=args.init_llm, init_embedding=args.init_embedding, init_kb=args.init_kb)

@@ -374,11 +374,11 @@ pnpm*
 stats.html
 
 
-backend/configs.py
-backend/instance/
-backend/migrations
-backend/config/init_config.py
-backend/local_models
+cracksql/configs.py
+cracksql/instance/
+cracksql/migrations
+cracksql/config/init_config.py
+cracksql/local_models
 webui/node_modules
 webui/dist
 *.env.serve-dev

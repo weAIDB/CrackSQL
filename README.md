@@ -1,188 +1,83 @@
 # CrackSQL
 
-<p align="center">
-  <b>A powerful SQL dialect conversion tool that supports precise conversion between different SQL dialects</b>
-</p>
+CrackSQL 是一个基于LLM的SQL重写工具，可以帮助用户将一种数据库的SQL语句转换为另一种数据库的SQL语句。
 
-<p align="center">
-  <a href="#-demo">Demo</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-feature-extension">Feature Extension</a> • 
-  <a href="#-faq">FAQ</a> •  
-  <a href="#-community">Community</a> •  
-  <a href="#-contributors">Contributors</a> •  
-  <a href="#-license">License</a>
-</p>
+## 功能特点
 
-<p align="center">
-  <b>English</b> | <a href="./README_CH.md">简体中文</a>
-</p>
+- 支持MySQL、PostgreSQL、Oracle等多种数据库
+- 使用LLM模型进行SQL转换
+- 支持知识库管理
+- 支持历史记录查询
 
-## ✨ Project Introduction
+## 安装方法
 
-CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs of different scenarios.
-
-> - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). More contributors are welcomed! :wave: 👫
-> - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
-
-## 📚 Features
-
-- 🚀 **Multi-dialect Support**: Supports conversion between three mainstream database dialects: PostgreSQL, MySQL, and Oracle
-- 🎯 **High-precision Conversion**: Based on a three-layer conversion architecture to ensure the accuracy of conversion results
-- 🌟 **Multiple Usage Methods**: Supports command line, Python API, and Web interface
-- 🔍 **Function-oriented Syntax Processing**: Breaks down SQL statements into syntax elements for specific functions
-- 🧠 **Model-based Syntax Matching**: Uses innovative cross-dialect embedding models for conversion
-- 🔄 **Local to Global Conversion Strategy**: Flexibly handles complex SQL conversion scenarios
-
-## 📊 Performance
-
-| Dialect Pair | Accuracy | Average Conversion Time |
-|:-------:|:--------:|:------------:|
-| PG → MySQL | 95% | 0.5s |
-| MySQL → Oracle | 93% | 0.6s |
-| Oracle → SQLite | 91% | 0.4s |
-
-## 🖥️ Demo
-
-<p align="center">
-  <i>TODO: Add interface preview image</i>
-</p>
-
-![Web Interface Preview](./data/images/demo.png)
-
-## 🚀 Quick Start
-
-### Method 1: Docker (Not supported yet)
+### 使用pip安装（推荐）
 
 ```bash
-# Pull image
-docker pull cracksql:latest
-
-# Run container
-docker run -d -p 5173:5173 cracksql:latest
-
-# Visit http://localhost:5173 to use the Web interface
+pip install cracksql
 ```
 
-### Method 2: Source Code Installation
+### 从源码安装
 
-#### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/git
+git clone https://github.com/your-username/cracksql.git
+cd cracksql
+pip install -e .
 ```
 
-#### 2. Use Frontend and Backend Application
-```bash
-# Start backend
-cd CrackSQL/backend
+## 使用方法
 
-# Install dependencies
-conda create -n CrackSQL python=3.10
-conda activate CrackSQL
-pip install -r requirements.txt
+```python
+from cracksql import create_app
 
-# Initialize database
-flask db init      # Initialize
-flask db migrate   # Generate version file
-flask db upgrade   # Synchronize to database
+# 初始化应用
+app = create_app('DEVELOPMENT')
 
-# Initialize knowledge base (Optional, can be done manually in the frontend after starting the frontend project)
-# 1. First rename config/init_config.yaml.copy to config/init_config.yaml
-# 2. Modify the relevant information in config/init_config.yaml. If you want to initialize the knowledge base, Embedding Model is required
-python3 init_knowledge_base.py --init_all
+# 使用SQL重写功能
+from cracksql.task.sql_rewrite import SQLRewriteTask
 
-# Start backend service (The backend service port can also be modified in app.py, currently 30006)
-python app.py
+# 创建重写任务
+task = SQLRewriteTask(
+    source_db_type='mysql',
+    target_db_type='postgresql',
+    original_sql='SELECT * FROM users WHERE id > 100'
+)
 
-# Start frontend (requires nodejs, version 20.11.1+)
-cd CrackSQL/webui
+# 执行重写
+result = task.execute()
+print(result.rewritten_sql)
 
-# Install dependencies
-yarn cache clean
-yarn install
+# 使用知识库
+from cracksql.retriever.knowledge_base import KnowledgeBase
 
-# Start development server
-yarn dev
+# 初始化知识库
+kb = KnowledgeBase(kb_name='mysql_to_pg')
 
-# Visit http://localhost:50212 to use the Web interface
+# 添加知识
+kb.add_knowledge(content={
+    'type': 'function',
+    'name': 'DATE_FORMAT',
+    'source_syntax': 'DATE_FORMAT(date,format)',
+    'target_syntax': 'TO_CHAR(date, format)'
+})
 
-# Tips: 
-# If you want to modify the frontend port number, you can modify it in webui/vite.config.js: port: 50212
-# If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file (if the file does not exist, you can rename webui/.env.serve-dev_copy to .env.serve-dev).
+# 查询知识
+results = kb.search('DATE_FORMAT function equivalent in PostgreSQL')
 ```
 
-#### 3. Command Line Usage
-```bash
-# Initialize knowledge base (Optional, can be done manually in the frontend after starting the frontend project)
-# 1. First rename config/init_config.yaml.copy to config/init_config.yaml
-# 2. Modify the relevant information in config/init_config.yaml. If you want to initialize the knowledge base, Embedding Model is required
-python init_knowledge_base.py --init_all
+## 配置说明
 
-# Convert
-python translate.py --src_dialect "source dialect"
-```
+配置文件位于 `config/config.yaml`，主要包含以下配置项：
 
-### Method 3: PyPI Package Installation
+- 数据库连接信息
+- LLM模型配置
+- 日志配置
+- 缓存配置
 
-Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
+## API文档
 
-![Web Interface Preview](./data/images/pypi.png)
+API文档请参考 [API文档](docs/api.md)
 
-```
-pip install cracksql==0.0.0b0
-```
+## 许可证
 
-## 📎 Feature Extension
-
-### Add New Syntax
-<i>To be supplemented</i>
-
-### Add New Database
-<i>Start from scratch</i>
-
-### Fine-tune Vector Model
-<i>To be supplemented</i>
-
-## 🤔 FAQ
-
-<i>TODO: Add frequently asked questions</i>
-
-## 📋 TODO
-
-- Python API
-
-## 👫 Community
-
-Welcome to scan the QR code to join the WeChat group!
-
-<p align="center">
-  <i>TODO: Add WeChat group QR code</i>
-</p>
-
-## 📒 Citation
-
-If you like this project, please cite our paper:
-
-```
-@misc{zhou2025cracksql,
-      title={Cracking SQL Barriers: An LLM-based Dialect Transaltion System}, 
-      author={Wei Zhou, Yuyang Gao, Xuanhe Zhou, and Guoliang Li},
-      year={2025},
-      journal={Proc. {ACM} Manag. Data},
-      volume={3},
-      number={2},
-}
-```
-
-## 📧 Contributors
-
-<a href="https://github.com/code4DB/CrackSQL/network/dependencies">
-  <img src="https://contrib.rocks/image?repo=code4DB/CrackSQL" />
-</a>
-
-## 📝 License
-
-<i>TODO: Add open source license</i>
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
+MIT License 
