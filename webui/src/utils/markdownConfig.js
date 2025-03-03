@@ -1,7 +1,7 @@
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
-import "highlight.js/styles/solarized-light.css";
+import "highlight.js/styles/ir-black.css";
 
 const marked = new Marked(
   markedHighlight({

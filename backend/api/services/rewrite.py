@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 from config.logging_config import logger
 from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, RETRIEVAL_ON, TRANSLATION_RESULT_TEMP
+from datetime import datetime
 
 
 class RewriteService:
@@ -123,27 +124,32 @@ class RewriteService:
         }
 
         # 计算持续时间
-        if history.created_at and history.updated_at:
-            # 计算时间差（秒）
-            time_diff = (history.updated_at - history.created_at).total_seconds()
+        if history.created_at:
+            # 根据状态决定使用哪个时间点计算
+            end_time = datetime.now() if history.status == RewriteStatus.PROCESSING else history.updated_at
+            if end_time:
+                # 计算时间差（秒）
+                time_diff = (end_time - history.created_at).total_seconds()
 
-            # 格式化持续时间
-            if time_diff < 60:
-                duration = f"{int(time_diff)}秒"
-            elif time_diff < 3600:
-                minutes = int(time_diff // 60)
-                seconds = int(time_diff % 60)
-                duration = f"{minutes}分{seconds}秒"
-            elif time_diff < 86400:
-                hours = int(time_diff // 3600)
-                minutes = int((time_diff % 3600) // 60)
-                duration = f"{hours}小时{minutes}分"
+                # 格式化持续时间
+                if time_diff < 60:
+                    duration = f"{int(time_diff)}秒"
+                elif time_diff < 3600:
+                    minutes = int(time_diff // 60)
+                    seconds = int(time_diff % 60)
+                    duration = f"{minutes}分{seconds}秒"
+                elif time_diff < 86400:
+                    hours = int(time_diff // 3600)
+                    minutes = int((time_diff % 3600) // 60)
+                    duration = f"{hours}小时{minutes}分"
+                else:
+                    days = int(time_diff // 86400)
+                    hours = int((time_diff % 86400) // 3600)
+                    duration = f"{days}天{hours}小时"
+
+                history_dict['duration'] = duration
             else:
-                days = int(time_diff // 86400)
-                hours = int((time_diff % 86400) // 3600)
-                duration = f"{days}天{hours}小时"
-
-            history_dict['duration'] = duration
+                history_dict['duration'] = "未知"
         else:
             history_dict['duration'] = "未知"
 
@@ -290,7 +296,8 @@ class RewriteService:
                     )
                     RewriteService.update_rewrite_status(
                         history_id=history_id,
-                        status=RewriteStatus.SUCCESS
+                        status=RewriteStatus.SUCCESS,
+                        sql=translated_sql
                     )
                 else:
                     RewriteService.add_rewrite_process(
