@@ -152,7 +152,7 @@ const props = defineProps({
 }
 
 .sql-section {
-  color: #333333;
+  color: #ffffff;
   background-color: rgba(111, 111, 111, 0.1) !important;
   border-radius: 8px;
   overflow: hidden;
