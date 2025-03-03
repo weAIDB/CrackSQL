@@ -88,7 +88,6 @@ import ChatItem from '@/components/ChatItem.vue'
 
 import ProcessItem from '@/components/ProcessItem.vue'
 import SqlInput from '@/components/SqlInput.vue'
->>>>>>> 5b58557a830941018279c36ac0d9eca5912eda90
 import type {RewriteHistory} from '@/types/database'
 import {onMounted, ref, onUnmounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
