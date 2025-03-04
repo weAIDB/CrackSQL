@@ -1,7 +1,4 @@
-backend/llm_model/implementations.py
-backend/app.py
 webui/.env.serve-dev
-webui/package.json
 
 ### venv template
 # Virtualenv
@@ -373,12 +370,12 @@ pnpm*
 #components.d.ts
 stats.html
 
-
-cracksql/configs.py
-cracksql/instance/
-cracksql/migrations
-cracksql/config/init_config.py
-cracksql/local_models
+backend/configs.py
+backend/instance/
+backend/migrations
+backend/config/init_config.py
+backend/local_models
+instance
 webui/node_modules
 webui/dist
 *.env.serve-dev
@@ -388,6 +385,8 @@ webui/dist
 *.cursorrules
 *.vscode
 *.idea
+test_pip
+cursor
 
 # Add this new rule
 !webui/src/lib

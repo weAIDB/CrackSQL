@@ -889,11 +889,7 @@ def parse_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description='Run Local to Global Dialect Translation.')
 
-    parser.add_argument('--config_name', type=str,
-                        default='PRODUCTION', help='Configuration app name')
-    parser.add_argument('--config_file', type=str,
-                        default='./config/config.yaml', help='Configuration file path')
-
+    
     parser.add_argument('--src_dialect', type=str,
                         help='Source database dialect', choices=DIALECT_LIST)
     parser.add_argument('--tgt_dialect', type=str,
@@ -928,7 +924,7 @@ def main():
     translated_sql_total, model_ans_list_total = list(), list()
     used_pieces_total, lift_histories_total = list(), list()
 
-    app = create_app(config_name=args.config_name, config_path=args.config_file)
+    app = create_app(config_name='PRODUCTION')
     with app.app_context():
         tgt_db = DatabaseConfig.query.get(1)
 

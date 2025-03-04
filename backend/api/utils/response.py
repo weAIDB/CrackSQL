@@ -9,11 +9,9 @@ class ResMsg(object):
 
     def __init__(self, data=None, code=ResponseCode.Success, rq=request):
         # 获取请求中语言选择,默认为中文
-        self.lang = rq.headers.get("lang",
-                                   current_app.config.get("LANG", "zh_CN")
-                                   )
+        self.lang = rq.headers.get("lang","en")
         self._data = data
-        self._msg = current_app.config[self.lang].get(code, None)
+        self._msg = current_app.config["RESPONSE_MESSAGE"].get(self.lang, {}).get(code, None)
         self._code = code
 
     def update(self, code=None, data=None, msg=None):
@@ -27,7 +25,7 @@ class ResMsg(object):
         if code is not None:
             self._code = code
             # 获取对应语言的响应消息
-            self._msg = current_app.config[self.lang].get(code, None)
+            self._msg = current_app.config["RESPONSE_MESSAGE"].get(self.lang, {}).get(code, None)
         if data is not None:
             self._data = data
         if msg is not None:

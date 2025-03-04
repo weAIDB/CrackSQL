@@ -2,7 +2,6 @@ import os
 import json
 
 from api.services.knowledge import get_json_items
-from app_factory import create_app
 from config.db_config import db_session_manager
 from preprocessor.query_simplifier.Tree import TreeNode
 
@@ -32,6 +31,4 @@ def load_json_keywords(kb_name: str, dialect: str):
 
 
 if __name__ == "__main__":
-    app = create_app(config_name='DEVELOPMENT')
-    with app.app_context():
-        load_json_keywords(kb_name="MySQL", dialect="MySQL")
+    load_json_keywords(kb_name="MySQL", dialect="MySQL")

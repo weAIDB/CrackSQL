@@ -1,0 +1,23 @@
+include README.md
+include LICENSE
+recursive-include cracksql/static *
+recursive-include cracksql/templates *
+recursive-include cracksql/config *.yaml *.yml *.json
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude .git
+global-exclude .pytest_cache
+prune cracksql/local_models
+prune cracksql/migrations
+prune cracksql/instance
+prune cracksql/logs
+prune cracksql/sources
+prune cracksql/.venv
+prune cracksql/.git
+prune cracksql/.idea
+prune cracksql/__pycache__
+prune cracksql/tests
+prune cracksql/docs 

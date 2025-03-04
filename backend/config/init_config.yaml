@@ -7,7 +7,7 @@ LLM_MODELS:
     category: "llm"
     api_base: ""
     api_key: ""  # Please replace with your actual API key
-    path: "./local_models/DeepSeek-R1-Distill-Qwen-1.5B"  # Local model path
+    path: "./backend/local_models/DeepSeek-R1-Distill-Qwen-1.5B"  # Local model path
     description: "DeepSeek-R1-Distill-Qwen-1.5B LLM model"
     temperature: 0.3
     max_tokens: 260000
@@ -21,7 +21,7 @@ EMBEDDING_MODELS:
     category: "embedding"
     api_base: ""
     api_key: ""  # Please replace with your actual API key
-    path: "./local_models/all-MiniLM-L6-v2"  # Local model path
+    path: "./backend/local_models/all-MiniLM-L6-v2"  # Local model path
     dimension: 384
     description: "Embedding model, used to generate text vectors"
 

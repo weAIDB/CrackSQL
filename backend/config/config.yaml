@@ -1,6 +1,5 @@
 COMMON: &common # Identifier
   DEBUG: False
-  SECRET_KEY: "fHoNCXiQeSCqGcZ*"
 
   # Page settings
   DEFAULT_PAGE_INDEX: 1
@@ -10,7 +9,6 @@ COMMON: &common # Identifier
   UPLOAD_FOLDER: './sources/'
 
   # Business database connection
-  SQLALCHEMY_DATABASE_URI: 'sqlite:///info.db'
   SQLALCHEMY_TRACK_MODIFICATIONS: False
   SQLALCHEMY_ECHO: False
   SQLALCHEMY_POOL_RECYCLE: 8
@@ -37,9 +35,7 @@ DEVELOPMENT: &development
 
 STAGING: &staging
   <<: *common
-  SECRET_KEY: sortasecure
 
 PRODUCTION: &production
   <<: *common
-  SECRET_KEY: mdd1##$$%^!DSA#FDSF
   SQLALCHEMY_ECHO: False

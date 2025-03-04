@@ -14,7 +14,7 @@ import subprocess
 import sys
 # Import application context
 from app_factory import create_app
-from config.db_config import db
+from config.db_config import db, db_session_manager
 from models import KnowledgeBase, JSONContent, LLMModel
 from api.services.knowledge import create_knowledge_base, add_kb_items
 from config.logging_config import logger
@@ -22,18 +22,13 @@ from llm_model.embeddings import get_embeddings
 from vector_store.chroma_store import ChromaStore
 import asyncio
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 
 
 def parse_args():
-    """Parse command line arguments"""
-    parser = argparse.ArgumentParser(description='Knowledge Base Initialization Script')
-    parser.add_argument('--config_file', type=str, default='./config/init_config.yaml', help='Configuration file path')
-    parser.add_argument('--init_all', action='store_true', help='Initialize all knowledge bases and models')
-    parser.add_argument('--init_llm', action='store_true', help='Initialize LLM models')
-    parser.add_argument('--init_embedding', action='store_true', help='Initialize Embedding models')
-    parser.add_argument('--init_kb', action='store_true', help='Initialize all knowledge bases')
-
+    """解析命令行参数"""
+    parser = argparse.ArgumentParser(description='知识库初始化脚本')
+    parser.add_argument('--config_file', type=str, default='./config/init_config.yaml', help='配置文件路径')
     return parser.parse_args()
 
 
@@ -57,55 +52,76 @@ def load_config(config_file_path):
 
 
 def check_database_exists(app):
-    """Check if database exists and initialize"""
+    """检查数据库表是否存在"""
     try:
-        # Try to query the database, using text() function to wrap SQL statement
-        db.session.execute(text("SELECT * from knowledge_bases limit 1;"))
-        return True
-    except (OperationalError, ProgrammingError) as e:
-        error_msg = str(e).lower()
-        if "does not exist" in error_msg or "no such table" in error_msg or "unknown database" in error_msg:
-            logger.warning("Database or table does not exist, initialization required")
-            return False
-        else:
-            logger.error(f"Database connection error: {str(e)}")
-            raise
+        # 尝试查询数据库中的表
+        with app.app_context():
+            # 使用反射获取所有表
+            inspector = inspect(db.engine)
+            
+            # 检查关键表是否存在
+            required_tables = ['knowledge_bases', 'json_contents', 'llm_models']
+            existing_tables = inspector.get_table_names()
+            
+            logger.info(f"现有数据库表: {existing_tables}")
+            
+            # 检查所有必需的表是否都存在
+            for table in required_tables:
+                if table not in existing_tables:
+                    logger.warning(f"缺少必要的表: {table}")
+                    return False
+            
+            return True
     except Exception as e:
-        logger.error(f"Error checking database: {str(e)}")
-        raise
-
-
-def initialize_database():
-    """Initialize database"""
-    try:
-        logger.info("Starting database initialization...")
-
-        # Execute Flask-Migrate commands
-        commands = [
-            ["flask", "db", "init"],
-            ["flask", "db", "migrate", "-m", "Initial migration"],
-            ["flask", "db", "upgrade"]
-        ]
-
-        for cmd in commands:
-            logger.info(f"Executing command: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True, text=True)
-
-            if result.returncode != 0:
-                logger.error(f"Command execution failed: {' '.join(cmd)}")
-                logger.error(f"Error message: {result.stderr}")
-                return False
-
-            logger.info(f"Command output: {result.stdout}")
-
-        logger.info("Database initialization successful")
-        return True
-
-    except Exception as e:
-        logger.error(f"Database initialization failed: {str(e)}")
+        logger.error(f"检查数据库时出错: {str(e)}")
         return False
 
 
+@db_session_manager
+def initialize_database(app=None):
+    """直接创建数据库，适用于生产环境"""
+    try:
+        logger.info("开始初始化数据库...")
+        
+        # 使用传入的应用实例或创建一个新的（不初始化调度器）
+        if app is None:
+            # 导入必要的模块，但避免循环导入
+            from app_factory import create_app
+            
+            # 创建应用实例，但禁用调度器
+            app = create_app("PRODUCTION")
+            # 确保不会启动调度器
+            app.config["SCHEDULER_OPEN"] = False
+        
+        # 确保实例文件夹存在
+        instance_dir = './instance'
+        if not os.path.exists(instance_dir):
+            os.makedirs(instance_dir, exist_ok=True)
+            logger.info(f"创建实例目录: {instance_dir}")
+        
+        # 在应用上下文中执行数据库操作
+        with app.app_context():
+            # 直接创建所有表
+            table_names = [table.name for table in db.metadata.sorted_tables]
+            logger.info(f"需要创建的表: {table_names}")
+            logger.info("创建所有数据库表...")
+            db.create_all()
+            
+            # 获取数据库文件路径
+            db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+            if db_uri.startswith('sqlite:///'):
+                db_path = db_uri.replace('sqlite:///', '')
+                logger.info(f"数据库文件路径: {db_path}")
+            
+            logger.info("数据库初始化成功")
+            return True
+            
+    except Exception as e:
+        logger.error(f"数据库初始化失败: {str(e)}")
+        return False
+
+
+@db_session_manager
 def init_llm_models(models_config):
     """Initialize LLM models"""
     if not models_config:
@@ -128,7 +144,7 @@ def init_llm_models(models_config):
                 continue
 
             # Check if model already exists
-            existing_model = LLMModel.query.filter_by(name=model_config['name']).first()
+            existing_model = db.session.query(LLMModel).filter_by(name=model_config['name']).first()
             if existing_model:
                 logger.info(f"LLM model {model_config['name']} already exists")
                 success_count += 1
@@ -161,6 +177,7 @@ def init_llm_models(models_config):
     return success_count > 0
 
 
+@db_session_manager
 def init_embedding_models(models_config):
     """Initialize Embedding models"""
     if not models_config:
@@ -189,7 +206,7 @@ def init_embedding_models(models_config):
                 continue
 
             # Check if model already exists
-            existing_model = LLMModel.query.filter_by(name=model_config['name']).first()
+            existing_model = db.session.query(LLMModel).filter_by(name=model_config['name']).first()
             if existing_model:
                 logger.info(f"Embedding model {model_config['name']} already exists")
                 success_count += 1
@@ -221,19 +238,21 @@ def init_embedding_models(models_config):
     return success_count > 0
 
 
+@db_session_manager
 def check_embedding_model(model_name):
     """Check if vector model exists"""
-    model = LLMModel.query.filter_by(name=model_name, category='embedding', is_active=True).first()
+    model = db.session.query(LLMModel).filter_by(name=model_name, category='embedding', is_active=True).first()
     if not model:
         logger.error(f"Vector model {model_name} does not exist or is not enabled, please initialize the model first")
         return False
     return True
 
 
+@db_session_manager
 def create_kb(kb_name, kb_info, db_type, embedding_model):
     """Create knowledge base"""
     # Check if knowledge base already exists
-    kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
+    kb = db.session.query(KnowledgeBase).filter_by(kb_name=kb_name).first()
     if kb:
         logger.info(f"Knowledge base {kb_name} already exists")
         return kb
@@ -254,6 +273,7 @@ def create_kb(kb_name, kb_info, db_type, embedding_model):
         return None
 
 
+@db_session_manager
 def import_knowledge_file(kb_name, file_path):
     """Import knowledge file"""
     if not os.path.exists(file_path):
@@ -291,16 +311,17 @@ def import_knowledge_file(kb_name, file_path):
         return False
 
 
+@db_session_manager
 def vectorize_pending_items(kb_name):
     """Vectorize pending knowledge entries"""
     # Get knowledge base
-    kb = KnowledgeBase.query.filter_by(kb_name=kb_name).first()
+    kb = db.session.query(KnowledgeBase).filter_by(kb_name=kb_name).first()
     if not kb:
         logger.error(f"Knowledge base does not exist: {kb_name}")
         return False
 
     # Get pending entries
-    pending_items = JSONContent.query.filter_by(
+    pending_items = db.session.query(JSONContent).filter_by(
         knowledge_base_id=kb.id,
         status="pending"
     ).all()
@@ -400,159 +421,132 @@ def vectorize_pending_items(kb_name):
     return True
 
 
-def init_knowledge_base_from_config(kb_config):
-    """Initialize knowledge base from configuration"""
-    # Check required parameters
-    if 'kb_name' not in kb_config:
-        logger.error("Knowledge base configuration missing required parameter: kb_name")
+def init_knowledge_base_from_config(kb_configs):
+    """从配置初始化知识库"""
+    if not kb_configs or not isinstance(kb_configs, list):
+        logger.error("知识库配置无效或为空")
         return False
+    
+    success_count = 0
+    total_count = len(kb_configs)
+    
+    # 初始化所有知识库
+    for kb_config in kb_configs:
+        # 检查必需参数
+        if 'kb_name' not in kb_config:
+            logger.error("知识库配置缺少必需参数: kb_name")
+            continue
 
-    if 'db_type' not in kb_config:
-        logger.error(
-            f"Knowledge base {kb_config.get('kb_name', 'unknown')} configuration missing required parameter: db_type")
-        return False
+        if 'db_type' not in kb_config:
+            logger.error(f"知识库 {kb_config.get('kb_name', 'unknown')} 配置缺少必需参数: db_type")
+            continue
 
-    if 'embedding_model' not in kb_config:
-        logger.error(
-            f"Knowledge base {kb_config.get('kb_name', 'unknown')} configuration missing required parameter: embedding_model")
-        return False
+        if 'embedding_model' not in kb_config:
+            logger.error(f"知识库 {kb_config.get('kb_name', 'unknown')} 配置缺少必需参数: embedding_model")
+            continue
 
-    kb_name = kb_config['kb_name']
-    db_type = kb_config['db_type']
-    kb_info = kb_config.get('kb_info', '')
-    embedding_model = kb_config['embedding_model']
-    knowledge_files = kb_config.get('knowledge_files', [])
+        kb_name = kb_config['kb_name']
+        db_type = kb_config['db_type']
+        kb_info = kb_config.get('kb_info', '')
+        embedding_model = kb_config['embedding_model']
+        knowledge_files = kb_config.get('knowledge_files', [])
 
-    # Check vector model
-    if not check_embedding_model(embedding_model):
-        logger.error(f"Failed to initialize knowledge base {kb_name}: Vector model does not exist")
-        return False
+        # 检查嵌入模型是否存在
+        if not check_embedding_model(embedding_model):
+            logger.error(f"知识库 {kb_name} 使用的嵌入模型 {embedding_model} 不存在")
+            continue
 
-    # Create knowledge base
-    kb = create_kb(
-        kb_name=kb_name,
-        kb_info=kb_info,
-        db_type=db_type,
-        embedding_model=embedding_model
-    )
+        # 创建知识库
+        if not create_kb(kb_name, kb_info, db_type, embedding_model):
+            logger.error(f"创建知识库 {kb_name} 失败")
+            continue
 
-    if not kb:
-        return False
+        # 导入知识文件
+        if knowledge_files:
+            for file_path in knowledge_files:
+                if not import_knowledge_file(kb_name, file_path):
+                    logger.warning(f"知识库 {kb_name} 导入知识文件 {file_path} 失败")
 
-    # Import knowledge files
-    success = True
-    files_processed = 0
-
-    for file_path in knowledge_files:
-        if os.path.exists(file_path):
-            logger.info(f"Starting import of knowledge file: {file_path}")
-            if import_knowledge_file(kb_name, file_path):
-                files_processed += 1
-            else:
-                success = False
-        else:
-            logger.warning(f"Knowledge file does not exist: {file_path}")
-
-    if files_processed == 0 and knowledge_files:
-        logger.warning(f"Knowledge base {kb_name} did not successfully import any knowledge files")
-
-    # Vectorize pending knowledge entries
-    if not vectorize_pending_items(kb_name):
-        success = False
-
-    if success:
-        logger.info(f"Knowledge base {kb_name} initialization complete")
-    else:
-        logger.warning(f"Knowledge base {kb_name} initialization partially complete, some operations failed")
-
-    return success
+        # 向量化待处理的知识条目
+        if not vectorize_pending_items(kb_name):
+            logger.warning(f"知识库 {kb_name} 向量化待处理的知识条目失败")
+        
+        success_count += 1
+        logger.info(f"知识库 {kb_name} 初始化完成")
+    
+    logger.info(f"知识库初始化完成: 成功 {success_count}/{total_count}")
+    return success_count > 0
 
 
-def initialize_kb(config_file_path, init_all=False, init_llm=False, init_embedding=False, init_kb=False):
-    """Main function"""
+def initialize_kb(config_file_path):
+    """主函数 - 按固定顺序执行初始化步骤"""
 
     if not config_file_path:
-        logger.error("Configuration file path is required")
-        sys.exit(1)
-    if not init_all and not init_llm and not init_embedding and not init_kb:
-        logger.error("No operation specified, please specify an operation to perform, such as "
-                        "`--init_all, --init_llm, --init_embedding, --init_kb`, etc.")
+        logger.error("必须提供配置文件路径")
         sys.exit(1)
 
-    # Create application context
-    app = create_app(config_name='PRODUCTION')
-    with app.app_context():
-        # Check if database exists
-        try:
-            db_exists = check_database_exists(app)
-            if db_exists and not init_all and not init_llm:
-                logger.info("Database already exists, skipping database initialization")
-                return
-            if not db_exists:
-                logger.warning("Database does not exist or is not initialized, automatically initializing database...")
-                if not initialize_database():
-                    logger.error("Database initialization failed, exiting program")
-                    sys.exit(1)
-                # Wait for database initialization to complete
-                logger.info("Waiting for database initialization to complete...")
-                time.sleep(2)
-                logger.info("Database initialization complete, continuing execution...")
-        except Exception as e:
-            logger.error(f"Error checking database: {str(e)}")
+    # 创建应用上下文
+    try:
+        # 创建应用实例，但禁用调度器以避免重复初始化
+        app = create_app(config_name='PRODUCTION')
+        app.config["SCHEDULER_OPEN"] = False
+    except Exception as e:
+        logger.error(f"创建应用上下文失败: {str(e)}")
+        sys.exit(1)
+    
+    # 步骤1: 检查并初始化数据库
+    try:
+        db_exists = check_database_exists(app)
+        if not db_exists:
+            logger.warning("数据库表不存在或未初始化，正在自动初始化数据库...")
+            if not initialize_database(app):
+                logger.error("数据库初始化失败，程序退出")
+                sys.exit(1)
+            logger.info("数据库初始化完成，继续执行...")
+    except Exception as e:
+        logger.error(f"检查数据库时出错: {str(e)}")
+        sys.exit(1)
+
+    # 加载配置文件
+    config = load_config(config_file_path)
+    if not config:
+        logger.error(f"加载配置文件失败: {config_file_path}")
+        sys.exit(1)
+
+    # 步骤2: 初始化嵌入模型
+    if 'EMBEDDING_MODELS' in config:
+        logger.info("开始初始化嵌入模型...")
+        if not init_embedding_models(config['EMBEDDING_MODELS']):
+            logger.error("嵌入模型初始化失败，程序退出")
             sys.exit(1)
+        logger.info("嵌入模型初始化完成")
+    else:
+        logger.warning("配置文件中未找到嵌入模型配置，跳过嵌入模型初始化")
 
-        # Load configuration file
-        config = load_config(config_file_path)
-        if not config:
-            logger.error(f"Failed to load configuration file: {config_file_path}")
+    # 步骤3: 初始化知识库
+    if 'KNOWLEDGE_BASES' in config:
+        logger.info("开始初始化知识库...")
+        if not init_knowledge_base_from_config(config['KNOWLEDGE_BASES']):
+            logger.error("知识库初始化失败，程序退出")
             sys.exit(1)
+        logger.info("知识库初始化完成")
+    else:
+        logger.warning("配置文件中未找到知识库配置，跳过知识库初始化")
 
-        # Initialize LLM models
-        if init_all or init_llm:
-            if not init_llm_models(config.get('LLM_MODELS', [])):
-                logger.error("Failed to initialize LLM models")
-                if init_llm:  # If only initializing LLM models, exit on failure
-                    sys.exit(1)
+    # 步骤4: 初始化LLM模型（如果有）
+    if 'LLM_MODELS' in config:
+        logger.info("开始初始化LLM模型...")
+        if not init_llm_models(config['LLM_MODELS']):
+            logger.error("LLM模型初始化失败，程序退出")
+            sys.exit(1)
+        logger.info("LLM模型初始化完成")
+    else:
+        logger.warning("配置文件中未找到LLM模型配置，跳过LLM模型初始化")
 
-        # Initialize Embedding models
-        if init_all or init_embedding:
-            if not init_embedding_models(config.get('EMBEDDING_MODELS', [])):
-                logger.error("Failed to initialize Embedding models")
-                if init_embedding:  # If only initializing Embedding models, exit on failure
-                    sys.exit(1)
-
-        # Initialize all knowledge bases
-        if init_all or init_kb:
-            kb_configs = config.get('KNOWLEDGE_BASES', [])
-            if not kb_configs:
-                logger.warning("No knowledge base configuration found in configuration file")
-                sys.exit(0)
-
-            success_count = 0
-            total_count = len(kb_configs)
-
-            # Initialize all knowledge bases
-            for kb_config in kb_configs:
-                if init_knowledge_base_from_config(kb_config):
-                    success_count += 1
-
-            logger.info(f"Knowledge base initialization complete: Success {success_count}/{total_count}")
-            sys.exit(0 if success_count > 0 else 1)
-
-        # If only initializing models, exit after completion
-        if init_llm or init_embedding:
-            sys.exit(0)
-
-
+    logger.info("所有初始化步骤已完成")
+    return True
 
 
 if __name__ == "__main__":
     args = parse_args()
-    # If no operation specified, display help information
-    if not (args.init_all or args.init_llm or args.init_embedding or args.init_kb):
-        logger.error("Please specify an operation to perform, such as "
-                        "`--init_all, --init_llm, --init_embedding, --init_kb`, etc.")
-        parser = argparse.ArgumentParser(description='Knowledge Base Initialization Script')
-        parser.print_help()
-        sys.exit(1)
-    initialize_kb(config_file_path=args.config_file, init_all=args.init_all, init_llm=args.init_llm, init_embedding=args.init_embedding, init_kb=args.init_kb)
+    initialize_kb(config_file_path=args.config_file)
