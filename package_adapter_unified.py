@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-CrackSQL 统一适配器脚本 - 简化版
-此脚本用于修改CrackSQL包中的文件，使其适合作为Python包分发
-主要功能：
-1. 修改app.py，使其成为简单的包入口点
-2. 修改router.py文件，避免路由注册错误
-3. 修改app_factory.py，删除路由注册相关代码
+CrackSQL Unified Adapter Script - Simplified Version
+This script is used to modify files in the CrackSQL package to make it suitable for Python package distribution
+Main features:
+1. Modify app.py to make it a simple package entry point
+2. Modify router.py files to avoid route registration errors
+3. Modify app_factory.py to remove route registration related code
 """
 
 import os
@@ -18,124 +18,124 @@ from pathlib import Path
 
 def modify_app_py(cracksql_dir):
     """
-    修改app.py文件，使其成为简单的包入口点
+    Modify app.py file to make it a simple package entry point
     """
     app_py_path = os.path.join(cracksql_dir, 'app.py')
     if not os.path.exists(app_py_path):
-        print(f"警告: 找不到app.py文件: {app_py_path}")
+        print(f"Warning: Cannot find app.py file: {app_py_path}")
         return False
     
-    # 新的app.py内容 - 简单的包入口点
+    # New app.py content - simple package entry point
     new_content = '''#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
-CrackSQL 包入口点
-此文件作为CrackSQL包的入口点，允许用户直接导入所有类和方法
+CrackSQL Package Entry Point
+This file serves as the entry point for the CrackSQL package, allowing users to directly import all classes and methods
 """
 
 __version__ = "0.1.0"
 
-# 导入警告
+# Import warnings
 import warnings
 
-# 尝试导入所有主要模块，但不强制要求它们存在
+# Try to import all main modules, but don't require them to exist
 try:
     from . import config
 except ImportError as e:
-    warnings.warn(f"导入config模块失败: {str(e)}")
+    warnings.warn(f"Failed to import config module: {str(e)}")
 
 try:
     from . import models
 except ImportError as e:
-    warnings.warn(f"导入models模块失败: {str(e)}")
+    warnings.warn(f"Failed to import models module: {str(e)}")
 
 try:
     from . import api
 except ImportError as e:
-    warnings.warn(f"导入api模块失败: {str(e)}")
+    warnings.warn(f"Failed to import api module: {str(e)}")
 
 try:
     from . import llm_model
 except ImportError as e:
-    warnings.warn(f"导入llm_model模块失败: {str(e)}")
+    warnings.warn(f"Failed to import llm_model module: {str(e)}")
 
 try:
     from . import vector_store
 except ImportError as e:
-    warnings.warn(f"导入vector_store模块失败: {str(e)}")
+    warnings.warn(f"Failed to import vector_store module: {str(e)}")
 
 try:
     from . import utils
 except ImportError as e:
-    warnings.warn(f"导入utils模块失败: {str(e)}")
+    warnings.warn(f"Failed to import utils module: {str(e)}")
 
 try:
     from . import retriever
 except ImportError as e:
-    warnings.warn(f"导入retriever模块失败: {str(e)}")
+    warnings.warn(f"Failed to import retriever module: {str(e)}")
 
 try:
     from . import task
 except ImportError as e:
-    warnings.warn(f"导入task模块失败: {str(e)}")
+    warnings.warn(f"Failed to import task module: {str(e)}")
 
 try:
     from . import translator
 except ImportError as e:
-    warnings.warn(f"导入translator模块失败: {str(e)}")
+    warnings.warn(f"Failed to import translator module: {str(e)}")
 
 try:
     from . import preprocessor
 except ImportError as e:
-    warnings.warn(f"导入preprocessor模块失败: {str(e)}")
+    warnings.warn(f"Failed to import preprocessor module: {str(e)}")
 
 try:
     from . import doc_process
 except ImportError as e:
-    warnings.warn(f"导入doc_process模块失败: {str(e)}")
+    warnings.warn(f"Failed to import doc_process module: {str(e)}")
 
-# 允许用户直接从包中导入所有内容
+# Allow users to directly import everything from the package
 '''
     
-    # 写入新内容
+    # Write new content
     with open(app_py_path, 'w', encoding='utf-8') as f:
         f.write(new_content)
     
-    print(f"已修改app.py文件，使其成为简单的包入口点")
+    print(f"Modified app.py file to make it a simple package entry point")
     return True
 
 def modify_app_factory_py(cracksql_dir):
     """
-    修改app_factory.py文件，删除路由注册相关代码
+    Modify app_factory.py file to remove route registration related code
     """
     app_factory_py_path = os.path.join(cracksql_dir, 'app_factory.py')
     if not os.path.exists(app_factory_py_path):
-        print(f"警告: 找不到app_factory.py文件: {app_factory_py_path}")
+        print(f"Warning: Cannot find app_factory.py file: {app_factory_py_path}")
         return False
     
-    # 读取原始内容
+    # Read original content
     with open(app_factory_py_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    # 删除导入router的代码
+    # Remove router import code
     content = re.sub(r'from api\.router import router\s*', '', content)
     
-    # 删除注册路由的代码
+    # Remove route registration code
     content = re.sub(r'register_api\(app, router\)\s*', '', content)
     
-    # 写入修改后的内容
+    # Write modified content
     with open(app_factory_py_path, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print(f"已修改app_factory.py文件，删除了路由注册相关代码")
+    print(f"Modified app_factory.py file, removed route registration related code")
     return True
 
 def fix_router_py(cracksql_dir):
     """
-    修改router.py文件，避免路由注册错误
+    Modify router.py files to avoid route registration errors
     """
-    # 查找所有router.py文件
+    # Find all router.py files
     router_files = []
     for root, dirs, files in os.walk(cracksql_dir):
         for file in files:
@@ -143,30 +143,30 @@ def fix_router_py(cracksql_dir):
                 router_files.append(os.path.join(root, file))
     
     if not router_files:
-        print("未找到router.py文件，跳过修改")
+        print("No router.py files found, skipping modification")
         return True
     
     success = True
     for router_file in router_files:
-        print(f"修改router文件: {router_file}")
+        print(f"Modifying router file: {router_file}")
         
-        # 读取原始内容
+        # Read original content
         with open(router_file, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        # 修改内容，添加try-except块
+        # Modify content, add try-except block
         new_content = '''#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
-Router模块 - 简化版
-此文件为简化版router，不注册任何路由
+Router Module - Simplified Version
+This is a simplified version of router that doesn't register any routes
 """
 
 try:
     from flask import Blueprint
 except ImportError:
-    # 如果无法导入Flask，创建一个虚拟的Blueprint类
+    # If Flask cannot be imported, create a dummy Blueprint class
     class Blueprint:
         def __init__(self, name, import_name, **kwargs):
             self.name = name
@@ -177,66 +177,66 @@ except ImportError:
                 return f
             return decorator
 
-# 创建蓝图但不注册任何路由
+# Create blueprint but don't register any routes
 bp = Blueprint('dummy', __name__)
 
-# 空函数，不执行任何操作
+# Empty function that does nothing
 def register_routes():
-    """此函数不注册任何路由"""
+    """This function doesn't register any routes"""
     pass
 '''
         
-        # 写入新内容
+        # Write new content
         with open(router_file, 'w', encoding='utf-8') as f:
             f.write(new_content)
         
-        print(f"已修改router文件: {router_file}")
+        print(f"Modified router file: {router_file}")
     
     return success
 
 def process_package(temp_dir):
     """
-    处理包目录，修改必要的文件
+    Process package directory and modify necessary files
     """
     cracksql_dir = os.path.join(temp_dir, 'cracksql')
     if not os.path.isdir(cracksql_dir):
-        print(f"错误: 找不到cracksql目录: {cracksql_dir}")
+        print(f"Error: Cannot find cracksql directory: {cracksql_dir}")
         return False
     
-    # 修改app.py
+    # Modify app.py
     if not modify_app_py(cracksql_dir):
-        print("警告: 修改app.py失败")
+        print("Warning: Failed to modify app.py")
     
-    # 修改app_factory.py
+    # Modify app_factory.py
     if not modify_app_factory_py(cracksql_dir):
-        print("警告: 修改app_factory.py失败")
+        print("Warning: Failed to modify app_factory.py")
     
-    # 修改router.py文件
+    # Modify router.py files
     if not fix_router_py(cracksql_dir):
-        print("警告: 修改router.py文件失败")
+        print("Warning: Failed to modify router.py files")
     
     return True
 
 def main():
-    """主函数"""
+    """Main function"""
     if len(sys.argv) < 2:
-        print("用法: python package_adapter_unified.py <临时目录>")
+        print("Usage: python package_adapter_unified.py <temp_directory>")
         return 1
     
     temp_dir = sys.argv[1]
     if not os.path.isdir(temp_dir):
-        print(f"错误: 指定的临时目录不存在: {temp_dir}")
+        print(f"Error: Specified temp directory does not exist: {temp_dir}")
         return 1
     
     print("=" * 60)
-    print("CrackSQL 统一适配器脚本 - 简化版")
+    print("CrackSQL Unified Adapter Script - Simplified Version")
     print("=" * 60)
     
     if process_package(temp_dir):
-        print("\n适配过程成功完成!")
+        print("\nAdaptation process completed successfully!")
         return 0
     else:
-        print("\n错误: 适配过程失败")
+        print("\nError: Adaptation process failed")
         return 1
 
 if __name__ == "__main__":

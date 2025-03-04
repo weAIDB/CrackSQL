@@ -17,94 +17,47 @@ from config.cache import cache
 from utils.public import read_yaml
 
 
-def is_package_installed(package_name):
-    """
-    检查指定的包是否已安装
-    
-    :param package_name: 包名
-    :return: 如果包已安装返回 True，否则返回 False
-    """
-    try:
-        spec = importlib.util.find_spec(package_name)
-        return spec is not None
-    except (ImportError, AttributeError):
-        return False
-
-
-def get_user_data_path(filename=None, app_name="CrackSQL"):
-    """
-    获取用户数据目录中的文件路径
-    
-    :param filename: 文件名，如果为 None，则返回目录路径
-    :param app_name: 应用名称
-    :return: 文件路径
-    """
-    # 获取用户主目录
-    home = Path.home()
-    
-    # 根据操作系统选择合适的数据目录
-    if sys.platform == "win32":
-        # Windows
-        data_dir = home / "AppData" / "Local" / app_name
-    elif sys.platform == "darwin":
-        # macOS
-        data_dir = home / "Library" / "Application Support" / app_name
-    else:
-        # Linux 和其他类 Unix 系统
-        data_dir = home / ".local" / "share" / app_name
-    
-    # 确保目录存在
-    data_dir.mkdir(parents=True, exist_ok=True)
-    
-    # 如果指定了文件名，则返回文件路径
-    if filename:
-        return str(data_dir / filename)
-    
-    # 否则返回目录路径
-    return str(data_dir)
-
-
 def find_config_file(filename, search_paths=None):
     """
-    智能查找配置文件
-    按照优先级顺序在多个位置查找配置文件
+    Intelligently find configuration file
+    Search for configuration file in multiple locations in priority order
     
-    :param filename: 配置文件名
-    :param search_paths: 额外的搜索路径
-    :return: 找到的配置文件路径，如果未找到则返回None
+    :param filename: Configuration file name
+    :param search_paths: Additional search paths
+    :return: Found configuration file path, returns None if not found
     """
     if search_paths is None:
         search_paths = []
         
-    # 获取当前模块所在的目录
+    # Get the directory where the current module is located
     current_dir = os.path.dirname(os.path.abspath(__file__))
     package_dir = os.path.dirname(current_dir)
     
-    # 尝试获取site-packages目录
+    # Try to get the site-packages directory
     site_packages = None
     for path in sys.path:
         if 'site-packages' in path:
             site_packages = path
             break
     
-    # 定义搜索路径优先级
+    # Define search path priority
     paths_to_search = [
-        # 1. 用户指定的搜索路径
+        # 1. User specified search paths
         *search_paths,
         
-        # 2. 当前工作目录
+        # 2. Current working directory
         os.path.join(os.getcwd(), filename),
         os.path.join(os.getcwd(), 'config', filename),
         
-        # 3. 项目目录
+        # 3. Project directory
         os.path.join(package_dir, filename),
         os.path.join(package_dir, 'config', filename),
         
-        # 4. 包安装目录 - 更多的组合
+        # 4. Package installation directory - more combinations
         os.path.join(current_dir, 'config', filename),
     ]
     
-    # 如果找到了site-packages目录，添加更多的搜索路径
+    # If site-packages directory is found, add more search paths
     if site_packages:
         paths_to_search.extend([
             os.path.join(site_packages, 'cracksql', filename),
@@ -113,13 +66,13 @@ def find_config_file(filename, search_paths=None):
             os.path.join(site_packages, 'config', filename),
         ])
     
-    # 添加系统路径
+    # Add system paths
     paths_to_search.extend([
         os.path.join(sys.prefix, 'cracksql', 'config', filename),
         os.path.join('/etc/cracksql', filename),
     ])
     
-    # 搜索所有可能的路径
+    # Search all possible paths
     for path in paths_to_search:
         if os.path.exists(path):
             return path
@@ -129,10 +82,10 @@ def find_config_file(filename, search_paths=None):
 
 def create_app(config_name='PRODUCTION', config_path=None):
     """
-    创建Flask应用实例
-    :param config_name: 配置名称，默认为PRODUCTION
-    :param config_path: 配置文件路径，如果为None则自动查找
-    :return: Flask应用实例
+    Create Flask application instance
+    :param config_name: Configuration name, defaults to PRODUCTION
+    :param config_path: Configuration file path, if None, automatically finds it
+    :return: Flask application instance
     """
     
     app = Flask(__name__)
@@ -156,80 +109,80 @@ def create_app(config_name='PRODUCTION', config_path=None):
         ]
     )
 
-    # 加载配置文件
+    # Load configuration file
     if config_path is None:
         config_path = find_config_file('config.yaml')
         if config_path is None:
-            print("警告: 无法找到配置文件，使用默认配置路径")
+            print("Warning: Unable to find configuration file, using default configuration path")
             config_path = './config/config.yaml'
-        print(f"使用配置文件: {config_path}")
+        print(f"Using configuration file: {config_path}")
 
-    # 加载配置
+    # Load configuration
     if os.path.exists(config_path):
         with open(config_path, 'r', encoding='utf-8') as f:
             config_data = yaml.safe_load(f)
             if config_name in config_data:
                 app.config.update(config_data[config_name])
             else:
-                print(f"警告: 配置文件中未找到 {config_name} 配置")
+                print(f"Warning: Configuration {config_name} not found in configuration file")
     else:
-        print(f"警告: 配置文件不存在: {config_path}")
+        print(f"Warning: Configuration file does not exist: {config_path}")
         
-    # 动态设置数据库路径
-    # 使用用户执行目录
+    # Dynamically set database path
+    # Use user execution directory
     current_dir = os.getcwd()
     instance_dir = os.path.join(current_dir, 'instance')
     
-    # 确保目录存在
+    # Ensure directory exists
     os.makedirs(instance_dir, exist_ok=True)
     
-    # 设置数据库文件路径
+    # Set database file path
     db_path = os.path.join(instance_dir, 'info.db')
-    print(f"使用数据库: {db_path}")
+    print(f"Using database: {db_path}")
     
-    # 更新数据库 URI
+    # Update database URI
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////{db_path}'
 
-    # 加载日志配置
+    # Load logging configuration
     logging_config_path = app.config.get('LOGGING_CONFIG_PATH')
     if logging_config_path:
         logging_config_path = find_config_file(os.path.basename(logging_config_path))
         if logging_config_path and os.path.exists(logging_config_path):
-            print(f"找到配置文件: {logging_config_path}")
+            print(f"Found configuration file: {logging_config_path}")
             with open(logging_config_path, 'r', encoding='utf-8') as f:
                 logging_config = yaml.safe_load(f)
                 logging.config.dictConfig(logging_config)
 
-    # 加载消息配置
+    # Load message configuration
     msg_config_path = app.config.get('RESPONSE_MESSAGE')
     if msg_config_path:
         msg_config_path = find_config_file(os.path.basename(msg_config_path))
         if msg_config_path and os.path.exists(msg_config_path):
-            print(f"找到配置文件: {msg_config_path}")
+            print(f"Found configuration file: {msg_config_path}")
             with open(msg_config_path, 'r', encoding='utf-8') as f:
                 msg_config = yaml.safe_load(f)
                 app.config['RESPONSE_MESSAGE'] = msg_config
 
-    # 初始化数据库
+    # Initialize database
     db.app = app
     db.init_app(app)
     Migrate(app, db)
 
-    # 注册API
+    # Register API
     register_api(app, router)
 
-    # 初始化缓存
+    # Initialize cache
     cache.init_app(app, config={
         "DEBUG": app.config['DEBUG'],
         "CACHE_TYPE": "simple",
         "CACHE_DEFAULT_TIMEOUT": 300
     })
 
-    # 启动定时任务
+    # Start scheduled tasks
     if app.config.get("SCHEDULER_OPEN"):
         scheduler_init(app)
     
-    # 推送应用上下文
+    # Push application context
     app.app_context().push()
 
     return app
@@ -243,7 +196,7 @@ def register_api(app, routers):
             try:
                 endpoint = router_api.__name__
                 view_func = router_api.as_view(endpoint)
-                # 如果没有服务名,默认 类名小写
+                # If no service name, default to lowercase class name
                 if hasattr(router_api, "service_name"):
                     url = '/{}/'.format(router_api.service_name.lower())
                 else:
