@@ -78,6 +78,9 @@ class Translator:
         self.src_sql = src_sql
         self.src_dialect = src_dialect
         self.tgt_dialect = tgt_dialect
+        self.vector_config = vector_config
+        self.tgt_db_config = tgt_db_config
+        
 
         if self.src_dialect == "postgresql":
             self.src_dialect = "pg"
@@ -100,7 +103,13 @@ class Translator:
         self.history_id = history_id  # History record ID
         self.out_type = out_type  # Output type
         self.out_dir = out_dir  # Output directory
-
+        self.out_file = None
+        if self.out_type is 'file':
+            if not os.path.exists(self.out_dir):
+                os.makedirs(self.out_dir)
+            file_name = f"{self.src_dialect}_{self.tgt_dialect}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            self.out_file = os.path.join(self.out_dir, file_name)
+            self.init_out_file()
         # Initialize core components
         self.translator = LLMTranslator(model_name)  # Initialize LLM translator
         self.vector_db = ChromaStore()  # Initialize vector database
@@ -823,24 +832,33 @@ class Translator:
 
         return current_sql, model_ans_list
 
+    def init_out_file(self):
+        res_data = {
+            "info":                    {
+                "src_dialect": self.src_dialect,
+                "tgt_dialect": self.tgt_dialect,
+                "src_sql": self.src_sql,
+                "model_name": self.model_name,
+                "vector_config": self.vector_config,
+                "tgt_db_config": self.tgt_db_config,
+            },
+            "process_data": []
+        }
+        with open(self.out_file, "w") as wf:
+            json.dump(res_data, wf, indent=4)
+
     def add_process(self, content, step_name, sql, role, is_success, error):
         if self.out_type == "file":
             # Add rewrite result record to file
-            if not os.path.exists(self.out_dir):
-                os.makedirs(self.out_dir)
-
-            # res_data = list()
-            # file_load = os.path.join(self.out_dir, "single_translation_result.json")
-            # if os.path.exists(file_load):
-            #     with open(file_load, "r") as rf:
-            #         res_data = json.load(rf)
-            # res_data.append({
-            #     "role": role, "sql": sql, "content": content,
-            #     "step_name": step_name, "is_success": is_success,
-            #     "error": error
-            # })
-            # with open(file_load, "w") as wf:
-            #     json.dump(res_data, wf, indent=4)
+            with open(self.out_file, "r") as rf:
+                res_data = json.load(rf)
+            res_data["process_data"].append({
+                "role": role, "sql": sql, "content": content,
+                "step_name": step_name, "is_success": is_success,
+                "error": error
+            })
+            with open(self.out_file, "w") as wf:
+                json.dump(res_data, wf, indent=4)
 
         elif self.out_type == "db":
             # Add rewrite result record to database
@@ -914,6 +932,7 @@ def parse_args():
 
     parser.add_argument('--out_dir', type=str,
                         help='Output directory to dump translation result')
+
 
     return parser.parse_args()
 
