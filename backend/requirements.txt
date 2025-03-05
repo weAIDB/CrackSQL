@@ -2,13 +2,18 @@ flask_cors==3.0.10
 flask==2.2.5
 flask-sqlalchemy==3.0.2
 flask_migrate==3.1.0
-pymysql==1.0.2
+
 PyJWT==2.3.0
 PyYAML==6.0
 Flask-APScheduler==1.12.3
 flask_caching==1.10.1
-aliyun-python-sdk-core==2.13.36
-gunicorn
+func_timeout==4.3.5
+paramiko==3.5.1
+
+# Database
+psycopg2-binary==2.9.10
+pymysql==1.0.2
+oracledb==3.0.0
 
 # Document processing
 tiktoken>=0.3.3

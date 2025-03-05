@@ -35,7 +35,10 @@ FILE_PATTERNS = [
     'task/*.py',
     'translator/*.py',
     'preprocessor/*.py',
+    'preprocessor/*/*.py',
+    'preprocessor/*/*/*.py',
     'doc_process/*.py',
+    'translate.py',
 ]
 
 # List of modules that should not be replaced with cracksql.xxx
@@ -59,7 +62,8 @@ DO_NOT_REPLACE_MODULES = [
     'jinja2', 'markupsafe', 'itsdangerous', 'six', 'setuptools', 'pip',
     'wheel', 'virtualenv', 'pytz', 'chardet', 'idna', 'certifi', 'urllib3',
     'tqdm', 'packaging', 'antlr4', 'flask_apscheduler', 'langchain_openai', 
-    'langchain_community', 'tenacity', 'langchain_core', 'langchain_community'
+    'langchain_community', 'tenacity', 'langchain_core', 'langchain_community', 
+    'psycopg2', 'sqlalchemy', 'cx_Oracle', 'paramiko', 'func_timeout', 'oracledb'
 ]
 
 # Import replacement rules

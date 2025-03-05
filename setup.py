@@ -12,10 +12,12 @@ setup(
         "flask-cors==3.0.10",
         "Flask-APScheduler==1.12.3",
         "flask_caching==1.10.1",
-        "gunicorn",
-        
+        "func_timeout==4.3.5",
+        "paramiko==3.5.1",
         # Database
         "pymysql==1.0.2",
+        "psycopg2-binary==2.9.10",
+        "oracledb==3.0.0",
         
         # Utils
         "PyJWT==2.3.0",

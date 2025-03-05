@@ -8,7 +8,7 @@ LLM_MODELS:
     category: "llm"                         # Model category
     api_base: "https://api.openai.com/v1"   # API base URL 
     api_key: "your-openai-api-key"          # Replace with your actual API key
-    path: "./local_models/gpt-4o"           # Local model path
+    path: "./local_models/gpt-4o"           # Local model path. Please replace with the actual path of the local model.
     description: "OpenAI LLM模型，用于生成文本"  # Model description
     temperature: 0.7                        # Temperature for text generation
     max_tokens: 128000                      # Maximum tokens for generation
@@ -22,7 +22,7 @@ EMBEDDING_MODELS:
     category: "embedding"                   # Model category
     api_base: "https://api.openai.com/v1"   # API base URL
     api_key: "your-openai-api-key"          # Replace with your actual API key
-    path: "./local_models/text-embedding-ada-002"  # Local model path
+    path: "./local_models/text-embedding-ada-002"  # Local model path. Please replace with the actual path of the local model.
     dimension: 1536                         # Vector dimension
     description: "OpenAI Embedding模型，用于生成文本向量"  # Model description
 

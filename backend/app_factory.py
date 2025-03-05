@@ -132,9 +132,10 @@ def create_app(config_name='PRODUCTION', config_path=None):
     # Use user execution directory
     current_dir = os.getcwd()
     instance_dir = os.path.join(current_dir, 'instance')
-    
+    logs_dir = os.path.join(current_dir, 'logs')
     # Ensure directory exists
     os.makedirs(instance_dir, exist_ok=True)
+    os.makedirs(logs_dir, exist_ok=True)
     
     # Set database file path
     db_path = os.path.join(instance_dir, 'info.db')

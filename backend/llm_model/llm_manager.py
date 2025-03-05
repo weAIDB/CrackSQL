@@ -1,11 +1,9 @@
 from typing import Dict, Optional
-from .base import BaseLLM
-from .implementations import CloudLLM, LocalLLM
+from llm_model.base import BaseLLM
+from llm_model.implementations import CloudLLM, LocalLLM
 from models import LLMModel
-import logging
 from config.db_config import db_session_manager
-
-logger = logging.getLogger(__name__)
+from config.logging_config import logger
 
 
 class LLMManager:

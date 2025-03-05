@@ -1,9 +1,7 @@
 from typing import List, Dict, Any
 from langchain.schema import SystemMessage, HumanMessage
-from .llm_manager import llm_manager
-import logging
-
-logger = logging.getLogger(__name__)
+from llm_model.llm_manager import llm_manager
+from config.logging_config import logger
 
 
 async def chat_completion(

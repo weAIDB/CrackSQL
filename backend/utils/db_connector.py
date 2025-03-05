@@ -10,7 +10,7 @@ import pymysql
 from pymysql.err import Error
 import psycopg2
 from psycopg2 import Error
-import cx_Oracle
+import oracledb
 
 from utils.constants import ORACLE_COMMAND_OPEN
 
@@ -36,7 +36,7 @@ def mysql_db_connect(db_config):
                                      user=db_config["user"],
                                      password=db_config["password"],
                                      host=db_config["host"],
-                                     port=db_config["port"])
+                                     port=int(db_config["port"]))
         cursor = connection.cursor()
         mysql_conn_map[dbname] = connection
         mysql_cursor_map[dbname] = cursor
@@ -150,9 +150,8 @@ def read_output(shell, prompt, timeout=15):
 
 def oracle_db_connect(db_config):
     db_name = db_config["db_name"]  # db_config["user"]
-    dsn = cx_Oracle.makedsn(db_config["host"], db_config["port"], service_name="your service")
-    connection = cx_Oracle.connect(db_config["db_name"], db_config["password"], dsn)
-
+    dsn = f"{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
+    connection = oracledb.connect(user=db_config["user"], password=db_config["password"], dsn=dsn)
     cursor = connection.cursor()
 
     oracle_cursor_map[db_name] = cursor

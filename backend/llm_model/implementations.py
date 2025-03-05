@@ -2,16 +2,11 @@
 
 import json
 import openai
-
-import logging
 from threading import Thread
 from typing import Dict, Any, List, Union, AsyncGenerator
 from langchain.schema import SystemMessage, HumanMessage
-
-from .base import BaseLLM
-
-
-logger = logging.getLogger(__name__)
+from llm_model.base import BaseLLM
+from config.logging_config import logger
 
 
 class CloudLLM(BaseLLM):

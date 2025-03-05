@@ -1,13 +1,10 @@
-import logging
 from flask import Blueprint
 from api.utils.response import ResMsg
 from api.utils.util import route
 from api.utils.scheduler import scheduler
-
+from config.logging_config import logger
 
 bp = Blueprint("scheduler", __name__, url_prefix='/api/scheduler')
-
-logger = logging.getLogger(__name__)
 
 
 @route(bp, '/jobs', methods=["GET"])

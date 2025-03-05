@@ -1,5 +1,4 @@
 import numpy as np
-import logging
 from typing import List, Union, Optional, Dict
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
@@ -7,8 +6,7 @@ from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 from models import LLMModel
 from config.db_config import db, db_session_manager
-
-logger = logging.getLogger(__name__)
+from config.logging_config import logger
 
 
 class EmbeddingManager:
@@ -25,6 +23,7 @@ class EmbeddingManager:
         config = db.session.query(LLMModel).filter_by(name=model_name,
                                                       category='embedding',
                                                       is_active=True).first()
+
         return {
             'name': config.name,
             'model_path': config.path,
