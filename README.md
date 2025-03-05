@@ -18,6 +18,10 @@
   <b>English</b> | <a href="./README_CH.md">简体中文</a>
 </p>
 
+<p align="center">
+  <b>Star ⭐ and subscribe 🔔 for the newest features and improvements!</b>
+</p>
+
 ## ✨ Project Introduction
 
 CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such
@@ -40,15 +44,29 @@ of different scenarios.
 
 ## 📊 Performance
 
-| Dialect Pair | Accuracy | Average Conversion Time |
-|:-------:|:--------:|:------------:|
-| PG → MySQL | 95% | 0.5s |
-| MySQL → Oracle | 93% | 0.6s |
-| Oracle → SQLite | 91% | 0.4s |
+Translation Accuracy (%) of Different Methods (N/A denotes the dialect translation is not supported in Ora2Pg).
+Note that the translation overhead is highly dependent on the SQL complexity (e.g., the number of SQL syntax piece to be translated) and can vary in several seconds to minutes.
+
+| **Method**                 | **PG → MySQL** | **MySQL → PG** | **PG → Oracle** | **Oracle → PG** | **MySQL → Oracle** | **Oracle → MySQL** |
+|--------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|------------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|---------------------------------------------------------|
+|                                                  | **Acc_EX**                                 | **Acc_RES**                                | **Acc_EX**                                  | **Acc_RES**                                 | **Acc_EX**                                     | **Acc_RES**                                    | **Acc_EX** | **Acc_RES** | **Acc_EX** | **Acc_RES** | **Acc_EX** | **Acc_RES** |
+| **SQLGlot**                  | 74.19                                               | 70.97                                               | 60.32                                                | 60.32                                                | 55.81                                                   | 53.49                                                   | 53.85               | 46.15                | 29.27               | 20.73                | 73.33               | 66.67                |
+| **jOOQ**                          | 70.97                                               | 70.97                                               | 39.68                                                | 39.68                                                | 62.79                                                   | 60.47                                                   | 84.62               | 53.85                | 47.56               | 35.37                | 80.0                | 53.33                |
+| **Ora2Pg** | N/A                                        | N/A                                        | 33.33                                     | 33.33                                     | N/A                                            | N/A                                            | 76.92    | 46.15     | N/A        | N/A         | N/A        | N/A         |
+| **SQLines**                  | 9.68                                                | 9.68                                                | 31.75                                                | 31.75                                                | 53.49                                                   | 48.84                                                   | 61.54               | 38.46                | 39.02               | 32.93                | 80.0                | 60.0                 |
+| **GPT-4o**                     | 61.29                                               | 61.29                                               | 50.79                                                | 44.44                                                | 60.47                                                   | 55.81                                                   | 84.62               | 53.85                | 12.2                | 10.98                | 80.0                | 73.33                |
+| **CrackSQL (Ours)**                          | **87.1**                                       | **74.19**                                      | **85.71**                                       | **79.37**                                       | **69.77**                                          | **67.44**                                          | **92.31**      | **61.54**       | **59.76**      | **42.68**       | **93.33**       | **80.0**        |
+
 
 ## 🖥️ Demo
 
-![Web Interface Preview](./data/images/demo.png)
+- Homepage of the deployed translation service:
+
+![Web Interface Homepage](./data/images/home.png)
+
+- detailed translation process of specific translation pair:
+
+![Web Interface Rewrite Detail](./data/images/detail.png)
 
 ## 🚀 Quick Start
 
