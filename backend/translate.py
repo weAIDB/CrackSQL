@@ -45,7 +45,7 @@ class Translator:
                  retrieval_on: bool,
                  top_k: int,
                  history_id: str = None,
-                 out_type: str = "db",
+                 out_type: str = "file",
                  out_dir: str = None):
         """SQL dialect converter
         
@@ -935,6 +935,7 @@ def parse_args():
 
 
     return parser.parse_args()
+
 
 
 def main():
