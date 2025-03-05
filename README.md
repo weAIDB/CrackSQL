@@ -20,15 +20,19 @@
 
 ## ✨ Project Introduction
 
-CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs of different scenarios.
+CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such
+as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs
+of different scenarios.
 
-> - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). More contributors are welcomed! :wave: 👫
+> - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). We are currently working on new features and more contributors are welcomed! :wave: 👫
 > - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
 
 ## 📚 Features
 
-- 🚀 **Multi-dialect Support**: Supports conversion between three mainstream database dialects: PostgreSQL, MySQL, and Oracle
-- 🎯 **High-precision Conversion**: Based on a three-layer conversion architecture to ensure the accuracy of conversion results
+- 🚀 **Multi-dialect Support**: Supports conversion between three mainstream database dialects: PostgreSQL, MySQL, and
+  Oracle
+- 🎯 **High-precision Conversion**: Based on a three-layer conversion architecture to ensure the accuracy of conversion
+  results
 - 🌟 **Multiple Usage Methods**: Supports command line, Python API, and Web interface
 - 🔍 **Function-oriented Syntax Processing**: Breaks down SQL statements into syntax elements for specific functions
 - 🧠 **Model-based Syntax Matching**: Uses innovative cross-dialect embedding models for conversion
@@ -44,34 +48,20 @@ CrackSQL is a tool focused on SQL dialect conversion, supporting precise convers
 
 ## 🖥️ Demo
 
-<p align="center">
-  <i>TODO: Add interface preview image</i>
-</p>
-
 ![Web Interface Preview](./data/images/demo.png)
 
 ## 🚀 Quick Start
 
-### Method 1: Docker (Not supported yet)
-
-```bash
-# Pull image
-docker pull cracksql:latest
-
-# Run container
-docker run -d -p 5173:5173 cracksql:latest
-
-# Visit http://localhost:5173 to use the Web interface
-```
-
-### Method 2: Source Code Installation
+### Method 1: Source Code Installation
 
 #### 1. Clone Repository
+
 ```bash
 git clone https://github.com/your-username/git
 ```
 
 #### 2. Use Frontend and Backend Application
+
 ```bash
 # Start backend
 cd CrackSQL/backend
@@ -112,6 +102,7 @@ yarn dev
 ```
 
 #### 3. Command Line Usage
+
 ```bash
 # Initialize knowledge base (Optional, can be done manually in the frontend after starting the frontend project)
 # 1. First rename config/init_config.yaml.copy to config/init_config.yaml
@@ -122,7 +113,7 @@ python init_knowledge_base.py --init_all
 python translate.py --src_dialect "source dialect"
 ```
 
-### Method 3: PyPI Package Installation
+### Method 2: PyPI Package Installation
 
 Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
 
@@ -132,15 +123,91 @@ Install the PyPI package at the [official website](https://pypi.org/project/crac
 pip install cracksql==0.0.0b0
 ```
 
+An example running code using this PyPI package is below:
+
+```python
+import os
+
+from cracksql.app_factory import create_app
+from cracksql.translate import Translator
+from cracksql.init_knowledge_base import initialize_kb
+
+
+def initkb():
+    possible_config_paths = [
+        "./init_config.yaml"
+    ]
+
+    config_file = None
+    for path in possible_config_paths:
+        if os.path.exists(path):
+            config_file = path
+            break
+
+    if not config_file:
+        config_file = "./backend/config/init_config.yaml"
+
+    try:
+        initialize_kb(config_file)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+
+
+def translate():
+    target_db_config = {
+        "host": "target database host",
+        "port": "target database number",
+        "user": "target database username",
+        "password": "target database password",
+        "db_name": "target database database name"
+    }
+
+    vector_config = {
+        "src_kb_name": "source database knowledge base name",
+        "tgt_kb_name": "target database knowledge base name"
+    }
+
+    llm_model_name = "llm model name"
+
+    src_dialect = "source database"
+    tgt_dialect = "target database"
+    src_sql = "source SQL"
+
+    translator = Translator(src_dialect=src_dialect, tgt_dialect=tgt_dialect,
+                            src_sql=src_sql, model_name=llm_model_name,
+                            tgt_db_config=target_db_config, vector_config=vector_config)
+
+    translated_sql, model_ans_list,
+    used_pieces, lift_histories = translator.local_to_global_rewrite()
+
+    print(translated_sql)
+    print(model_ans_list)
+    print(used_pieces)
+    print(lift_histories)
+
+
+if __name__ == "__main__":
+    app = create_app("PRODUCTION")
+    app.config["SCHEDULER_OPEN"] = False
+    with app.app_context():
+        initkb()
+        translate()
+
+```
+
 ## 📎 Feature Extension
 
 ### Add New Syntax
+
 <i>To be supplemented</i>
 
 ### Add New Database
+
 <i>Start from scratch</i>
 
 ### Fine-tune Vector Model
+
 <i>To be supplemented</i>
 
 ## 🤔 FAQ
