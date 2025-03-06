@@ -5,8 +5,11 @@ import openai
 from threading import Thread
 from typing import Dict, Any, List, Union, AsyncGenerator
 from langchain.schema import SystemMessage, HumanMessage
+from transformers import pipeline
+
 from llm_model.base import BaseLLM
 from config.logging_config import logger
+from utils.constants import MAX_TOKENS_DEFAULT, TEMPERATURE_DEFAULT
 
 
 class CloudLLM(BaseLLM):
@@ -29,10 +32,10 @@ class CloudLLM(BaseLLM):
         """Chat with the model using OpenAI API"""
         import time
         import random
-        
+
         max_retries = kwargs.get('max_retries', 5)
         base_delay = kwargs.get('base_delay', 3)  # 基础延迟时间（秒）
-        
+
         # 将LangChain消息格式转换为OpenAI格式
         openai_messages = []
         for msg in messages:
@@ -44,7 +47,7 @@ class CloudLLM(BaseLLM):
                 openai_messages.append(msg)
             else:
                 openai_messages.append({"role": "assistant", "content": msg.content})
-        
+
         # 重试机制
         for attempt in range(max_retries):
             try:
@@ -52,14 +55,15 @@ class CloudLLM(BaseLLM):
                 if attempt > 0:
                     # 指数退避策略：随着重试次数增加，延迟时间指数增长
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
-                    logger.info(f"Rate limit reached, retrying in {delay:.2f} seconds (attempt {attempt+1}/{max_retries})...")
+                    logger.info(
+                        f"Rate limit reached, retrying in {delay:.2f} seconds (attempt {attempt + 1}/{max_retries})...")
                     time.sleep(delay)
-                
+
                 completion = self.llm.chat.completions.create(
                     model=self.model_config.get('name'),
                     messages=openai_messages,
-                    max_tokens=self.model_config.get('max_tokens', 32000),
-                    temperature=self.model_config.get('temperature', 0.01)
+                    max_tokens=self.model_config.get('max_tokens', MAX_TOKENS_DEFAULT),
+                    temperature=self.model_config.get('temperature', TEMPERATURE_DEFAULT)
                 )
                 response = json.loads(completion.to_json())
                 response_format = {
@@ -69,9 +73,9 @@ class CloudLLM(BaseLLM):
                 }
                 logger.info(f"Cloud LLM chat response: {response_format['content'][:100]}...")
                 return response_format
-                
+
             except openai.RateLimitError as e:
-                logger.warning(f"Rate limit error (attempt {attempt+1}/{max_retries}): {str(e)}")
+                logger.warning(f"Rate limit error (attempt {attempt + 1}/{max_retries}): {str(e)}")
                 if attempt == max_retries - 1:  # 最后一次尝试
                     logger.error(f"Max retries reached. Cloud LLM chat error: {str(e)}")
                     raise
@@ -83,12 +87,12 @@ class CloudLLM(BaseLLM):
         """Generate text"""
         import time
         import random
-        
+
         max_retries = kwargs.get('max_retries', 3)
         base_delay = kwargs.get('base_delay', 2)  # 基础延迟时间（秒）
-        
+
         messages = [{"role": "user", "content": prompt}]
-        
+
         # 重试机制
         for attempt in range(max_retries):
             try:
@@ -96,14 +100,15 @@ class CloudLLM(BaseLLM):
                 if attempt > 0:
                     # 指数退避策略：随着重试次数增加，延迟时间指数增长
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
-                    logger.info(f"Rate limit reached, retrying in {delay:.2f} seconds (attempt {attempt+1}/{max_retries})...")
+                    logger.info(
+                        f"Rate limit reached, retrying in {delay:.2f} seconds (attempt {attempt + 1}/{max_retries})...")
                     time.sleep(delay)
-                
+
                 completion = self.llm.chat.completions.create(
                     model=self.model_config.get('name'),
                     messages=messages,
-                    max_tokens=self.model_config.get('max_tokens', 32000),
-                    temperature=self.model_config.get('temperature', 0.01)
+                    max_tokens=self.model_config.get('max_tokens', MAX_TOKENS_DEFAULT),
+                    temperature=self.model_config.get('temperature', TEMPERATURE_DEFAULT)
                 )
                 response = json.loads(completion.to_json())
                 response_format = {
@@ -113,9 +118,9 @@ class CloudLLM(BaseLLM):
                 }
                 logger.info(f"Cloud LLM generate response: {response_format['content'][:100]}...")
                 return response_format
-                
+
             except openai.RateLimitError as e:
-                logger.warning(f"Rate limit error (attempt {attempt+1}/{max_retries}): {str(e)}")
+                logger.warning(f"Rate limit error (attempt {attempt + 1}/{max_retries}): {str(e)}")
                 if attempt == max_retries - 1:  # 最后一次尝试
                     logger.error(f"Max retries reached. Cloud LLM generate error: {str(e)}")
                     raise
@@ -142,28 +147,17 @@ class LocalLLM(BaseLLM):
         try:
             # Load model and tokenizer
             model_path = self.model_config.get('model_path')
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                device_map="auto",  # Add device mapping
-                trust_remote_code=True,
-                torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32,
-                low_cpu_mem_usage=True,  # Reduce CPU memory usage
-                attn_implementation="eager"  # Disable unstable optimizations
-            ).to(device)
-
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                model_path,
-                trust_remote_code=True
+            self.model = pipeline(
+                "text-generation",
+                model=model_path,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
             )
 
             # Save configuration
             self.device = device
-            self.max_tokens = self.model_config.get('max_tokens', 2000)
-            self.temperature = self.model_config.get('temperature', 0.01)
-            self.streamer = TextIteratorStreamer(self.tokenizer)
-
-            # Set model to evaluation mode
-            self.model.eval()
+            self.max_tokens = self.model_config.get('max_tokens', MAX_TOKENS_DEFAULT)
+            self.temperature = self.model_config.get('temperature', TEMPERATURE_DEFAULT)
 
         except Exception as e:
             logger.error(f"Failed to load local model: {str(e)}")
@@ -192,57 +186,31 @@ class LocalLLM(BaseLLM):
         return True
 
     def chat(self,
-                   messages: List[Union[SystemMessage, HumanMessage]],
-                   **kwargs) -> str:
+             messages: List[Union[SystemMessage, HumanMessage]],
+             **kwargs) -> str:
         """Chat using local model"""
         try:
             # Convert messages to format acceptable by the model
             prompt = self._format_messages(messages)
-            
-            # 使用本地模型生成响应
-            inputs = self.tokenizer(
-                prompt,
-                return_tensors="pt",
-                padding=True,
-                truncation=True,
-                max_length=self.max_tokens,
-                return_attention_mask=True
-            ).to(self.device)
-            
-            import torch
-            with torch.no_grad():
-                output = self.model.generate(
-                    **inputs,
-                    max_new_tokens=self.max_tokens,
-                    do_sample=True,
-                    temperature=self.temperature,
-                    top_p=0.9,
-                    pad_token_id=self.tokenizer.pad_token_id,
-                    eos_token_id=self.tokenizer.eos_token_id
-                )
-            
-            full_response = self.tokenizer.decode(output[0], skip_special_tokens=True)
-            
-            # 只提取Assistant的回复部分
-            if "Assistant:" in full_response:
-                assistant_response = full_response.split("Assistant:")[-1].strip()
-            else:
-                # 如果没有找到Assistant:标记，返回整个响应
-                assistant_response = full_response
 
-            logger.info(f"Local LLM chat response: {assistant_response[:100]}...")
-            
+            full_response = self.model(
+                messages,
+                max_new_tokens=self.max_tokens,
+            )
+            assistant_response = full_response[0]["generated_text"][-1]
+            # logger.info(f"Local LLM chat response: {assistant_response['content'][:100]}...")
+
             # 构造与CloudLLM相同的返回格式
             response_format = {
                 "role": "assistant",
-                "content": assistant_response,
+                "content": assistant_response['content'],
                 "raw": {
                     "full_response": full_response,
                     "model": self.model_config.get('model_path'),
                     "prompt": prompt
                 }
             }
-            
+
             return response_format
         except Exception as e:
             logger.error(f"Local LLM chat error: {str(e)}")
@@ -260,7 +228,7 @@ class LocalLLM(BaseLLM):
                 max_length=self.max_tokens,
                 return_attention_mask=True
             ).to(self.device)
-            
+
             import torch
             with torch.no_grad():
                 output = self.model.generate(
@@ -272,10 +240,10 @@ class LocalLLM(BaseLLM):
                     pad_token_id=self.tokenizer.pad_token_id,
                     eos_token_id=self.tokenizer.eos_token_id
                 )
-            
+
             response_text = self.tokenizer.decode(output[0], skip_special_tokens=True)
             logger.info(f"Local LLM generate response: {response_text[:100]}...")
-            
+
             # 构造与CloudLLM相同的返回格式
             response_format = {
                 "role": "assistant",
@@ -286,7 +254,7 @@ class LocalLLM(BaseLLM):
                     "prompt": prompt
                 }
             }
-            
+
             return response_format
         except Exception as e:
             logger.error(f"Local LLM generate error: {str(e)}")

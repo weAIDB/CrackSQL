@@ -6,6 +6,8 @@ CHUNK_SIZE = 250
 RETRIEVAL_ON = True
 MAX_RETRY_TIME = 2
 
+MAX_TOKENS_DEFAULT = 8192
+TEMPERATURE_DEFAULT = 0.0
 FAILED_TEMPLATE = 'Cannot translate!'
 
 TRANSLATION_ANSWER_PATTERN = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"Confidence":\s*(.*?)\s'
