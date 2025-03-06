@@ -425,26 +425,36 @@ def pre_func_fine_data():
 
 
 def pre_func_fine_data_model():
-    model_id = "gpt-4o"  # llama3.1, llama3.2, gpt-3.5-turbo, gpt-4-turbo, gpt-4o, gpt-4o-mini
-    translator = init_model(model_id)
+    """
+    Pre-process function fine-grained data using model
+    """
+    # Load data
+    with open("data/function_data.json", "r") as f:
+        function_data = json.load(f)
 
+    # Load function data
+    with open("data/function_load.json", "r") as f:
+        function_load = json.load(f)
+
+    # Initialize model
+    translator = LLMTranslator("gpt-3.5-turbo-16k")
+    translator.model_id = "gpt-3.5-turbo-16k"
+
+    # Define database mapping
+    map_rep = {"postgres": "PostgreSQL", "mysql": "MySQL", "oracle": "Oracle"}
     databases = ["postgres", "mysql", "oracle"]
 
+    # Process all data
     all_data = dict()
     for db in databases:
         all_data[db] = dict()
-
-        function_load = dialect_load_function[db]
-        with open(function_load, "r") as rf:
-            function_data = json.load(rf)
-
         for item in function_data:
-            key = item["Name"].split("(")[0].lower()
-            if key not in all_data[db]:
-                all_data[db][key] = list()
-            item["Dialect"] = db
-            all_data[db][key].append(item)
+            if db in function_load:
+                func = list(item.values())[0]
+                func_pre = func.split("(")[0].lower()
+                all_data[db][func_pre] = [item]
 
+    # Process mapping
     all_mapping = dict()
     for db in databases:
         all_mapping[db] = dict()

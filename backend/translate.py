@@ -322,11 +322,13 @@ class Translator:
     def rewrite_piece(self, piece, history=list(), err_info_list=list()) -> [str, str]:
         """SQL fragment rewriting method
         
+        This method uses LLM to rewrite a SQL fragment from source dialect to target dialect.
+        
         Args:
             piece: SQL fragment, can be dict (contains Node) or str
             history: History conversion record list
             err_info_list: Error information list
-        
+            
         Returns:
             tuple: (Converted SQL, Complete model response information)
         """
@@ -713,39 +715,29 @@ class Translator:
                     history=list(), sys_prompt=None, user_prompt=None):
         """Model judgment method
         
-        This method uses LLM to judge the quality of SQL conversion and identify segments that need further optimization.
-        
         Args:
             root_node: Root node of SQL syntax tree
             all_pieces: List of all SQL segments
-            src_sql: Source SQL statement
-            current_sql: Currently converted SQL statement
-            ans_slice: Last processed segment
-            history: Dialog history record, default empty list
-            sys_prompt: System prompt, default None
-            user_prompt: User prompt, default None
-        
+            src_sql: Source SQL
+            current_sql: Current SQL
+            ans_slice: Answer slice
+            history: Conversation history
+            sys_prompt: System prompt
+            user_prompt: User prompt
+            
         Returns:
-            tuple: (piece, assist_info, answer_raw)
-                - piece: SQL segment that needs further processing
-                - assist_info: Assistance information
-                - answer_raw: Raw output of model judgment
+            Piece to be processed, assistance information, and judgment result
         """
-        # Determine the fragment to analyze
-        if ans_slice is None:
-            snippet = "all snippets"  # Analyze all segments
-        else:
-            snippet = f"`{str(ans_slice['Node'])}`"  # Analyze specific segment
-
-        # If system prompt is not provided, use default judgment prompt template
+        # If no system prompt provided, use default
         if sys_prompt is None:
-            sys_prompt = SYSTEM_PROMPT_JUDGE.format(
-                src_dialect=self.src_dialect,
-                tgt_dialect=self.tgt_dialect
-            ).strip("\n")
-
-        # If user prompt is not provided, use default judgment prompt template
+            sys_prompt = SYSTEM_PROMPT_JUDGE
+        
+        # If no user prompt provided, generate one
         if user_prompt is None:
+            # Get snippet from current SQL
+            snippet = self.get_snippet(root_node, all_pieces, ans_slice)
+            
+            # Format user prompt
             user_prompt = USER_PROMPT_JUDGE.format(
                 src_dialect=self.src_dialect,
                 tgt_dialect=self.tgt_dialect,
@@ -813,7 +805,10 @@ class Translator:
         translator = LLMTranslator(self.model_name)
         history, model_ans_list = list(), list()
 
-        sys_prompt = SYSTEM_PROMPT_NA
+        sys_prompt = SYSTEM_PROMPT_NA.format(
+            src_dialect=DIALECT_MAP[self.src_dialect],
+            tgt_dialect=DIALECT_MAP[self.tgt_dialect]
+        ).strip("\n")
         user_prompt = USER_PROMPT_NA.format(src_dialect=DIALECT_MAP[self.src_dialect],
                                             tgt_dialect=DIALECT_MAP[self.tgt_dialect], sql=self.src_sql).strip("\n")
 

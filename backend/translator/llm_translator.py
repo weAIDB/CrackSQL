@@ -11,6 +11,8 @@ class LLMTranslator:
         self.model_conf = model_conf
         self.model = llm_manager.get_model(self.model_name, self.model_conf)
         self.trans_func = self.chat
+        if not self.model:
+            raise ValueError(f"Model {self.model_name} not found")
 
     def chat(self, history: [], sys_prompt, user_prompt):
         if sys_prompt is not None:
@@ -25,7 +27,7 @@ class LLMTranslator:
                 messages.append(message)
         messages.append({"role": "user", "content": user_prompt})
 
-        # use `asyncio.run()` for asynchronous running
+        # 直接调用模型的chat方法
         response = self.model.chat(messages)
 
         return response

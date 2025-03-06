@@ -374,6 +374,7 @@ backend/configs.py
 backend/instance/
 backend/migrations
 backend/config/init_config.py
+backend/config/init_config.yaml
 backend/local_models
 instance
 webui/node_modules
@@ -391,3 +392,4 @@ cursor
 # Add this new rule
 !webui/src/lib
 
+*_*_*.json

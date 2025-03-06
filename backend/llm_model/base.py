@@ -28,13 +28,13 @@ class BaseLLM(ABC):
         pass
 
     @abstractmethod
-    async def chat(self,
+    def chat(self,
                    messages: List[Union[SystemMessage, HumanMessage]],
                    **kwargs) -> str:
         """Chat interface"""
         pass
 
     @abstractmethod
-    async def generate(self, prompt: str, **kwargs) -> str:
+    def generate(self, prompt: str, **kwargs) -> str:
         """Generate text"""
         pass
