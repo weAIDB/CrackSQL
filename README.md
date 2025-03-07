@@ -1,15 +1,17 @@
 # CrackSQL
 
 <p align="center">
-  <b>Unlock seamless SQL translation – effortless, precise, and efficient across databases</b>
+  <b>📄 Unlock seamless SQL translation – effortless, precise, and efficient across databases~ 🐬</b>
 </p>
 
-<p align="center">
-  <a>![Dialect](https://img.shields.io/badge/Dialect%20Pair-6-blue?style=flat-square)</a>
-  <a>![Benchmark](https://img.shields.io/badge/Translation%20Benchmark-501-blue?style=flat-square)</a>
+<div align="center">
+  
+  <a>![Dialect](https://img.shields.io/badge/SQL%20Dialect-3+24-blue?style=flat-square)</a>
+  <a>![Benchmark](https://img.shields.io/badge/Translation%20Benchmark-501+-blue?style=flat-square)</a>
   <a>![LLM](https://img.shields.io/badge/Finetuned%20LLM-4-green?style=flat-square)</a>
   <a>![Embedding Model](https://img.shields.io/badge/Finetuned%20Embedding%20Model-3-green?style=flat-square)</a>
-</p>
+
+</div>
 
 <p align="center">
   <a href="#-demo">Demo</a> •
@@ -20,15 +22,14 @@
   <a href="#-contributors">Contributors</a> •  
   <a href="#-license">License</a>
 </p>
+
 <p align="center">
   <b>English</b> | <a href="./README_ZH.md">简体中文</a>
 </p>
 
-<div style="text-align: center;">
-  <p style="padding: 10px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block;">
-    <span style="color: black;"><b>Star ⭐ and subscribe 🔔 for the latest features and improvements!</b></span>
-  </p>
-</div>
+<p align="center">
+  <b>Star ⭐ and subscribe 🔔 for the latest features and improvements!</b>
+</p>
 
 ## ✨ Project Introduction
 
