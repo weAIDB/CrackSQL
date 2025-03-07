@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <b>English</b> | <a href="./README_CH.md">简体中文</a>
+  <b>English</b> | <a href="./README_ZH.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -70,7 +70,85 @@ Note that the translation overhead is highly dependent on the SQL complexity (e.
 
 ## 🚀 Quick Start
 
-### Method 1: Source Code Installation
+### Method 1: PyPI Package Installation
+
+Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
+
+![Web Interface Preview](./data/images/pypi.png)
+
+```
+# create virtual environment
+conda create -n CrackSQL python=3.10
+conda activate CrackSQL
+
+# install PyPI package
+pip install cracksql==0.0.0b0
+```
+
+An example running code using this PyPI package is below:
+
+```python
+
+from cracksql.cracksql import translate, initkb
+
+def initkb_func():
+    try:
+        initkb("./init_config.yaml")
+        print("Knowledge base initialized successfully")
+    except Exception as e:
+        print(f"Knowledge base initialization failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
+
+def trans_func():
+
+    target_db_config = {
+        "host": "target database host",
+        "port": target database number (int type),
+        "user": "target database username",
+        "password": "target database password",
+        "db_name": "target database database name"
+    }
+
+    vector_config = {
+        "src_kb_name": "source database knowledge base name",
+        "tgt_kb_name": "target database knowledge base name"
+    }
+
+    try:
+        print("Starting SQL translation...")
+        translated_sql, model_ans_list, used_pieces, lift_histories = translate(
+            model_name="DeepSeek-R1-Distill-Qwen-32B", 
+            src_sql='SELECT DISTINCT "t1"."id" , EXTRACT(YEAR FROM CURRENT_TIMESTAMP) - EXTRACT(YEAR FROM CAST( "t1"."birthday" AS TIMESTAMP )) FROM "patient" AS "t1" INNER JOIN "examination" AS "t2" ON "t1"."id" = "t2"."id" WHERE "t2"."rvvt" = "+"',
+            src_dialect="postgresql",
+            tgt_dialect="mysql",
+            target_db_config=target_db_config,
+            vector_config=vector_config,
+            out_dir="./", 
+            retrieval_on=False, 
+            top_k=3
+        )
+
+        print("Translation completed!")
+        print(f"Translated SQL: {translated_sql}")
+        print(f"Model answer list: {model_ans_list}")
+        print(f"Used knowledge pieces: {used_pieces}")
+        print(f"Lift histories: {lift_histories}")
+    except Exception as e:
+        print(f"Error occurred during translation: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
+
+if __name__ == "__main__":
+
+    initkb_func()
+    trans_func()
+
+```
+
+### Method 2: Source Code Installation
 
 #### 1. Clone Repository
 
@@ -131,92 +209,6 @@ python init_knowledge_base.py --init_all
 python translate.py --src_dialect "source dialect"
 ```
 
-### Method 2: PyPI Package Installation
-
-Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
-
-![Web Interface Preview](./data/images/pypi.png)
-
-```
-# create virtual environment
-conda create -n CrackSQL python=3.10
-
-# install PyPI package
-pip install cracksql==0.0.0b0
-```
-
-An example running code using this PyPI package is below:
-
-```python
-import os
-
-from cracksql.app_factory import create_app
-from cracksql.translate import Translator
-from cracksql.init_knowledge_base import initialize_kb
-
-
-def initkb():
-    possible_config_paths = [
-        "./init_config.yaml"
-    ]
-
-    config_file = None
-    for path in possible_config_paths:
-        if os.path.exists(path):
-            config_file = path
-            break
-
-    if not config_file:
-        config_file = "./backend/config/init_config.yaml"
-
-    try:
-        initialize_kb(config_file)
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-
-
-def translate():
-    target_db_config = {
-        "host": "target database host",
-        "port": "target database number",
-        "user": "target database username",
-        "password": "target database password",
-        "db_name": "target database database name"
-    }
-
-    vector_config = {
-        "src_kb_name": "source database knowledge base name",
-        "tgt_kb_name": "target database knowledge base name"
-    }
-
-    llm_model_name = "llm model name"
-
-    src_dialect = "source database"
-    tgt_dialect = "target database"
-    src_sql = "source SQL"
-
-    translator = Translator(src_dialect=src_dialect, tgt_dialect=tgt_dialect,
-                            src_sql=src_sql, model_name=llm_model_name,
-                            tgt_db_config=target_db_config, vector_config=vector_config)
-
-    translated_sql, model_ans_list,
-    used_pieces, lift_histories = translator.local_to_global_rewrite()
-
-    print(translated_sql)
-    print(model_ans_list)
-    print(used_pieces)
-    print(lift_histories)
-
-
-if __name__ == "__main__":
-    app = create_app("PRODUCTION")
-    app.config["SCHEDULER_OPEN"] = False
-    with app.app_context():
-        initkb()
-        translate()
-
-```
 
 ## 📎 Feature Extension
 
