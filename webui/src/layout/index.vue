@@ -7,12 +7,12 @@
       <AppMain/>
     </div>
 
-    <!-- 网站引导 -->
+    <!-- Website Tour -->
     <el-tour v-model="tourOpen">
       <el-tour-step
           placement="bottom"
           target="#welcome"
-          title="🎉🎉🎉欢迎使用方言改写🎉🎉🎉"
+          title="🎉🎉🎉Welcome to SQL Dialect Rewrite🎉🎉🎉"
           :description="$t('tour.welcome.desc')"
       />
       <el-tour-step
@@ -30,56 +30,56 @@
       <el-tour-step
           placement="right"
           target="#chat"
-          title="最近的一次改写"
-          description="在这里可以查看最近的一次改写任务"
+          title="Latest Rewrite"
+          description="View the latest rewrite task here"
       />
       <el-tour-step
           placement="right"
           target="#history"
-          title="改写历史"
-          description="查看所有的SQL改写记录"
+          title="Rewrite History"
+          description="View all SQL rewrite records"
       />
       <el-tour-step
           placement="right"
           target="#knowledge"
-          title="知识库管理"
-          description="在这里可以进行知识库管理"
+          title="Knowledge Base Management"
+          description="Manage knowledge base here"
       />
       <el-tour-step
           placement="right"
           target="#database"
-          title="数据库配置"
-          description="管理目标数据库的连接配置"
+          title="Database Configuration"
+          description="Manage target database connection settings"
       />
       <el-tour-step
           placement="right"
           target="#modelmanagement"
-          title="模型管理"
-          description="LLM和Embedding模型在这里进行配置"
+          title="Model Management"
+          description="Configure LLM and Embedding models here"
       />
       <el-tour-step
           placement="right"
           target="#source-db"
-          title="语句原始数据库"
-          description="请选择语句原始数据库"
+          title="Source Database"
+          description="Please select the source database"
       />
       <el-tour-step
           placement="left"
           target="#target-db"
-          title="目标数据库"
-          description="请选择目标数据库，为了提高语句转换的正确率，请添加目标数据库的连接信息，转换过程中，会访问改数据库获取执行计划。"
+          title="Target Database"
+          description="Please select the target database. To improve the accuracy of statement conversion, please add the connection information of the target database. During the conversion process, the execution plan will be obtained by accessing this database."
       />
       <el-tour-step
           placement="left"
           target="#sql-input"
-          title="语句输入"
-          description="请在此处输入需要转换的SQL语句"
+          title="SQL Input"
+          description="Please enter the SQL statement to be converted here"
       />
       <el-tour-step
           placement="left"
           target="#convert-btn"
-          title="开始转换"
-          description="点击按钮开始进行语句改写"
+          title="Start Conversion"
+          description="Click the button to start statement rewriting"
       />
     </el-tour>
   </div>

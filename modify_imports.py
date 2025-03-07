@@ -39,6 +39,7 @@ FILE_PATTERNS = [
     'preprocessor/*/*/*.py',
     'doc_process/*.py',
     'translate.py',
+    'cracksql.py',
 ]
 
 # List of modules that should not be replaced with cracksql.xxx

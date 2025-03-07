@@ -2,7 +2,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Union
 from langchain.schema import SystemMessage, HumanMessage
-from config.logging_config import logger
 
 
 class BaseLLM(ABC):

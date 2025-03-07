@@ -5,12 +5,12 @@ scheduler = APScheduler()
 
 def scheduler_init(app):
     try:
-        # 检查调度器是否已经在运行
+        # check if scheduler is running
         if not scheduler.running:
             scheduler.init_app(app)
             scheduler.start()
-            logging.info('调度器已启动 ---------------')
+            logging.info('scheduler start ---------------')
     except BaseException as error:
-        # 修复日志格式问题
-        logging.error(f"调度器启动错误: {str(error)} ---------------")
+        # fix log format problem
+        logging.error(f"scheduler start error: {str(error)} ---------------")
         pass

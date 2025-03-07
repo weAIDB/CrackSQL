@@ -142,15 +142,29 @@ class LocalLLM(BaseLLM):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
         # Determine device
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if torch.cuda.is_available():
+            device = "cuda"
+            torch_dtype = torch.bfloat16
+        elif hasattr(torch, 'mps') and torch.backends.mps.is_available():
+            device = "mps"
+            # MPS不支持bfloat16，使用float16或float32
+            torch_dtype = torch.float16 if torch.backends.mps.is_built() else torch.float32
+        else:
+            device = "cpu"
+            torch_dtype = torch.float32
 
         try:
             # Load model and tokenizer
             model_path = self.model_config.get('model_path')
+            logger.info(f"Loading local model from {model_path} with device={device}, dtype={torch_dtype}")
+            
+            self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+            
+            # 使用pipeline加载模型
             self.model = pipeline(
                 "text-generation",
                 model=model_path,
-                torch_dtype=torch.bfloat16,
+                torch_dtype=torch_dtype,
                 device_map="auto",
             )
 
