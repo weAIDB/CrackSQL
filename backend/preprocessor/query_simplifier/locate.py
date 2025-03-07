@@ -9,26 +9,39 @@ import json
 import os.path
 from typing import List, Dict
 
+from api.services.knowledge import get_json_items
+from config.db_config import db_session_manager
 from preprocessor.antlr_parser.parse_tree import parse_tree
 from preprocessor.query_simplifier.Tree import TreeNode
 from utils.constants import ORACLE_COMMAND_OPEN
 from utils.db_connector import sql_execute
-from utils.tools import remove_all_space, get_proj_root_path
+from utils.tools import remove_all_space
 
 pg_func_name = set()
 
 
-def load_pg_func_name():
+@db_session_manager
+def load_pg_func_name(kb_name):
     global pg_func_name
-    with open(os.path.join(get_proj_root_path(), "data", 'processed_document', 'pg',
-                           'pg_1_function_ready.json'), 'r') as file:
-        func_array = json.loads(file.read())
-        for table in func_array:
-            i = 1
-            while i < len(table):
-                name = table[i]['Function'][:table[i]['Function'].find('(')]
-                pg_func_name.add(name.upper())
-                i = i + 1
+
+    if os.path.isfile(kb_name):
+        with open(kb_name, "r") as rf:
+            items = json.load(rf)
+    else:
+        items = get_json_items(kb_name, all_item=True)
+
+    for item in items:
+        if not os.path.isfile(kb_name):
+            item = json.loads(item.content)
+
+        if item['type'] != "function":
+            continue
+
+        if item['tree'] == "Parse error" or item['tree'] == "Found error":
+            continue
+
+        name = item['keyword'][:item['keyword'].find('(')]
+        pg_func_name.add(name.upper())
 
 
 def get_pg_location(line_string: str, col: int, ori_sql: str):
@@ -56,7 +69,7 @@ def get_oracle_location(line_string: str, col: int, ori_sql: str):
     return res
 
 
-def locate_function(error_info: str, dialect: str, sql: str):
+def locate_function(error_info: str, dialect: str, sql: str, kb_name: str):
     if dialect == 'mysql':
         if error_info.find('check the manual that corresponds to your MySQL '
                            'server version for the right syntax to use near ') != -1:
@@ -106,7 +119,7 @@ def locate_function(error_info: str, dialect: str, sql: str):
                 func_name = pg_func_map[func_name]
             assert err_lines[1].startswith('LINE 1: ')
             if len(pg_func_name) == 0:
-                load_pg_func_name()
+                load_pg_func_name(kb_name)
 
             return error_info, func_name, pg_location
         else:
@@ -170,12 +183,12 @@ def find_function(func_name, all_pieces, root_node, sql, location=None):
         return res_piece
 
 
-def locate_node_piece(sql, tgt_dialect, all_pieces, root_node, tgt_db_config):
+def locate_node_piece(sql, tgt_dialect, all_pieces, root_node, tgt_db_config, tgt_kb_name):
     flag, error_info = sql_execute(tgt_dialect, tgt_db_config, sql)
     if flag:
         return None, "no execute error"
     else:
-        error_type, func_name, location = locate_function(error_info, tgt_dialect, sql)
+        error_type, func_name, location = locate_function(error_info, tgt_dialect, sql, tgt_kb_name)
         if func_name is not None:
             piece = find_function(func_name, all_pieces, root_node, sql, location)
             if piece is not None:
