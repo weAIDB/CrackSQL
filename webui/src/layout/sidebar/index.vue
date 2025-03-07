@@ -172,10 +172,10 @@ function goToHome() {
   router.push('/');
 }
 const onGotoGitHubClick = () => {
-  window.open('https://github.com/code4DB/CrackSQL', '_blank')
+  window.open('https://github.com/weAIDB/CrackSQL', '_blank')
 }
 const onGotoGitHubIssueClick = () => {
-  window.open('https://github.com/code4DB/CrackSQL/issues', '_blank')
+  window.open('https://github.com/weAIDB/CrackSQL/issues', '_blank')
 }
 const onExitClick = () => {
   basicStore.resetStateAndToLogin()

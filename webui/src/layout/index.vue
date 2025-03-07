@@ -13,19 +13,19 @@
           placement="bottom"
           target="#welcome"
           title="🎉🎉🎉Welcome to SQL Dialect Rewrite🎉🎉🎉"
-          :description="$t('tour.welcome.desc')"
+          description="This is a tool for converting SQL statements between different database dialects. It uses LLM to understand the intent of the SQL statement and convert it to the target dialect."
       />
       <el-tour-step
           placement="bottom"
           target="#github"
-          :title="$t('tour.github.title')"
-          :description="$t('tour.github.desc')"
+          title="🎉🎉🎉Welcome to SQL Dialect Rewrite🎉🎉🎉"
+          description="Visit Github and give us a Star! Your encouragement drives us forward!"
       />
       <el-tour-step
           placement="right"
           target="#dashboard"
-          :title="$t('tour.dashboard.title')"
-          :description="$t('tour.dashboard.desc')"
+          title="🎉🎉🎉Welcome to SQL Dialect Rewrite🎉🎉🎉"
+          description="Start your SQL dialect conversion journey here!"
       />
       <el-tour-step
           placement="right"

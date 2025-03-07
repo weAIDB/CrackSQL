@@ -85,7 +85,6 @@
 <script setup lang="ts">
 import {rewriteLatestReq} from '@/api/rewrite.js'
 import ChatItem from '@/components/ChatItem.vue'
-import ProcessItem from '@/components/ProcessItem.vue'
 import SqlInput from '@/components/SqlInput.vue'
 import type {RewriteHistory} from '@/types/database'
 import {onMounted, ref, onUnmounted} from 'vue'

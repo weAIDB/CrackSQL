@@ -8,42 +8,15 @@ export default {
     title: 'SQL Dialect Converter',
     subtitle: 'Making cross-database migration simple and efficient',
     github: 'View on GitHub',
-    features: {
-      title: 'Features',
-      format: {
-        title: 'Multi-Format Support',
-        desc: 'Support processing and analysis of various unstructured data like text and PDF, providing a unified analysis interface.'
-      },
-      nlp: {
-        title: 'Natural Language Interaction',
-        desc: 'Using large language model technology, support natural language description of analysis requirements without professional skills.'
-      },
-      engine: {
-        title: 'Intelligent Analysis Engine',
-        desc: 'Based on LLM, automatically understand query intent, generate optimized execution plans, and ensure analysis accuracy.'
-      },
-      database: {
-        title: 'Multi-Database Support',
-        desc: 'Support mainstream databases like MySQL, PostgreSQL, Oracle. Provide SQL syntax parsing and conversion support for complex queries, stored procedures and various SQL statements.'
-      },
-      conversion: {
-        title: 'Intelligent Conversion',
-        desc: 'Using AI technology to intelligently analyze SQL statement structure and automatically handle syntax differences between databases. Support batch conversion to improve migration efficiency.'
-      },
-      validation: {
-        title: 'Execution Plan Validation',
-        desc: 'Automatically compare execution plans before and after conversion to ensure performance consistency. Built-in optimization strategies for different database features.'
-      }
-    },
     operation: {
       title: 'Start Conversation',
-      subtitle: 'Select model and document collection to start your intelligent analysis journey',
+      subtitle: 'Select model and database to start your SQL dialect rewrite journey',
       model: 'Conversation Model',
       modelPlaceholder: 'Please select a model',
-      kb: 'Document Collection',
-      kbPlaceholder: 'Please select a document collection',
-      input: 'Please enter your question',
-      submit: 'Start Analysis',
+      kb: 'Database',
+      kbPlaceholder: 'Please select a database',
+      input: 'Please enter your SQL statement',
+      submit: 'Start Rewrite',
       sourceDb: {
         label: 'Source Database',
         placeholder: 'Please select'
@@ -106,10 +79,10 @@ export default {
     breadcrumb: {
       dashboard: 'Dashboard'
     },
-    title: 'Database Statement Converter',
+    title: 'SQL Dialect Rewrite',
     sidebar: {
       logo: {
-        title: 'DB Statement Converter'
+        title: 'SQL Dialect Rewrite'
       },
       tooltip: {
         collapse: 'Collapse Sidebar',
@@ -140,7 +113,7 @@ export default {
   },
   sidebar: {
     logo: {
-      title: 'Unify System'
+      title: 'SQL Dialect Rewrite'
     },
     tooltip: {
       collapse: 'Collapse Sidebar',
@@ -151,52 +124,6 @@ export default {
       language: 'Switch Language',
       theme: 'Switch Theme',
       logoutConfirm: 'Are you sure you want to log out?'
-    }
-  },
-  tour: {
-    welcome: {
-      title: '👋 Welcome to Intelligent Analysis System',
-      desc: 'This is a powerful unstructured data analysis platform that helps you quickly understand and analyze various text data.'
-    },
-    dashboard: {
-      title: 'Feature: Start New Chat',
-      desc: 'Here you can start a new data analysis task.'
-    },
-    chat: {
-      title: 'Feature: Recent Chat',
-      desc: 'View your most recent chat records, including conversation content and analysis results.'
-    },
-    history: {
-      title: 'Feature: Analysis History',
-      desc: 'View all historical analysis records, including text analysis results and chat records for easy review and reuse.'
-    },
-    knowledge: {
-      title: 'Feature: Data Collection Management',
-      desc: 'Manage all data collections, including document import, view, and deletion operations.'
-    },
-    models: {
-      title: 'Feature: Model Management',
-      desc: 'Manage all models, including model import, view, and deletion operations.'
-    },
-    llm: {
-      title: 'Feature: Select LLM Model',
-      desc: 'Choose the LLM model you want to use, supporting multiple model options.'
-    },
-    kb: {
-      title: 'Feature: Select Document Collection',
-      desc: 'Choose the document collection you want to use, supporting multiple document collection options.'
-    },
-    input: {
-      title: 'Text Input Area',
-      desc: 'Enter the text content you want to analyze here.'
-    },
-    convert: {
-      title: 'Feature: Start Analysis',
-      desc: 'Click the button to start intelligent analysis, the system will automatically process the text and generate analysis reports.'
-    },
-    github: {
-      title: 'Open Source Community',
-      desc: 'This project is open source on GitHub. Welcome to join the community and improve the system together.'
     }
   },
   history: {

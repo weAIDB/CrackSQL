@@ -7,43 +7,16 @@ export default {
   dashboard: {
     title: 'SQL方言转换助手',
     subtitle: '让跨数据库迁移变得简单高效',
-    github: '在 GitHub 上查看项目',
-    features: {
-      title: '功能特点',
-      format: {
-        title: '多格式支持',
-        desc: '支持处理和分析文本、PDF等各种非结构化数据，提供统一的分析接口。'
-      },
-      nlp: {
-        title: '自然语言交互',
-        desc: '使用大语言模型技术，支持用自然语言描述分析需求，无需专业技能。'
-      },
-      engine: {
-        title: '智能分析引擎',
-        desc: '基于LLM，自动理解查询意图，生成优化执行计划，确保分析准确性。'
-      },
-      database: {
-        title: '多数据库支持',
-        desc: '支持MySQL、PostgreSQL、Oracle等主流数据库。提供SQL语法解析和转换支持，能够处理复杂查询、存储过程等多种SQL语句。'
-      },
-      conversion: {
-        title: '智能转换',
-        desc: '采用AI技术智能分析SQL语句结构，自动处理不同数据库间的语法差异。支持批量转换，提升迁移效率。'
-      },
-      validation: {
-        title: '执行计划验证',
-        desc: '自动对比转换前后的SQL执行计划，确保性能一致性。内置优化策略，针对不同数据库特性进行优化。'
-      }
-    },
+    github: '前往Github，给我们一个Star吧！鼓励是前进的动力，我们一定会做的更好的！🎉🎉🎉',
     operation: {
       title: '开始对话',
-      subtitle: '选择模型和文档集合开始您的智能分析之旅',
+      subtitle: '选择模型和数据库开始您的SQL方言转换之旅',
       model: '对话模型',
       modelPlaceholder: '请选择模型',
-      kb: '文档集合',
-      kbPlaceholder: '请选择文档集合',
-      input: '请输入您的问题',
-      submit: '开始分析',
+      kb: '数据库',
+      kbPlaceholder: '请选择数据库',
+      input: '请输入您的SQL语句',
+      submit: '开始转换',
       sourceDb: {
         label: '原句所在数据库',
         placeholder: '请选择'
@@ -140,63 +113,17 @@ export default {
   },
   sidebar: {
     logo: {
-      title: 'Unify System'
+      title: 'SQL Dialect Rewrite'
     },
     tooltip: {
-      collapse: 'Collapse Sidebar',
-      expand: 'Expand Sidebar',
-      newChat: 'Start New Chat',
-      feedback: 'We look forward to your feedback!',
-      github: 'Visit Github and give us a Star! Your encouragement drives us forward! 🎉🎉🎉',
-      language: 'Switch Language',
-      theme: 'Switch Theme',
-      logoutConfirm: 'Are you sure you want to log out?'
-    }
-  },
-  tour: {
-    welcome: {
-      title: '👋 欢迎使用智能分析系统',
-      desc: '这是一个强大的非结构化数据分析平台，帮助您快速理解和分析各类文本数据。'
-    },
-    dashboard: {
-      title: '功能：开始新对话',
-      desc: '在这里您可以开始一个新的数据分析任务。'
-    },
-    chat: {
-      title: '功能：最近对话',
-      desc: '查看您最近的对话记录，包括对话内容和分析结果。'
-    },
-    history: {
-      title: '功能：分析历史',
-      desc: '查看所有历史分析记录，包括文本分析结果和对话记录，方便回顾和复用。'
-    },
-    knowledge: {
-      title: '功能：数据集管理',
-      desc: '管理所有数据集，包括文档导入、查看和删除操作。'
-    },
-    models: {
-      title: '功能：模型管理',
-      desc: '管理所有模型，包括模型导入、查看和删除操作。'
-    },
-    llm: {
-      title: '功能：选择LLM模型',
-      desc: '选择您想要使用的LLM模型，支持多种模型选项。'
-    },
-    kb: {
-      title: '功能：选择文档集',
-      desc: '选择您想要使用的文档集，支持多个文档集选项。'
-    },
-    input: {
-      title: '文本输入区',
-      desc: '在这里输入您想要分析的文本内容。'
-    },
-    convert: {
-      title: '功能：开始分析',
-      desc: '点击按钮开始智能分析，系统将自动处理文本并生成分析报告。'
-    },
-    github: {
-      title: '开源社区',
-      desc: '本项目在GitHub开源。欢迎加入社区，一起完善系统。'
+      collapse: '收起侧边栏',
+      expand: '展开侧边栏',
+      newChat: '开始新的改写',
+      feedback: '我们非常期待您的反馈！',
+      github: '前往Github，给我们一个Star吧！鼓励是前进的动力，我们一定会做的更好的！🎉🎉🎉',
+      language: '切换语言',
+      theme: '切换主题',
+      logoutConfirm: '确定要退出登录吗？'
     }
   },
   history: {
