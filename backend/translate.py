@@ -179,7 +179,7 @@ class Translator:
 
         # Locate first fragment to process
         piece, assist_info = locate_node_piece(current_sql, self.tgt_dialect, all_pieces,
-                                               root_node, self.tgt_db_config)
+                                               root_node, self.tgt_db_config, self.tgt_kb_name)
 
         # If no fragment located, use model judgment
         if piece is None:
@@ -301,7 +301,7 @@ class Translator:
 
             # Locate next fragment to process
             piece, assist_info = locate_node_piece(current_sql, self.tgt_dialect, all_pieces,
-                                                   root_node, self.tgt_db_config)
+                                                   root_node, self.tgt_db_config, self.tgt_kb_name)
             if piece is None:
                 # Check for duplicate results
                 if current_sql in sql_ans_list:
@@ -728,15 +728,21 @@ class Translator:
         Returns:
             Piece to be processed, assistance information, and judgment result
         """
-        # If no system prompt provided, use default
+        # Determine the fragment to analyze
+        if ans_slice is None:
+            snippet = "all snippets"  # Analyze all segments
+        else:
+            snippet = f"`{str(ans_slice['Node'])}`"  # Analyze specific segment
+
+        # If system prompt is not provided, use default judgment prompt template
         if sys_prompt is None:
-            sys_prompt = SYSTEM_PROMPT_JUDGE
+            sys_prompt = SYSTEM_PROMPT_JUDGE.format(
+                src_dialect=self.src_dialect,
+                tgt_dialect=self.tgt_dialect
+            ).strip("\n")
         
         # If no user prompt provided, generate one
         if user_prompt is None:
-            # Get snippet from current SQL
-            snippet = self.get_snippet(root_node, all_pieces, ans_slice)
-            
             # Format user prompt
             user_prompt = USER_PROMPT_JUDGE.format(
                 src_dialect=self.src_dialect,
