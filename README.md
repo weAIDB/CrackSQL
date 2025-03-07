@@ -1,7 +1,14 @@
 # CrackSQL
 
 <p align="center">
-  <b>A powerful SQL dialect conversion tool that supports precise conversion between different SQL dialects</b>
+  <b>Unlock seamless SQL translation – effortless, precise, and efficient across databases</b>
+</p>
+
+<p align="center">
+  <a>![Dialect](https://img.shields.io/badge/Dialect%20Pair-6-blue?style=flat-square)</a>
+  <a>![Benchmark](https://img.shields.io/badge/Translation%20Benchmark-501-blue?style=flat-square)</a>
+  <a>![LLM](https://img.shields.io/badge/Finetuned%20LLM-4-green?style=flat-square)</a>
+  <a>![Embedding Model](https://img.shields.io/badge/Finetuned%20Embedding%20Model-3-green?style=flat-square)</a>
 </p>
 
 <p align="center">
@@ -13,49 +20,44 @@
   <a href="#-contributors">Contributors</a> •  
   <a href="#-license">License</a>
 </p>
-
 <p align="center">
   <b>English</b> | <a href="./README_ZH.md">简体中文</a>
 </p>
 
-<p align="center">
-  <b>Star ⭐ and subscribe 🔔 for the newest features and improvements!</b>
-</p>
+<div style="text-align: center;">
+  <p style="padding: 10px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block;">
+    <span style="color: black;"><b>Star ⭐ and subscribe 🔔 for the latest features and improvements!</b></span>
+  </p>
+</div>
 
 ## ✨ Project Introduction
 
-CrackSQL is a tool focused on SQL dialect conversion, supporting precise conversion between different SQL dialects (such
-as PostgreSQL to MySQL). It provides three usage methods: command line, Python API, and Web interface, meeting the needs
-of different scenarios.
+CrackSQL is a powerful SQL dialect translation tool that integrates rule-based strategies with LLMs for high accuracy.
+It enables seamless conversion between dialects (e.g., PostgreSQL to MySQL) with flexible access through Python API, command line, and web interface.
 
-> - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). We are currently working on new features and more contributors are welcomed! :wave: 👫
+> - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). We are currently working on [new features](#todo) and more contributors are welcomed! :wave: 👫
 > - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
 
 ## 📚 Features
 
-- 🚀 **Multi-dialect Support**: Supports conversion between three mainstream database dialects: PostgreSQL, MySQL, and
-  Oracle
-- 🎯 **High-precision Conversion**: Based on a three-layer conversion architecture to ensure the accuracy of conversion
-  results
-- 🌟 **Multiple Usage Methods**: Supports command line, Python API, and Web interface
-- 🔍 **Function-oriented Syntax Processing**: Breaks down SQL statements into syntax elements for specific functions
-- 🧠 **Model-based Syntax Matching**: Uses innovative cross-dialect embedding models for conversion
-- 🔄 **Local to Global Conversion Strategy**: Flexibly handles complex SQL conversion scenarios
+- 🚀 **Extensive Dialect Compatibility**: Effortlessly translates between PostgreSQL, MySQL, and Oracle with flexible, tailored strategies.
+- 🎯 **Precision & Advanced Processing**: Achieves flawless translations with function-oriented query handling and cutting-edge model-based syntax matching through an adaptive local-to-global iteration strategy.
+- 🔄 **Versatile Access & Integration**: Seamlessly integrates with Python API, command line, and web interface to meet all user requirements.
 
 ## 📊 Performance
 
 Translation Accuracy (%) of Different Methods (N/A denotes the dialect translation is not supported in Ora2Pg).
-Note that the translation overhead is highly dependent on the SQL complexity (e.g., the number of SQL syntax piece to be translated) and can vary in several seconds to minutes.
+Note that the required translation duration is highly dependent on the SQL complexity (e.g., the number of SQL syntax piece to be translated) and can vary from several seconds to minutes.
 
 | **Method**                 | **PG → MySQL** | **MySQL → PG** | **PG → Oracle** | **Oracle → PG** | **MySQL → Oracle** | **Oracle → MySQL** |
-|--------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|------------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|---------------------------------------------------------|
-|                                                  | **Acc_EX**                                 | **Acc_RES**                                | **Acc_EX**                                  | **Acc_RES**                                 | **Acc_EX**                                     | **Acc_RES**                                    | **Acc_EX** | **Acc_RES** | **Acc_EX** | **Acc_RES** | **Acc_EX** | **Acc_RES** |
-| **SQLGlot**                  | 74.19                                               | 70.97                                               | 60.32                                                | 60.32                                                | 55.81                                                   | 53.49                                                   | 53.85               | 46.15                | 29.27               | 20.73                | 73.33               | 66.67                |
-| **jOOQ**                          | 70.97                                               | 70.97                                               | 39.68                                                | 39.68                                                | 62.79                                                   | 60.47                                                   | 84.62               | 53.85                | 47.56               | 35.37                | 80.0                | 53.33                |
-| **Ora2Pg** | N/A                                        | N/A                                        | 33.33                                     | 33.33                                     | N/A                                            | N/A                                            | 76.92    | 46.15     | N/A        | N/A         | N/A        | N/A         |
-| **SQLines**                  | 9.68                                                | 9.68                                                | 31.75                                                | 31.75                                                | 53.49                                                   | 48.84                                                   | 61.54               | 38.46                | 39.02               | 32.93                | 80.0                | 60.0                 |
-| **GPT-4o**                     | 61.29                                               | 61.29                                               | 50.79                                                | 44.44                                                | 60.47                                                   | 55.81                                                   | 84.62               | 53.85                | 12.2                | 10.98                | 80.0                | 73.33                |
-| **CrackSQL (Ours)**                          | **87.1**                                       | **74.19**                                      | **85.71**                                       | **79.37**                                       | **69.77**                                          | **67.44**                                          | **92.31**      | **61.54**       | **59.76**      | **42.68**       | **93.33**       | **80.0**        |
+|--------------------------------------------------|:---------------------------------------------------:|:---------------------------------------------------:|:----------------------------------------------------:|:----------------------------------------------------:|:-------------------------------------------------------:|:-------------------------------------------------------:|
+|                                                  | **Acc_EX**                                 | **Acc_RES**                                | **Acc_EX**                                  | **Acc_RES**                                 | **Acc_EX**                                     | **Acc_RES**                                    |
+| **SQLGlot**                  | 74.19                                               | 70.97                                               | 60.32                                                | 60.32                                                | 55.81                                                   | 53.49                                                   |
+| **jOOQ**                          | 70.97                                               | 70.97                                               | 39.68                                                | 39.68                                                | 62.79                                                   | 60.47                                                   |
+| **Ora2Pg** | N/A                                        | N/A                                        | 33.33                                     | 33.33                                     | N/A                                            | N/A                                            |
+| **SQLines**                  | 9.68                                                | 9.68                                                | 31.75                                                | 31.75                                                | 53.49                                                   | 48.84                                                   |
+| **GPT-4o**                     | 61.29                                               | 61.29                                               | 50.79                                                | 44.44                                                | 60.47                                                   | 55.81                                                   |
+| **CrackSQL (Ours)**                          | **87.1**                                       | **74.19**                                      | **85.71**                                       | **79.37**                                       | **69.77**                                          | **67.44**                                          |
 
 
 ## 🖥️ Demo
@@ -64,7 +66,7 @@ Note that the translation overhead is highly dependent on the SQL complexity (e.
 
 ![Web Interface Homepage](./data/images/home.png)
 
-- detailed translation process of specific translation pair:
+- Detailed translation process of specific translation pair:
 
 ![Web Interface Rewrite Detail](./data/images/detail.png)
 
@@ -85,7 +87,7 @@ conda activate CrackSQL
 pip install cracksql==0.0.0b0
 ```
 
-An example running code using this PyPI package is below:
+An running code example using this PyPI package is below:
 
 ```python
 
@@ -209,7 +211,6 @@ python init_knowledge_base.py --init_all
 python translate.py --src_dialect "source dialect"
 ```
 
-
 ## 📎 Feature Extension
 
 ### Add New Syntax
@@ -228,7 +229,7 @@ python translate.py --src_dialect "source dialect"
 
 <i>TODO: Add frequently asked questions</i>
 
-## 📋 TODO
+## 📋 TODO <a id="todo"></a>
 
 - Python API
 
