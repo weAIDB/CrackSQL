@@ -88,7 +88,7 @@ including prevalent models like [GPT](https://openai.com/api/) as well as the re
   </tr>
 </tbody></table>
 
-Additionally, the prerequisites for each mode are listed below, where [*SQL Parser (BNF)*](./backend/preprocessor/antlr_parser) and [*Dialect Specification*](./data/processed_document) have already been provided. 
+Additionally, the prerequisites for each mode are listed below, where [*SQL Parser (ANTLR)*](./backend/preprocessor/antlr_parser) and [*Dialect Specification*](./data/processed_document) have already been provided. 
 Please refer to [*Feature Extension*](#extension) section to customize and enhance CrackSQL to make it more powerful for your own cases.
 
 <table><thead>
@@ -123,7 +123,7 @@ Please refer to [*Feature Extension*](#extension) section to customize and enhan
   </tr>
   <tr>
     <td>Rule+LLM</td>
-    <td>✅<br>(BNF)</td>
+    <td>✅<br>(ANTLR)</td>
     <td>✅</td>
     <td>✅ / -</td>
     <td>✅</td>
@@ -137,6 +137,7 @@ Please refer to [*Feature Extension*](#extension) section to customize and enhan
 The following table demonstrates the translation accuracy (%) of different methods over our collected [benchmark](./data) (N/A denotes the dialect translation is not supported in Ora2Pg).
 - (1) $Acc_{EX}$ indicates the translated SQL is syntactically correct and executable over the target database.
 - (2) $Acc_{RES}$ represents the translated SQL delivers exactly the same result (including the displayed order) as the original ones.
+
 Note that the required translation duration is highly dependent on the SQL complexity (e.g., the number of SQL syntax piece to be translated) and can vary from several seconds to minutes.
 
 | **Method**                 | **PG → MySQL** | **MySQL → PG** | **PG → Oracle** | **Oracle → PG** | **MySQL → Oracle** | **Oracle → MySQL** |
@@ -167,7 +168,7 @@ We have currently offered two methods (i.e., PyPI package and source code instal
 
 ### Method 1: PyPI Package Installation
 
-Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
+1. Install the PyPI package at the [official website](https://pypi.org/project/cracksql/0.0.0b0/).
 
 ![Web Interface Preview](./data/images/pypi.png)
 
@@ -180,7 +181,7 @@ conda activate CrackSQL
 pip install cracksql==0.0.0b0
 ```
 
-A running code example using this PyPI package is presented below:
+2. Run with the PyPI package. A running code example using this package is presented below:
 
 ```python
 
@@ -382,7 +383,6 @@ In this file, each item should be organized according to the following format.
 
 <details><summary><b>Q: How to make CrackSQL support additional syntax or new dialect?</b></summary>
 <b>A:</b>
-
 To support additional syntax, you need to modify the `.g4` files in ANTLR and then generate an updated Python parser. 
 Moreover, you should provide the corresponding dialect specifications for the newly-added syntax.
 
@@ -394,9 +394,9 @@ For more detailed information, please refer to the [*Feature Extension*](#extens
 
 ## 📋 TODO <a id="todo"></a>
 
-- Effective Artifact Release: We are currently preparing our MoE-based cross-dialect embedding models for practical usage and intend to release them on Hugging Face soon.
-- Comprehensive Dialect Support: We will support more dialects with prepared syntax parser and functionality specifications, which is a longstanding work and more contributors are welcomed!  
-- Translation Efficiency Improvement: We aim to implement the rules discovered by LLMs into rule systems, thus reducing the LLM invocation overhead.
+- **Effective Artifact Release**: We are currently preparing our MoE-based cross-dialect embedding models for practical usage and intend to release them on Hugging Face soon.
+- **Comprehensive Dialect Support**: We will support more dialects with prepared syntax parser and functionality specifications, which is a longstanding work and more contributors are welcomed!  
+- **Translation Efficiency Improvement**: We aim to implement the rules discovered by LLMs into rule systems, thus reducing the LLM invocation overhead.
 
 ## 👫 Community
 
