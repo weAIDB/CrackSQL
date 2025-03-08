@@ -34,25 +34,114 @@
 ## ✨ Project Introduction
 
 CrackSQL is a powerful SQL dialect translation tool that integrates rule-based strategies with LLMs for high accuracy.
-It enables seamless conversion between dialects (e.g., PostgreSQL to MySQL) with flexible access through Python API, command line, and web interface.
+It enables seamless conversion between dialects (e.g., PostgreSQL → MySQL) with flexible access through Python API, command line, and web interface.
 
 > - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). We are currently working on [new features](#todo) and more contributors are welcomed! :wave: 👫
 > - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
 
 ## 📚 Features
 
-- 🚀 **Extensive Dialect Compatibility**: Effortlessly translates between PostgreSQL, MySQL, and Oracle with flexible, tailored strategies.
+- 🚀 **Extensive Dialect Compatibility**: Effortlessly translates between PostgreSQL, MySQL, and Oracle with tailored flexible strategies.
 - 🎯 **Precision & Advanced Processing**: Achieves flawless translations with function-oriented query handling and cutting-edge model-based syntax matching through an adaptive local-to-global iteration strategy.
 - 🔄 **Versatile Access & Integration**: Seamlessly integrates with Python API, command line, and web interface to meet all user requirements.
 
+Currently, CrackSQL has integrated three modes for dialect translation, adopting the rules from [SQLGlot](https://sqlglot.com/sqlglot.html) and supporting a wide range of large language models (LLMs), 
+including prevalent models like [GPT](https://openai.com/api/) as well as the recent [DeepSeek](https://huggingface.co/deepseek-ai/DeepSeek-R1).
+
+<table><thead>
+  <tr>
+    <th rowspan="2">Mode</th>
+    <th rowspan="2">SQL Dialect</th>
+    <th colspan="2">LLM<br>(w/o &amp; w fine-tuned)</th>
+    <th colspan="2">Embedding Model<br>(w/o &amp; w fine-tuned)</th>
+  </tr>
+  <tr>
+    <th>Cloud Service<br>(e.g., <a href="https://openai.com/api/" target="_blank" rel="noopener noreferrer">💬 GPT series</a>)</th>
+    <th>Local Deployed<br>(e.g., <a href="https://huggingface.co/" target="_blank" rel="noopener noreferrer">🤗 Hugging Face</a>)</th>
+    <th>Cloud Service<br>(e.g., <a href="https://openai.com/api/" target="_blank" rel="noopener noreferrer">💬 GPT series</a>)</th>
+    <th>Local Deployed<br>(e.g., <a href="https://huggingface.co/" target="_blank" rel="noopener noreferrer">🤗 Hugging Face</a>)</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td>Rule-only</td>
+    <td>24</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>LLM-direct</td>
+    <td>✅</td>
+    <td>✅</td>
+    <td>✅</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Rule+LLM</td>
+    <td>3</td>
+    <td>✅</td>
+    <td>✅</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+</tbody></table>
+
+Additionally, the prerequisites for each mode are listed below, where [*SQL Parser (BNF)*](./backend/preprocessor/antlr_parser) and [*Dialect Specification*](./data/processed_document) have already been provided. 
+Please refer to [*Feature Extension*](#extension) section to customize and enhance CrackSQL to make it more powerful for your own cases.
+
+<table><thead>
+  <tr>
+    <th rowspan="2">Mode</th>
+    <th colspan="3">SQL Dialect</th>
+    <th colspan="2">Model Service</th>
+  </tr>
+  <tr>
+    <th>SQL Parser</th>
+    <th>Dialect Specification</th>
+    <th>Database Connection</th>
+    <th>LLM</th>
+    <th>Embedding Model</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td>Rule-only</td>
+    <td>✅<br>(SQLGlot)</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>LLM-direct</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Rule+LLM</td>
+    <td>✅<br>(BNF)</td>
+    <td>✅</td>
+    <td>✅ / -</td>
+    <td>✅</td>
+    <td>✅ / -</td>
+  </tr>
+</tbody>
+</table>
+
 ## 📊 Performance
 
-Translation Accuracy (%) of Different Methods (N/A denotes the dialect translation is not supported in Ora2Pg).
+The following table demonstrates the translation accuracy (%) of different methods over our collected [benchmark](./data) (N/A denotes the dialect translation is not supported in Ora2Pg).
+- (1) $Acc_{EX}$ indicates the translated SQL is syntactically correct and executable over the target database.
+- (2) $Acc_{RES}$ represents the translated SQL delivers exactly the same result (including the displayed order) as the original ones.
 Note that the required translation duration is highly dependent on the SQL complexity (e.g., the number of SQL syntax piece to be translated) and can vary from several seconds to minutes.
 
 | **Method**                 | **PG → MySQL** | **MySQL → PG** | **PG → Oracle** | **Oracle → PG** | **MySQL → Oracle** | **Oracle → MySQL** |
 |--------------------------------------------------|:---------------------------------------------------:|:---------------------------------------------------:|:----------------------------------------------------:|:----------------------------------------------------:|:-------------------------------------------------------:|:-------------------------------------------------------:|
-|                                                  | **Acc_EX**                                 | **Acc_RES**                                | **Acc_EX**                                  | **Acc_RES**                                 | **Acc_EX**                                     | **Acc_RES**                                    |
+|                                                  | **$Acc_{EX}$**                                 | **$Acc_{RES}$**                                | **$Acc_{EX}$**                                  | **$Acc_{RES}$**                                 | **$Acc_{EX}$**                                     | **$Acc_{RES}$**                                    |
 | **SQLGlot**                  | 74.19                                               | 70.97                                               | 60.32                                                | 60.32                                                | 55.81                                                   | 53.49                                                   |
 | **jOOQ**                          | 70.97                                               | 70.97                                               | 39.68                                                | 39.68                                                | 62.79                                                   | 60.47                                                   |
 | **Ora2Pg** | N/A                                        | N/A                                        | 33.33                                     | 33.33                                     | N/A                                            | N/A                                            |
@@ -60,8 +149,9 @@ Note that the required translation duration is highly dependent on the SQL compl
 | **GPT-4o**                     | 61.29                                               | 61.29                                               | 50.79                                                | 44.44                                                | 60.47                                                   | 55.81                                                   |
 | **CrackSQL (Ours)**                          | **87.1**                                       | **74.19**                                      | **85.71**                                       | **79.37**                                       | **69.77**                                          | **67.44**                                          |
 
-
 ## 🖥️ Demo
+
+The following showcases the primary pages of the CrackSQL interface service, including the service guidance homepage and detailed translation process.
 
 - Homepage of the deployed translation service:
 
@@ -71,7 +161,9 @@ Note that the required translation duration is highly dependent on the SQL compl
 
 ![Web Interface Rewrite Detail](./data/images/detail.png)
 
-## 🚀 Quick Start
+## 🕹 Quick Start
+
+We have currently offered two methods (i.e., PyPI package and source code installation) to deploy CrackSQL.
 
 ### Method 1: PyPI Package Installation
 
@@ -88,7 +180,7 @@ conda activate CrackSQL
 pip install cracksql==0.0.0b0
 ```
 
-An running code example using this PyPI package is below:
+A running code example using this PyPI package is presented below:
 
 ```python
 
@@ -96,7 +188,7 @@ from cracksql.cracksql import translate, initkb
 
 def initkb_func():
     try:
-        initkb("./init_config.yaml")
+        initkb("./init_config.yaml")  # fill the basic configurations in the `.yaml` first
         print("Knowledge base initialized successfully")
     except Exception as e:
         print(f"Knowledge base initialization failed: {str(e)}")
@@ -208,31 +300,103 @@ yarn dev
 # 2. Modify the relevant information in config/init_config.yaml. If you want to initialize the knowledge base, Embedding Model is required
 python init_knowledge_base.py --init_all
 
-# Convert
-python translate.py --src_dialect "source dialect"
+# Translate
+# specify the required configurations displayed by `--help` command
+python translate.py --help
 ```
 
-## 📎 Feature Extension
+## 📎 Feature Extension <a id="extension"></a>
 
-### Add New Syntax
+### 📄 Complement Additional Syntax and Specification
 
-<i>To be supplemented</i>
+#### 1. Additional Syntax
 
-### Add New Database
+To complement additional syntax, you can modify the `.g4` files in ANTLR according to the grammar rules shown below. 
+In this grammar, each parsing rule is structured recursively and consists of both non-terminal and terminal tokens.
+Once your `.g4` files are prepared, you can use the [official ANTLR tool](https://github.com/antlr/antlr4/blob/master/doc/python-target.md) to generate an updated Python parser for integration into [CrackSQL](./backend/preprocessor/antlr_parser).
 
-<i>Start from scratch</i>
+```antlrv4
+sql_script
+    : sql_plus_command_no_semicolon? (
+        (sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
+    ) EOF
+    ;
+......
+```
 
-### Fine-tune Vector Model
+#### 2. Additional Specification
 
-<i>To be supplemented</i>
+To complement additional specification, you can append new specifications to a `.json` file in the following format.
+
+```json
+[
+  {
+    "keyword": "the SQL snippet, REQUIRED",
+    "type": "function/keyword/type/operator, REQUIRED",
+    "tree": "syntax tree generated by SQL parser, REQUIRED",
+    "description": "brief usage description, REQUIRED",
+    "detail": "detailed usage illustration, REQUIRED (empty string if None)",
+    "link": ["link1", "link2", "link3"],
+    "example": ["example1", "example2", "example3"]
+  },
+  {
+    ......
+  }
+]
+```
+
+### 🐬 Add New Dialect
+
+Enabling CrackSQL to support new dialects requires two key components: (1) a dialect syntax parser and (2) functionality specifications.
+
+#### 1. New Syntax Parser
+
+You can start by checking the [official ANTLR repository](https://github.com/antlr/grammars-v4/tree/master/sql)  to see if the desired dialect grammar (i.e., ANTLR `.g4` files) is already available.
+If the required grammar does not exist, you need to compose the corresponding ANTLR grammar files to build the SQL syntax parser.
+Once the `.g4` files are ready, you can use the [official ANTLR tool](https://github.com/antlr/antlr4/blob/master/doc/python-target.md) to generate an updated Python parser. 
+This parser can then be integrated into [CrackSQL](./backend/preprocessor/antlr_parser).
+
+#### 2. New Dialect Specification
+
+You need to transform the functionality specifications (e.g., the [Oracle function descriptions](https://docs.oracle.com/cd/E11882_01/server.112/e41084/functions.htm#SQLRF006)) into a `.json` file. 
+In this file, each item should be organized according to the following format.
+
+```json
+[
+  {
+    "keyword": "the SQL snippet, REQUIRED",
+    "type": "function/keyword/type/operator, REQUIRED",
+    "tree": "syntax tree generated by SQL parser, REQUIRED",
+    "description": "brief usage description, REQUIRED",
+    "detail": "detailed usage illustration, REQUIRED (empty string if None)",
+    "link": ["link1", "link2", "link3"],
+    "example": ["example1", "example2", "example3"]
+  },
+  {
+    ......
+  }
+]
+```
 
 ## 🤔 FAQ
 
-<i>TODO: Add frequently asked questions</i>
+<details><summary><b>Q: How to make CrackSQL support additional syntax or new dialect?</b></summary>
+<b>A:</b>
+
+To support additional syntax, you need to modify the `.g4` files in ANTLR and then generate an updated Python parser. 
+Moreover, you should provide the corresponding dialect specifications for the newly-added syntax.
+
+To support new dialect, two key components (i.e., dialect syntax parser and functionality specifications) are required.
+Currently, the syntax parser is created based on ANTLR grammar, and the specifications can be derived from processing official documents.
+
+For more detailed information, please refer to the [*Feature Extension*](#extension) section.
+</details>
 
 ## 📋 TODO <a id="todo"></a>
 
-- Python API
+- Effective Artifact Release: We are currently preparing our MoE-based cross-dialect embedding models for practical usage and intend to release them on Hugging Face soon.
+- Comprehensive Dialect Support: We will support more dialects with prepared syntax parser and functionality specifications, which is a longstanding work and more contributors are welcomed!  
+- Translation Efficiency Improvement: We aim to implement the rules discovered by LLMs into rule systems, thus reducing the LLM invocation overhead.
 
 ## 👫 Community
 
@@ -262,6 +426,9 @@ If you like this project, please cite our paper:
 <a href="https://github.com/code4DB/CrackSQL/network/dependencies">
   <img src="https://contrib.rocks/image?repo=code4DB/CrackSQL" />
 </a>
+
+<a href="https://enmotech.com/"><img src="https://obs-emcsapp-public.obs.cn-north-4.myhwclouds.com/image%2Fcompanylogo_1579397843740.jpg" height=48pt></a>
+<a href="https://www.bytedance.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/ByteDance_logo_English.svg/1200px-ByteDance_logo_English.svg.png" height=30pt></a>
 
 ## 📝 License
 
