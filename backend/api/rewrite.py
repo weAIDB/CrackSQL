@@ -67,6 +67,8 @@ def latest_api():
             
         res.update(data=result)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         res.update(code=ResponseCode.Fail, msg=str(e))
     
     return res.data

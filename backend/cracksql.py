@@ -3,9 +3,11 @@ from translate import Translator
 from app_factory import create_app
 from typing import Dict, List, Tuple, Union, Optional
 from api.services.llm_model import LLMModelService
+from utils.constants import DIALECT_LIST, DIALECT_LIST_RULE
 
 
-def add_llm_model(name: str, deployment_type: str, path: str, api_base: str, api_key: str, temperature: float, max_tokens: int, description: str, is_active: bool = True):
+def add_llm_model(name: str, deployment_type: str, path: str, api_base: str, api_key: str, temperature: float,
+                  max_tokens: int, description: str, is_active: bool = True):
     """
     Add a new LLM model to the database
     
@@ -28,13 +30,13 @@ def add_llm_model(name: str, deployment_type: str, path: str, api_base: str, api
             raise ValueError("name is required")
         if not deployment_type:
             raise ValueError("deployment_type is required")
-        
+
         if deployment_type == "local" and not path:
             raise ValueError("path is required")
-        
+
         if deployment_type == "cloud" and not api_base:
             raise ValueError("api_base is required")
-        
+
         data = {
             "name": name,
             "path": path,
@@ -61,7 +63,8 @@ def add_llm_model(name: str, deployment_type: str, path: str, api_base: str, api
         return False
 
 
-def add_embedding_model(name: str, deployment_type: str, path: str, api_base: str, api_key: str, dimension: int, description: str, is_active: bool = True):
+def add_embedding_model(name: str, deployment_type: str, path: str, api_base: str, api_key: str, dimension: int,
+                        description: str, is_active: bool = True):
     """
     Add a new embedding model to the database
     
@@ -83,13 +86,13 @@ def add_embedding_model(name: str, deployment_type: str, path: str, api_base: st
             raise ValueError("name is required")
         if not deployment_type:
             raise ValueError("deployment_type is required")
-        
+
         if deployment_type == "local" and not path:
             raise ValueError("path is required")
-        
+
         if deployment_type == "cloud" and not api_base:
             raise ValueError("api_base is required")
-        
+
         data = {
             "name": name,
             "path": path,
@@ -114,18 +117,17 @@ def add_embedding_model(name: str, deployment_type: str, path: str, api_base: st
         return False
 
 
-
 def translate(
-    src_sql: str, 
-    src_dialect: str, 
-    tgt_dialect: str, 
-    model_name: str = "llama3.3", 
-    target_db_config: Optional[Dict] = None, 
-    vector_config: Optional[Dict] = None,
-    out_dir: str = "./", 
-    retrieval_on: bool = False, 
-    top_k: int = 3,
-    max_retry_time: int = 3
+        src_sql: str,
+        src_dialect: str,
+        tgt_dialect: str,
+        model_name: str = None,
+        target_db_config: Optional[Dict] = None,
+        vector_config: Optional[Dict] = None,
+        out_dir: str = "./",
+        retrieval_on: bool = False,
+        top_k: int = 3,
+        max_retry_time: int = 3
 ) -> Union[str, Tuple[str, List, List, List]]:
     """
     Translate source SQL from one database dialect to target database dialect
@@ -145,44 +147,42 @@ def translate(
     Returns:
         Union[str, Tuple[str, List, List, List]]: Translated SQL, model answer list, used knowledge pieces, lift history
     """
-
-    if not model_name:
-        raise ValueError("model_name is required")
-    
     if not src_sql:
         raise ValueError("src_sql is required")
-    
+
     if not src_dialect:
         raise ValueError("src_dialect is required")
-    
+
     if not tgt_dialect:
         raise ValueError("tgt_dialect is required")
-    
-    if not target_db_config or not target_db_config.get("host", None):
-        raise ValueError("target_db_config is required")
-    
-    if not vector_config or not vector_config.get("src_kb_name", None) or not vector_config.get("tgt_kb_name", None):
-        raise ValueError("vector_config is required")
-    
+
     app = create_app("PRODUCTION")
     app.config["SCHEDULER_OPEN"] = False
-    
+
     with app.app_context():
         translator = Translator(
-            model_name=model_name, 
+            model_name=model_name,
             src_sql=src_sql,
             src_dialect=src_dialect,
-            tgt_dialect=tgt_dialect, 
-            tgt_db_config=target_db_config, 
+            tgt_dialect=tgt_dialect,
+            tgt_db_config=target_db_config,
             vector_config=vector_config,
-            history_id="", 
-            out_type="file", 
-            out_dir=out_dir, 
-            retrieval_on=retrieval_on, 
+            history_id="",
+            out_type="file",
+            out_dir=out_dir,
+            retrieval_on=retrieval_on,
             top_k=top_k
         )
-        
-        return translator.local_to_global_rewrite(max_retry_time=max_retry_time)
+
+        if not target_db_config or (not vector_config or not vector_config.get("src_kb_name", None) or
+                                    not vector_config.get("tgt_kb_name", None)):
+            if not model_name and (src_dialect in DIALECT_LIST_RULE or tgt_dialect not in DIALECT_LIST_RULE):
+                return translator.rule_rewrite()
+            else:
+                return translator.direct_rewrite()
+        else:
+            return translator.local_to_global_rewrite(max_retry_time=max_retry_time)
+
 
 def initkb(config_file_path: Optional[str] = None) -> bool:
     """
@@ -197,7 +197,7 @@ def initkb(config_file_path: Optional[str] = None) -> bool:
     try:
         if config_file_path is None:
             raise ValueError("config_file_path is required")
-        
+
         initialize_kb(config_file_path)
         return True
     except Exception as e:

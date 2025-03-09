@@ -14,6 +14,10 @@ TRANSLATION_ANSWER_PATTERN = r'"Answer":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"
 JUDGE_ANSWER_PATTERN = r'"SQL Snippet":\s*(.*?)\s*,\s*"Reasoning":\s*(.*?),\s*"Confidence":\s*(.*?)\s'
 
 DIALECT_LIST = ["pg", "mysql", "oracle"]
+DIALECT_LIST_RULE = ["athena", "bigquery", "clickhouse", "databricks", "doris", "drill", "druid",
+                     "duckdb", "dune", "hive", "materialize", "mysql", "oracle", "postgres",
+                     "presto", "prql", "redshift", "risingwave", "snowflake", "spark", "spark2",
+                     "sqlite", "starrocks", "tableau", "teradata", "trino", "tsql", "postgresql"]
 DIALECT_MAP = {
     'pg': 'PostgreSQL 14.7',
     'mysql': "MySQL 8.4",

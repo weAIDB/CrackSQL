@@ -26,7 +26,7 @@ from translator.llm_translator import LLMTranslator
 from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
     SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_RET, USER_PROMPT_RET, EXAMPLE_PROMPT, JUDGE_INFO_PROMPT
 from utils.constants import DIALECT_MAP, FAILED_TEMPLATE, CHUNK_SIZE, TRANSLATION_ANSWER_PATTERN, \
-    JUDGE_ANSWER_PATTERN, DIALECT_LIST
+    JUDGE_ANSWER_PATTERN, DIALECT_LIST, DIALECT_LIST_RULE
 from utils.tools import process_err_msg, process_history_text
 from vector_store.chroma_store import ChromaStore
 
@@ -47,7 +47,7 @@ class Translator:
                  history_id: str = None,
                  out_type: str = "file",
                  out_dir: str = None):
-        """SQL dialect converter
+        """SQL dialect translator
         
         This class is used to convert one SQL dialect to another, supporting retrieval enhancement and history tracking.
         
@@ -80,7 +80,6 @@ class Translator:
         self.tgt_dialect = tgt_dialect
         self.vector_config = vector_config
         self.tgt_db_config = tgt_db_config
-        
 
         if self.src_dialect == "postgresql":
             self.src_dialect = "pg"
@@ -91,10 +90,11 @@ class Translator:
         self.tgt_db_config = tgt_db_config
 
         # Embedding model related configuration
-        self.src_kb_name = vector_config['src_kb_name']  # Source dialect vector collection
-        self.tgt_kb_name = vector_config['tgt_kb_name']  # Target dialect vector collection
-        self.tgt_embedding_model_name = KnowledgeBase.query.filter_by(
-            kb_name=vector_config['tgt_kb_name']).first().embedding_model_name
+        if vector_config is not None:
+            self.src_kb_name = vector_config['src_kb_name']  # Source dialect vector collection
+            self.tgt_kb_name = vector_config['tgt_kb_name']  # Target dialect vector collection
+            self.tgt_embedding_model_name = KnowledgeBase.query.filter_by(
+                kb_name=vector_config['tgt_kb_name']).first().embedding_model_name
 
         self.retrieval_on = retrieval_on  # Whether to enable retrieval
         self.top_k = top_k  # Retrieval TOP-K results
@@ -104,14 +104,16 @@ class Translator:
         self.out_type = out_type  # Output type
         self.out_dir = out_dir  # Output directory
         self.out_file = None
-        if self.out_type is 'file':
+        if self.out_type == 'file':
             if not os.path.exists(self.out_dir):
                 os.makedirs(self.out_dir)
             file_name = f"{self.src_dialect}_{self.tgt_dialect}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             self.out_file = os.path.join(self.out_dir, file_name)
             self.init_out_file()
+
         # Initialize core components
-        self.translator = LLMTranslator(model_name)  # Initialize LLM translator
+        if model_name is not None and model_name != "":
+            self.translator = LLMTranslator(model_name)  # Initialize LLM translator
         self.vector_db = ChromaStore()  # Initialize vector database
 
     @db_session_manager
@@ -147,7 +149,7 @@ class Translator:
 
         try:
             # rule normalization
-            # self.src_sql = self.rule_rewrite(self.src_sql, self.src_dialect, self.src_dialect)
+            # self.src_sql, _, _, _ = self.rule_rewrite(self.src_sql, self.src_dialect, self.src_dialect)
 
             # Parse SQL to get syntax tree and fragments
             root_node, all_pieces = self.do_query_segmentation()
@@ -166,7 +168,7 @@ class Translator:
             return self.src_sql, ['Warning: No piece find'], used_pieces, lift_histories
 
         # rule translation
-        # current_sql = self.rule_rewrite(self.src_sql, self.src_dialect, self.tgt_dialect)
+        # current_sql, _, _, _ = self.rule_rewrite(self.src_sql, self.src_dialect, self.tgt_dialect)
         # piece, assist_info = locate_node_piece(current_sql, self.tgt_dialect, all_pieces,
         #                                        root_node, self.tgt_db_config)
         # if piece is None:
@@ -248,7 +250,7 @@ class Translator:
             # if piece["Count"] == 0:
             #     try:
             #         # First try using sqlglot for direct conversion
-            #         ans_slice = self.rule_rewrite(str(piece['Node']), self.src_dialect, self.tgt_dialect)
+            #         ans_slice, _, _, _ = self.rule_rewrite(str(piece['Node']), self.src_dialect, self.tgt_dialect)
             #         model_ans = {"role": "sqlglot", "content": ans_slice, "Action": "translate",
             #                      "Time": str(datetime.now())}
             #     except Exception as e:
@@ -740,7 +742,7 @@ class Translator:
                 src_dialect=self.src_dialect,
                 tgt_dialect=self.tgt_dialect
             ).strip("\n")
-        
+
         # If no user prompt provided, generate one
         if user_prompt is None:
             # Format user prompt
@@ -794,19 +796,22 @@ class Translator:
 
         return piece, assist_info, answer_raw
 
-    def rule_rewrite(self, src_sql, src_dialect, tgt_dialect):
+    def rule_rewrite(self):
         try:
-            if src_dialect == "postgresql":
+            src_dialect, tgt_dialect = self.src_dialect, self.tgt_dialect
+            if self.src_dialect == "pg":
                 src_dialect = "postgres"
-            if tgt_dialect == "postgresql":
+            if self.tgt_dialect == "pg":
                 tgt_dialect = "postgres"
-            tgt_sql = sqlglot.transpile(src_sql, read=src_dialect, write=tgt_dialect)[0]
-            return tgt_sql
+            print(src_dialect, tgt_dialect)
+            tgt_sql = sqlglot.transpile(self.src_sql, read=src_dialect, write=tgt_dialect)[0]
+            return tgt_sql, [], [], []
 
         except Exception as e:
             traceback.print_exc()
-            return src_sql
+            return self.src_sql, [], [], []
 
+    @db_session_manager
     def direct_rewrite(self):
         translator = LLMTranslator(self.model_name)
         history, model_ans_list = list(), list()
@@ -818,9 +823,15 @@ class Translator:
         user_prompt = USER_PROMPT_NA.format(src_dialect=DIALECT_MAP[self.src_dialect],
                                             tgt_dialect=DIALECT_MAP[self.tgt_dialect], sql=self.src_sql).strip("\n")
 
-        answer = translator.trans_func(history, sys_prompt, user_prompt)
-        current_sql = answer["Answer"]
-        answer_raw = {}
+        answer_raw = translator.trans_func(history, sys_prompt, user_prompt)
+        # Parse model answer using regex
+        pattern = TRANSLATION_ANSWER_PATTERN
+        res = self.translator.parse_llm_answer(answer_raw["content"], pattern)
+        self.add_process(content=process_history_text(answer_raw["content"], role="assistant", action="translate"),
+                         step_name="Rewrite result", sql=res["Answer"], role="assistant", is_success=True, error=None)
+
+        answer_raw["Answer"] = res["Answer"]
+        current_sql = answer_raw["Answer"]
         answer_raw["Action"] = "translate"
         answer_raw["Time"] = str(datetime.now())
         answer_raw["SYSTEM_PROMPT"] = sys_prompt
@@ -831,11 +842,11 @@ class Translator:
         self.add_process(content="SQL rewrite completed", step_name="Rewrite result", sql=current_sql,
                          role="assistant", is_success=True, error=None)
 
-        return current_sql, model_ans_list
+        return current_sql, model_ans_list, [], []
 
     def init_out_file(self):
         res_data = {
-            "info":                    {
+            "info": {
                 "src_dialect": self.src_dialect,
                 "tgt_dialect": self.tgt_dialect,
                 "src_sql": self.src_sql,
@@ -908,7 +919,6 @@ def parse_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description='Run Local to Global Dialect Translation.')
 
-    
     parser.add_argument('--src_dialect', type=str,
                         help='Source database dialect', choices=DIALECT_LIST)
     parser.add_argument('--tgt_dialect', type=str,
@@ -916,13 +926,24 @@ def parse_args():
     parser.add_argument('--src_sql', type=str,
                         help='Source SQL to be translated or file including multiple Source SQLs')
 
-    parser.add_argument('--src_kb_name', type=str,
+    parser.add_argument('--src_kb_name', type=str, default=None,
                         help='Source specification base or its file path')
-    parser.add_argument('--tgt_kb_name', type=str,
+    parser.add_argument('--tgt_kb_name', type=str, default=None,
                         help='Target specification base or its file path')
 
-    parser.add_argument('--llm_model_name', type=str,
+    parser.add_argument('--llm_model_name', type=str, default=None,
                         help='LLM for dialect translation')
+
+    parser.add_argument('--host', type=str, default=None,
+                        help='IP address for target dialect database')
+    parser.add_argument('--port', type=str, default=None,
+                        help='port for target dialect database')
+    parser.add_argument('--user', type=str, default=None,
+                        help='account username for target dialect database')
+    parser.add_argument('--password', type=str, default=None,
+                        help='account password for target dialect database')
+    parser.add_argument('--db_name', type=str, default=None,
+                        help='database name for target dialect database')
 
     parser.add_argument('--retrieval_on', action='store_true',
                         help='Employ specification retrieval for dialect translation')
@@ -934,9 +955,7 @@ def parse_args():
     parser.add_argument('--out_dir', type=str,
                         help='Output directory to dump translation result')
 
-
     return parser.parse_args()
-
 
 
 def main():
@@ -947,19 +966,23 @@ def main():
 
     app = create_app(config_name='PRODUCTION')
     with app.app_context():
-        tgt_db = DatabaseConfig.query.get(1)
+        tgt_db_config = None
+        if (args.host is not None and args.port is not None and
+                args.user is not None and args.password is not None and args.db_name is not None):
+            tgt_db_config = {
+                "host": args.host,
+                "port": args.port,
+                "user": args.username,
+                "password": args.password,
+                "db_name": args.database
+            }
 
-        tgt_db_config = {
-            "host": tgt_db.host,
-            "port": tgt_db.port,
-            "user": tgt_db.username,
-            "password": tgt_db.password,
-            "db_name": tgt_db.database
-        }
-        vector_config = {
-            "src_kb_name": args.src_kb_name,
-            "tgt_kb_name": args.tgt_kb_name
-        }
+        vector_config = None
+        if args.src_kb_name is not None and args.tgt_kb_name is not None:
+            vector_config = {
+                "src_kb_name": args.src_kb_name,
+                "tgt_kb_name": args.tgt_kb_name
+            }
 
         if os.path.isfile(args.src_sql):
             with open(args.src_sql, "r") as rf:
@@ -974,8 +997,17 @@ def main():
                                     history_id=None, out_type="file", out_dir=args.out_dir,
                                     retrieval_on=args.retrieval_on, top_k=args.top_k)
 
-            translated_sql, model_ans_list, \
-            used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=args.max_retry_time)
+            if not tgt_db_config or not vector_config:
+                if not args.llm_model_name and (args.src_dialect in DIALECT_LIST_RULE
+                                                or args.tgt_dialect not in DIALECT_LIST_RULE):
+                    translated_sql, model_ans_list, \
+                        used_pieces, lift_histories = translator.rule_rewrite()
+                else:
+                    translated_sql, model_ans_list, \
+                        used_pieces, lift_histories = translator.direct_rewrite()
+            else:
+                translated_sql, model_ans_list, \
+                    used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=args.max_retry_time)
 
             translated_sql_total.append(translated_sql)
             with open(os.path.join(args.out_dir, "translated_sql_total.json"), "w") as wf:

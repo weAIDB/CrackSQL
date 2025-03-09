@@ -5,7 +5,7 @@ export default {
     DatabaseChat: 'Database Configuration'
   },
   dashboard: {
-    title: 'SQL Dialect Converter',
+    title: 'SQL Dialect Translator',
     subtitle: 'Making cross-database migration simple and efficient',
     github: 'View on GitHub',
     operation: {
@@ -42,7 +42,7 @@ export default {
       sql: {
         placeholder: 'Please enter the SQL statement to convert...'
       },
-      convert: 'Start Conversion',
+      convert: 'Start Translation',
       validation: {
         noSql: 'Please enter SQL statement',
         noSource: 'Please select source database',
@@ -87,7 +87,7 @@ export default {
       tooltip: {
         collapse: 'Collapse Sidebar',
         expand: 'Expand Sidebar',
-        newChat: 'Start New Conversion',
+        newChat: 'Start New Translation',
         feedback: 'We look forward to your feedback!',
         github: 'Visit Github and give us a Star! Your encouragement drives us forward! 🎉🎉🎉',
         language: 'Switch Language',

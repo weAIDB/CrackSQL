@@ -83,7 +83,6 @@ The input SQL is:
 ```sql
 {sql}
 ```
-{example}
 ## OUTPUT FORMAT ##
 Please return your response without any redundant information, strictly adhering to the following format:
 ```json

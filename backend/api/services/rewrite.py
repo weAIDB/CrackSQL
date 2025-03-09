@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 from config.logging_config import logger
-from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, RETRIEVAL_ON, TRANSLATION_RESULT_TEMP
+from utils.constants import TOP_K, FAILED_TEMPLATE, MAX_RETRY_TIME, RETRIEVAL_ON, TRANSLATION_RESULT_TEMP, DIALECT_LIST_RULE
 from datetime import datetime
 
 
@@ -95,26 +95,38 @@ class RewriteService:
         if not history:
             return None
 
-        history_dict = {
-            'id': history.id,
-            'source_db_type': history.source_db_type,
-            'original_sql': history.original_sql,
-            'original_kb': {
+        original_kb = None
+        if history.original_kb is not None:
+            original_kb = {
                 'id': history.original_kb.id,
                 'name': history.original_kb.kb_name,
-            },
-            'target_kb': {
+            }
+
+        target_kb = None
+        if history.target_kb is not None:
+            target_kb = {
                 'id': history.target_kb.id,
                 'name': history.target_kb.kb_name
-            },
-            'target_db': {
+            }
+
+        target_db = None
+        if history.target_db is not None:
+            target_db = {
                 'id': history.target_db.id,
                 'database': history.target_db.database,
                 'host': history.target_db.host,
                 'port': history.target_db.port,
                 'username': history.target_db.username,
                 'db_type': history.target_db.db_type
-            },
+            }
+
+        history_dict = {
+            'id': history.id,
+            'source_db_type': history.source_db_type,
+            'original_sql': history.original_sql,
+            'original_kb': original_kb,
+            'target_kb': target_kb,
+            'target_db': target_db,
             'llm_model_name': history.llm_model_name,
             'status': history.status,
             'created_at': history.created_at,
@@ -133,25 +145,25 @@ class RewriteService:
 
                 # 格式化持续时间
                 if time_diff < 60:
-                    duration = f"{int(time_diff)}秒"
+                    duration = f"{int(time_diff)} s"
                 elif time_diff < 3600:
                     minutes = int(time_diff // 60)
                     seconds = int(time_diff % 60)
-                    duration = f"{minutes}分{seconds}秒"
+                    duration = f"{minutes} min {seconds} s"
                 elif time_diff < 86400:
                     hours = int(time_diff // 3600)
                     minutes = int((time_diff % 3600) // 60)
-                    duration = f"{hours}小时{minutes}分"
+                    duration = f"{hours} h {minutes} min"
                 else:
                     days = int(time_diff // 86400)
                     hours = int((time_diff % 86400) // 3600)
-                    duration = f"{days}天{hours}小时"
+                    duration = f"{days} day {hours} h"
 
                 history_dict['duration'] = duration
             else:
-                history_dict['duration'] = "未知"
+                history_dict['duration'] = "unknown"
         else:
-            history_dict['duration'] = "未知"
+            history_dict['duration'] = "unknown"
 
         # Get associated processes
         processes = RewriteProcess.query \
@@ -271,18 +283,35 @@ class RewriteService:
                     "password": target_db.password,
                     "db_name": target_db.database
                 }
-                vector_config = {
-                    "src_kb_name": history.original_kb.kb_name,
-                    "tgt_kb_name": history.target_kb.kb_name
-                }
+
+                vector_config = None
+                if history.original_kb is not None and history.target_kb is not None:
+                    vector_config = {
+                        "src_kb_name": history.original_kb.kb_name,
+                        "tgt_kb_name": history.target_kb.kb_name
+                    }
 
                 translator = Translator(model_name=history.llm_model_name, src_sql=history.original_sql,
                                         src_dialect=history.source_db_type.lower(),
                                         tgt_dialect=history.target_db.db_type.lower(),
                                         tgt_db_config=target_db_config, vector_config=vector_config,
                                         history_id=history_id, out_type="db", retrieval_on=RETRIEVAL_ON, top_k=TOP_K)
-                translated_sql, model_ans_list, \
-                    used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=MAX_RETRY_TIME)
+
+                if not target_db_config or (not vector_config or not vector_config.get("src_kb_name", None) or
+                                            not vector_config.get("tgt_kb_name", None)):
+                    if (history.llm_model_name is None or history.llm_model_name == "") and \
+                            (history.source_db_type.lower() in DIALECT_LIST_RULE
+                             or history.target_db.db_type.lower() not in DIALECT_LIST_RULE):
+                        translated_sql, model_ans_list, \
+                            used_pieces, lift_histories = translator.rule_rewrite()
+                    else:
+                        translated_sql, model_ans_list, \
+                            used_pieces, lift_histories = translator.direct_rewrite()
+                else:
+                    translated_sql, model_ans_list, \
+                        used_pieces, lift_histories = translator.local_to_global_rewrite(max_retry_time=MAX_RETRY_TIME)
+
+                print("translated_sql", translated_sql)
 
                 if translated_sql != FAILED_TEMPLATE:
                     content = TRANSLATION_RESULT_TEMP.format(translated_sql=translated_sql)

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="cracksql",
-    version="0.0.0-alpha",
+    version="0.0.0-theta",
     packages=find_packages(exclude=["tests*"]),
     install_requires=[
         # Flask related
@@ -14,6 +14,7 @@ setup(
         "flask_caching==1.10.1",
         "func_timeout==4.3.5",
         "paramiko==3.5.1",
+
         # Database
         "pymysql==1.0.2",
         "psycopg2-binary==2.9.10",
@@ -45,9 +46,9 @@ setup(
         
         # ML frameworks
         "transformers>=4.47.1",
-        "torch==2.1.0",
-        "torchvision",
-        "torchaudio",
+        # "torch==2.1.0",
+        # "torchvision",
+        # "torchaudio",
         "accelerate>=0.26.0",
     ],
     author="code4DB",

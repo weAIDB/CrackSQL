@@ -325,7 +325,7 @@ SELECT employee_id, employee_name, department_name, top_manager FROM emp_hierarc
   }
 })
 
-const originalDB = ref("Oracle")
+const originalDB = ref("PostgreSQL")
 const originalKb = ref("")
 const targetDB = ref("")
 const targetKb = ref("")
