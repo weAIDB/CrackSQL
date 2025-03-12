@@ -176,7 +176,7 @@ python3 init_knowledge_base.py --init_all
 # 启动后端服务（后端服务端口也可以在app.py中修改，目前为30006）
 python app.py
 
-# 启动前端（需要nodejs，版本20.11.1+）
+# 新开一个终端，启动前端（需要nodejs，版本20.11.1+）
 cd CrackSQL/webui
 
 # 安装依赖

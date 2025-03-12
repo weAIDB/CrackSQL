@@ -5,19 +5,7 @@
   "author": "kuanghua",
   "scripts": {
     "dev": "vite --mode serve-dev",
-    "test": "vite --mode serve-test",
-    "build:test": "vite build --mode  build-test",
-    "build": "vite build --mode build",
-    "preview:build": "npm run build && vite preview ",
-    "preview": "vite preview ",
-    "lint": "eslint --ext .js,.jsx,.vue,.ts,.tsx src --fix",
-    "test:unit": "vue-cli-service test:unit",
-    "test:watchAll": "vue-cli-service test:unit --watchAll",
-    "test:cov": "vue-cli-service test:unit --coverage",
-    "test:majestic": "majestic",
-    "vitest": "vitest --ui",
-    "tsc-check": "tsc",
-    "coverage": "vitest run --coverage"
+    "build": "vite build --mode build"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.4",

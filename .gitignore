@@ -1,4 +1,3 @@
-webui/.env.serve-dev
 
 ### venv template
 # Virtualenv
@@ -379,8 +378,6 @@ backend/local_models
 instance
 webui/node_modules
 webui/dist
-*.env.serve-dev
-*.env.build
 *.venv
 *.cursor
 *.cursorrules

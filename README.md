@@ -275,7 +275,7 @@ python3 init_knowledge_base.py --init_all
 # Start backend service (The backend service port can also be modified in app.py, currently 30006)
 python app.py
 
-# Start frontend (requires nodejs, version 20.11.1+)
+# Open a new terminal window, start frontend (requires nodejs, version 20.11.1+)
 cd CrackSQL/webui
 
 # Install dependencies
@@ -289,7 +289,7 @@ yarn dev
 
 # Tips: 
 # If you want to modify the frontend port number, you can modify it in webui/vite.config.js: port: 50212
-# If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file (if the file does not exist, you can rename webui/.env.serve-dev_copy to .env.serve-dev).
+# If the backend API port number has been changed, or you want to use the server's IP, you can modify the VITE_APP_BASE_URL parameter in webui/.env.serve-dev file (if the file does not exist, you can rename webui/.env.serve-dev_template to .env.serve-dev).
 ```
 
 #### 3. Command Line Usage
