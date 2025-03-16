@@ -499,6 +499,9 @@ export default {
       success: 'Success',
       failed: 'Failed',
       processing: 'Processing'
+    },
+    operation: {
+      stop: 'Stop'
     }
   },
   database: {

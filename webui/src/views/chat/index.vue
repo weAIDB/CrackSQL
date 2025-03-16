@@ -48,6 +48,9 @@
             <el-icon><Timer /></el-icon>
             {{ historyDetail.duration }}
           </div>
+          <el-button v-if="historyDetail.status === 'processing'" type="danger" @click="stopRewrite">
+            {{ $t('chat.operation.stop') }}
+          </el-button>
         </div>
       </div>
     </div>
@@ -83,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import {rewriteLatestReq} from '@/api/rewrite.js'
+import {rewriteLatestReq, stopRewriteReq} from '@/api/rewrite.js'
 import ChatItem from '@/components/ChatItem.vue'
 import SqlInput from '@/components/SqlInput.vue'
 import type {RewriteHistory} from '@/types/database'
@@ -114,6 +117,15 @@ const getRewriteDetail = async () => {
   } catch (error) {
     console.error('获取改写详情失败:', error)
     stopPolling()
+  }
+}
+
+// 停止改写
+const stopRewrite = async () => {
+  try {
+    await stopRewriteReq({id: historyDetail.value?.id})
+  } catch (error) {
+    console.error('停止改写失败:', error)
   }
 }
 

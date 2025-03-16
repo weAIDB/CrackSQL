@@ -125,3 +125,35 @@ def delete_api():
         res.update(code=ResponseCode.Fail, msg=str(e))
     
     return res.data
+
+
+@route(bp, '/stop', methods=['POST'])
+def stop_api():
+    """Stop rewrite task"""
+    res = ResMsg()
+    obj = request.get_json(force=True)
+    history_id = obj.get('id')
+    
+    if not history_id:
+        res.update(code=ResponseCode.InvalidParameter, msg="History ID cannot be empty")
+        return res.data
+    
+    try:
+        # Try to remove the task from scheduler
+        job_id = f'rewrite_task_{history_id}'
+        if scheduler.get_job(job_id):
+            scheduler.remove_job(job_id)
+        
+        # Update task status to stopped
+        RewriteService.update_rewrite_status(
+            history_id=history_id,
+            status=RewriteStatus.FAILED,
+            sql=None,
+            error="Task stopped by user"
+        )
+        
+        res.update(data={'message': 'Task stopped successfully'})
+    except Exception as e:
+        res.update(code=ResponseCode.Fail, msg=str(e))
+    
+    return res.data

@@ -39,6 +39,15 @@ export const createRewriteReq = (data) => {
   })
 }
 
+// 停止改写任务
+export const stopRewriteReq = (data) => {
+  return axiosReq({
+    url: 'api/rewrite/stop',
+    method: 'post',
+    data
+  })
+}
+
 // 删除改写历史
 export const deleteRewriteReq = (id) => {
   return axiosReq({

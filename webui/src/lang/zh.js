@@ -490,6 +490,9 @@ export default {
       success: '成功',
       failed: '失败',
       processing: '处理中'
+    },
+    operation: {
+      stop: '停止'
     }
   },
   database: {
