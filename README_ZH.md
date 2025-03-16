@@ -171,7 +171,7 @@ flask db upgrade   # 同步到数据库
 # 初始化知识库（可选，也可以在启动前端项目后在前端手动完成）
 # 1. 首先将config/init_config.yaml.copy重命名为config/init_config.yaml
 # 2. 修改config/init_config.yaml中的相关信息。如果要初始化知识库，需要Embedding Model
-python3 init_knowledge_base.py --init_all
+python init_knowledge_base.py  --config_file xxxxxxxxx
 
 # 启动后端服务（后端服务端口也可以在app.py中修改，目前为30006）
 python app.py
@@ -180,11 +180,10 @@ python app.py
 cd CrackSQL/webui
 
 # 安装依赖
-yarn cache clean
-yarn install
+pnpm install
 
 # 启动开发服务器
-yarn dev
+pnpm run dev
 
 # 访问http://localhost:50212使用Web界面
 

@@ -13,7 +13,6 @@ declare module '@vue/runtime-core' {
     CreateKnowledgeBase: typeof import('./../src/components/CreateKnowledgeBase.vue')['default']
     DatabaseConfigForm: typeof import('./../src/components/DatabaseConfigForm.vue')['default']
     ElSvgIcon: typeof import('./../src/components/ElSvgIcon.vue')['default']
-    ProcessItem: typeof import('./../src/components/ProcessItem.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SqlInput: typeof import('./../src/components/SqlInput.vue')['default']

@@ -26,7 +26,7 @@ openai>=1.3.0
 aiohttp>=3.8.0  # For asynchronous HTTP requests
 tenacity>=8.2.0  # For retry mechanism
 sentence-transformers>=2.2.0  # For text vectorization
-numpy>=1.24.0  # Scientific computing
+numpy==1.24.0  # Scientific computing
 scikit-learn>=1.0.0  # For vector calculation
 chromadb>=0.4.15  # Chroma vector database
 

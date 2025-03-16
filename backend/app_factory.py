@@ -130,19 +130,20 @@ def create_app(config_name='PRODUCTION', config_path=None):
         
     # Dynamically set database path
     # Use user execution directory
-    current_dir = os.getcwd()
-    instance_dir = os.path.join(current_dir, 'instance')
-    logs_dir = os.path.join(current_dir, 'logs')
+    current_dir = Path.cwd()
+    instance_dir = current_dir / 'instance'
+    logs_dir = current_dir / 'logs'
     # Ensure directory exists
-    os.makedirs(instance_dir, exist_ok=True)
-    os.makedirs(logs_dir, exist_ok=True)
+    instance_dir.mkdir(exist_ok=True)
+    logs_dir.mkdir(exist_ok=True)
     
     # Set database file path
-    db_path = os.path.join(instance_dir, 'info.db')
+    db_path = instance_dir / 'info.db'
     print(f"Using database: {db_path}")
     
-    # Update database URI
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////{db_path}'
+    # Update database URI - using as_uri() to get the correct format for SQLAlchemy
+    db_uri = db_path.as_uri().replace('file:', '')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite://{db_uri}'
 
     # Load logging configuration
     logging_config_path = app.config.get('LOGGING_CONFIG_PATH')

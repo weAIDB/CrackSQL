@@ -270,7 +270,7 @@ flask db upgrade   # Synchronize to database
 # Initialize knowledge base (Optional, can be done manually in the frontend after starting the frontend project)
 # 1. First rename config/init_config.yaml.copy to config/init_config.yaml
 # 2. Modify the relevant information in config/init_config.yaml. If you want to initialize the knowledge base, Embedding Model is required
-python3 init_knowledge_base.py --init_all
+python init_knowledge_base.py  --config_file xxxxxxxxx
 
 # Start backend service (The backend service port can also be modified in app.py, currently 30006)
 python app.py
@@ -279,11 +279,10 @@ python app.py
 cd CrackSQL/webui
 
 # Install dependencies
-yarn cache clean
-yarn install
+pnpm install
 
 # Start development server
-yarn dev
+pnpm run dev
 
 # Visit http://localhost:50212 to use the Web interface
 
