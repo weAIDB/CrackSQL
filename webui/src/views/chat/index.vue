@@ -48,7 +48,7 @@
             <el-icon><Timer /></el-icon>
             {{ historyDetail.duration }}
           </div>
-          <el-button v-if="historyDetail.status === 'processing'" type="danger" @click="stopRewrite">
+          <el-button style="margin-left: 20px;" v-if="historyDetail.status === 'processing'" type="danger" @click="stopRewrite">
             {{ $t('chat.operation.stop') }}
           </el-button>
         </div>
@@ -60,6 +60,8 @@
       <!-- 用户输入的SQL -->
       <sql-input
           :message="{
+            status: historyDetail.status,
+            error: historyDetail.error_message,
             source_db_type: historyDetail.source_db_type,
             original_sql: historyDetail.original_sql,
             target_db: historyDetail.target_db,
@@ -124,6 +126,7 @@ const getRewriteDetail = async () => {
 const stopRewrite = async () => {
   try {
     await stopRewriteReq({id: historyDetail.value?.id})
+    getRewriteDetail()
   } catch (error) {
     console.error('停止改写失败:', error)
   }

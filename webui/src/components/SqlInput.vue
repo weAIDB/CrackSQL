@@ -1,7 +1,9 @@
 <template>
   <div class="sql-input-container">
     <el-descriptions :column="2" border>
-
+      <el-descriptions-item v-if="message.status === 'failed'" label="Error Message" :span="4">
+        <span style="color: #f56c6c">{{ message.error || '' }}</span>
+      </el-descriptions-item>
       <el-descriptions-item label="Connection Info" :span="4">
         <div class="connection-info">
           {{ message.target_db.username }}@{{ message.target_db.host }}:{{ message.target_db.port }}/{{ message.target_db.database }}
@@ -68,6 +70,8 @@ interface KB {
 }
 
 interface SqlMessage {
+  status: string
+  error: string
   source_db_type: string
   original_sql: string
   target_db: TargetDB

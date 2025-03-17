@@ -33,7 +33,7 @@
             <el-icon><Timer /></el-icon>
             <span style="margin-left: 5px;">Duration: {{ historyDetail.duration }}</span>
           </div>
-          <el-button v-if="historyDetail.status === 'processing'" type="danger" @click="stopRewrite">
+          <el-button style="margin-left: 20px;" v-if="historyDetail.status === 'processing'" type="danger" @click="stopRewrite">
             {{ $t('chat.operation.stop') }}
           </el-button>
         </div>
@@ -108,6 +108,7 @@ const getRewriteDetail = async () => {
 const stopRewrite = async () => {
   try {
     await stopRewriteReq({id: historyDetail.value?.id})
+    getRewriteDetail()
   } catch (error) {
     console.error('停止改写失败:', error)
   }

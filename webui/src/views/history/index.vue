@@ -94,6 +94,8 @@
         <div v-else class="expanded-sql">
           <sql-input
             :message="{
+              status: item.status,
+              error: item.error_message,
               source_db_type: item.source_db_type,
               original_sql: item.original_sql,
               target_db: item.target_db,
