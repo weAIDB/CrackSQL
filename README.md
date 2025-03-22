@@ -398,11 +398,11 @@ For more detailed information, please refer to the [*Feature Extension*](#extens
 
 ## 👫 Community
 
-Welcome to scan the QR code to join the WeChat group!
+We deeply appreciate the invaluable effort contributed by our dedicated team of developers, supportive users, and esteemed industry partners.
 
-<p align="center">
-  <i>TODO: Add WeChat group QR code</i>
-</p>
+<a href="https://enmotech.com/"><img src="https://obs-emcsapp-public.obs.cn-north-4.myhwclouds.com/image%2Fcompanylogo_1579397843740.jpg" height=48pt></a>
+<a href="https://www.bytedance.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/ByteDance_logo_English.svg/1200px-ByteDance_logo_English.svg.png" height=30pt></a>
+
 
 ## 📒 Citation
 
@@ -419,18 +419,8 @@ If you like this project, please cite our paper:
 }
 ```
 
-## 📧 Contributors
-
-<a href="https://github.com/code4DB/CrackSQL/network/dependencies">
-  <img src="https://contrib.rocks/image?repo=code4DB/CrackSQL" />
-</a>
-
-<a href="https://enmotech.com/"><img src="https://obs-emcsapp-public.obs.cn-north-4.myhwclouds.com/image%2Fcompanylogo_1579397843740.jpg" height=48pt></a>
-<a href="https://www.bytedance.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/ByteDance_logo_English.svg/1200px-ByteDance_logo_English.svg.png" height=30pt></a>
 
 ## 📝 License
-
-<i>TODO: Add open source license</i>
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
