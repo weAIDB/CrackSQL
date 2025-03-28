@@ -388,5 +388,5 @@ cursor
 
 # Add this new rule
 !webui/src/lib
-
+./specstory
 *_*_*.json
