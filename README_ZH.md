@@ -35,6 +35,7 @@
 
 CrackSQL是一款强大的SQL方言转换工具，集成了基于规则的策略和大语言模型，以实现高精度的转换。它支持不同SQL方言之间的无缝转换（如PostgreSQL到MySQL），并提供Python API、命令行和Web界面等多种灵活访问方式。
 
+> - **2025年4月:** 我们在网上发布了关于这个项目的 [demo论文](https://arxiv.org/abs/2504.00882)！📚
 > - **2025年3月:** 我们重构了代码并在多个开源平台上发布了我们的项目（[PyPI](https://pypi.org/project/cracksql/0.0.0b0/)）。我们目前正在开发[新功能](#待办事项)，欢迎更多贡献者加入！:wave: 👫
 > - **2025年2月:** 我们的论文"*Cracking SQL Barrier: An LLM-based Dialect Translation System*"已被SIGMOD 2025接收！:tada: :tada: :tada:
 
@@ -407,13 +408,27 @@ sql_script
 如果您喜欢这个项目，请引用我们的论文：
 
 ```
-@misc{zhou2025cracksql,
-      title={Cracking SQL Barriers: An LLM-based Dialect Transaltion System}, 
-      author={Wei Zhou, Yuyang Gao, Xuanhe Zhou, and Guoliang Li},
-      year={2025},
-      journal={Proc. {ACM} Manag. Data},
-      volume={3},
-      number={2},
+@article{zhou2025cracksql,
+  author       = {Wei Zhou and
+                  Yuyang Gao and
+                  Xuanhe Zhou and
+                  Guoliang Li},
+  title        = {{Cracking SQL Barriers:} {An}  LLM-based Dialect Transaltion System},
+  journal      = {Proc. {ACM} Manag. Data},
+  volume       = {3},
+  number       = {3 (SIGMOD)},
+  year         = {2025}
+}
+
+@article{zhou2025cracksqldemo,
+  author       = {Wei Zhou and
+                  Yuyang Gao and
+                  Xuanhe Zhou and
+                  Guoliang Li},
+  title        = {CrackSQL: A Hybrid SQL Dialect Translation System Powered by Large Language Models},
+  journal      = {arXiv Preprint},
+  url       = {https://arxiv.org/abs/2504.00882},
+  year         = {2025}
 }
 ```
 
