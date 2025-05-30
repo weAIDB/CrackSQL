@@ -2,6 +2,7 @@ import numpy as np
 from typing import List, Union, Optional, Dict
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import DashScopeEmbeddings
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 from models import LLMModel
@@ -92,6 +93,13 @@ class EmbeddingManager:
                     model=model_config['name'],
                     openai_api_key=model_config['api_key'],
                     openai_api_base=model_config['api_base']
+                )
+            elif model_config["deployment_type"] == "cloud-aliyun":
+                # Cloud model (Aliyun)
+                # Ref: https://help.aliyun.com/zh/model-studio/use-bailian-in-langchain
+                embedding = DashScopeEmbeddings(
+                    model=model_config["name"],
+                    dashscope_api_key=model_config["api_key"],
                 )
             else:
                 import torch

@@ -18,7 +18,7 @@ LLM_MODELS:
 EMBEDDING_MODELS:
   # OpenAI Embedding model
   - name: "text-embedding-ada-002"          # Model name
-    deployment_type: "cloud"                # Deployment type: cloud or local  
+    deployment_type: "cloud"                # Deployment type: cloud or cloud-aliyun or local
     category: "embedding"                   # Model category
     api_base: "https://api.openai.com/v1"   # API base URL
     api_key: "your-openai-api-key"          # Replace with your actual API key
