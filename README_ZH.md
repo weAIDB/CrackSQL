@@ -150,17 +150,17 @@ CrackSQL是一款强大的SQL方言转换工具，集成了基于规则的策略
 | **GPT-4o**           |      61.29     |      61.29     |      50.79     |      44.44     |     60.47     |     55.81     |
 | **CrackSQL (我们的方法)** |      87.1      |      74.19     |      85.71     |      79.37     |     69.77     |     67.44     |
 
-## 🖥️ 演示
+## 🎬 演示
 
 以下展示了CrackSQL界面服务的主要页面，包括服务指导首页和详细转换过程。
 
 - 已部署的转换服务首页：
 
-![Web界面首页](./data/images/home.png)
+[![Web界面首页](./data/images/home.png)](https://vimeo.com/1071435762?share=copy)
 
 - 特定转换对的详细转换过程：
 
-![Web界面重写详情](./data/images/detail.png)
+[![Web界面重写详情](./data/images/detail.png)](https://vimeo.com/1071435762?share=copy)
 
 ## 🕹 快速开始
 

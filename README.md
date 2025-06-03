@@ -151,17 +151,17 @@ Note that the required translation duration is highly dependent on the SQL compl
 | **GPT-4o**           |      61.29     |      61.29     |      50.79     |      44.44     |     60.47     |     55.81     |
 | **CrackSQL  (Ours)** |      87.1      |      74.19     |      85.71     |      79.37     |     69.77     |     67.44     |
 
-## 🖥️ Demo
+## 🎬 Demo
 
 The following showcases the primary pages of the CrackSQL interface service, including the service guidance homepage and detailed translation process.
 
 - Homepage of the deployed translation service:
 
-![Web Interface Homepage](./data/images/home.png)
+[![Web Interface Homepage](./data/images/home.png)](https://vimeo.com/1071435762?share=copy)
 
 - Detailed translation process of specific translation pair:
 
-![Web Interface Rewrite Detail](./data/images/detail.png)
+[![Web Interface Rewrite Detail](./data/images/detail.png)](https://vimeo.com/1071435762?share=copy)
 
 ## 🕹 Quick Start
 
