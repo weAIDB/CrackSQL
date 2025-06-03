@@ -972,9 +972,9 @@ def main():
             tgt_db_config = {
                 "host": args.host,
                 "port": args.port,
-                "user": args.username,
+                "user": args.user,
                 "password": args.password,
-                "db_name": args.database
+                "db_name": args.db_name
             }
 
         vector_config = None
