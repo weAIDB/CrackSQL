@@ -179,7 +179,7 @@ conda create -n CrackSQL python=3.10
 conda activate CrackSQL
 
 # install PyPI package
-pip install cracksql==0.0.0b0
+pip install cracksql
 ```
 
 2. Run with the PyPI package. A running code example using this package is presented below:
