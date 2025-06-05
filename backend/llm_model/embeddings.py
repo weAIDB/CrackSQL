@@ -142,8 +142,9 @@ async def _get_embeddings_with_context(text: Union[str, List[str]], model_name: 
     try:
         # Use LangChain's embed_query/embed_documents methods
         if isinstance(text, str):
-            embedding = await embedding_model.aembed_query(text)
+            embedding = await embedding_model.aembed_query(text[:8192])
         else:
+            text = [t[:8192] for t in text]
             embedding = await embedding_model.aembed_documents(text)
         return np.array(embedding)
     except Exception as e:
