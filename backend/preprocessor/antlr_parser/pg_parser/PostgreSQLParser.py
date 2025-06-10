@@ -1,6 +1,9 @@
 # Generated from /data/Coding/LLM4DB/antlr_gram/pg/PostgreSQLParser.g4 by ANTLR 4.13.1
 # encoding: utf-8
 from antlr4 import *
+from preprocessor.antlr_parser.pg_parser.PostgreSQLLexer import PostgreSQLLexer
+from preprocessor.antlr_parser.pg_parser.LexerDispatchingErrorListener import LexerDispatchingErrorListener
+from preprocessor.antlr_parser.pg_parser.ParserDispatchingErrorListener import ParserDispatchingErrorListener
 from io import StringIO
 import sys
 if sys.version_info[1] > 5:
@@ -6680,8 +6683,8 @@ class PostgreSQLParser ( Parser ):
     EndDollarStringConstant=678
     AfterEscapeStringConstantWithNewlineMode_Continued=679
 
-    def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
-        super().__init__(input, output)
+    def __init__(self, input:TokenStream):
+        super().__init__(input)
         self.checkVersion("4.13.1")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
@@ -35395,7 +35398,7 @@ class PostgreSQLParser ( Parser ):
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,286,self._ctx)
 
-            ParseRoutineBody(_localctx)
+            self.ParseRoutineBody(localctx)
                         
         except RecognitionException as re:
             localctx.exception = re
@@ -76297,6 +76300,74 @@ class PostgreSQLParser ( Parser ):
 
             if predIndex == 7:
                 return self.precpred(self._ctx, 1)
+    
+    def ParseRoutineBody(self, _localctx):
+        lang = None
+        for coi in _localctx.createfunc_opt_item():
+            if coi.LANGUAGE() is not None:
+                if coi.nonreservedword_or_sconst() is not None:
+                    if coi.nonreservedword_or_sconst().nonreservedword() is not None:
+                        if coi.nonreservedword_or_sconst().nonreservedword().identifier() is not None:
+                            if coi.nonreservedword_or_sconst().nonreservedword().identifier().Identifier() is not None:
+                                lang = coi.nonreservedword_or_sconst().nonreservedword().identifier().Identifier().getText()
+                                break
+
+        if lang is None:
+            return
+
+        func_as = None
+        for a in _localctx.createfunc_opt_item():
+            if a.func_as() is not None:
+                func_as = a
+                break
+
+        if func_as is not None:
+            txt = self.get_routine_body_string(func_as.func_as().sconst(0))
+            postgreSQL_parser = self.get_postgresql_parser(txt)
+            if lang == "plpgsql":
+                func_as.func_as().Definition = postgreSQL_parser.plsqlroot()
+            elif lang == "sql":
+                func_as.func_as().Definition = postgreSQL_parser.root()
+
+        def trim_quotes(self, s: str) -> str:
+            return s[1:-1] if s and len(s) > 1 else s
+
+    def unquote(self, s: str) -> str:
+        slength = len(s)
+        r = []
+        i = 0
+        while i < slength:
+            c = s[i]
+            r.append(c)
+            if c == '\'' and i < slength - 1 and s[i + 1] == '\'':
+                i += 1
+            i += 1
+        return ''.join(r)
+
+    def get_routine_body_string(self, rule) -> str:
+        anysconst = rule.anysconst()
+        string_constant = anysconst.StringConstant()
+        if string_constant is not None:
+            return self.unquote(self.trim_quotes(string_constant.getText()))
+        unicode_escape_string_constant = anysconst.UnicodeEscapeStringConstant()
+        if unicode_escape_string_constant is not None:
+            return self.trim_quotes(unicode_escape_string_constant.getText())
+        escape_string_constant = anysconst.EscapeStringConstant()
+        if escape_string_constant is not None:
+            return self.trim_quotes(escape_string_constant.getText())
+        result = ''
+        dollar_text = anysconst.DollarText()
+        for s in dollar_text:
+            result += s.getText()
+        return result
+
+    def get_postgresql_parser(self, txt):
+        input_stream = InputStream(txt)
+        lexer = PostgreSQLLexer(input_stream)
+        token_stream = CommonTokenStream(lexer)
+        parser = PostgreSQLParser(token_stream)
+        return parser
+
          
 
 
