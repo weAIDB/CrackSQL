@@ -17,7 +17,7 @@ DIALECT_LIST = ["pg", "mysql", "oracle"]
 DIALECT_LIST_RULE = ["athena", "bigquery", "clickhouse", "databricks", "doris", "drill", "druid",
                      "duckdb", "dune", "hive", "materialize", "mysql", "oracle", "postgres",
                      "presto", "prql", "redshift", "risingwave", "snowflake", "spark", "spark2",
-                     "sqlite", "starrocks", "tableau", "teradata", "trino", "tsql", "pg"]
+                     "sqlite", "starrocks", "tableau", "teradata", "trino", "tsql", "postgresql", "pg"]
 DIALECT_MAP = {
     'pg': 'PostgreSQL 14.7',
     'mysql': "MySQL 8.4",
