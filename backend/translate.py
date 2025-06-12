@@ -26,7 +26,7 @@ from translator.llm_translator import LLMTranslator
 from translator.translate_prompt import SYSTEM_PROMPT_NA, USER_PROMPT_NA, \
     SYSTEM_PROMPT_SEG, USER_PROMPT_SEG, SYSTEM_PROMPT_RET, USER_PROMPT_RET, EXAMPLE_PROMPT, JUDGE_INFO_PROMPT
 from utils.constants import DIALECT_MAP, FAILED_TEMPLATE, CHUNK_SIZE, TRANSLATION_ANSWER_PATTERN, \
-    JUDGE_ANSWER_PATTERN, DIALECT_LIST, DIALECT_LIST_RULE
+    JUDGE_ANSWER_PATTERN, DIALECT_LIST, DIALECT_LIST_RULE, DIALECT_ABBREVIATIONS
 from utils.tools import process_err_msg, process_history_text
 from vector_store.chroma_store import ChromaStore
 
@@ -996,10 +996,11 @@ def main():
                                     tgt_db_config=tgt_db_config, vector_config=vector_config,
                                     history_id=None, out_type="file", out_dir=args.out_dir,
                                     retrieval_on=args.retrieval_on, top_k=args.top_k)
-
+            full_name_src = DIALECT_ABBREVIATIONS.get(args.src_dialect, args.src_dialect)
+            full_name_tgt = DIALECT_ABBREVIATIONS.get(args.tgt_dialect, args.tgt_dialect)
             if not tgt_db_config or not vector_config:
-                if not args.llm_model_name and (args.src_dialect in DIALECT_LIST_RULE
-                                                or args.tgt_dialect not in DIALECT_LIST_RULE):
+                if not args.llm_model_name and (full_name_src in DIALECT_LIST_RULE
+                                                and full_name_tgt in DIALECT_LIST_RULE):
                     translated_sql, model_ans_list, \
                         used_pieces, lift_histories = translator.rule_rewrite()
                 else:
