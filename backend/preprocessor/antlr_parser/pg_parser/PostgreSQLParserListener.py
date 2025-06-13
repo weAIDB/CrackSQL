@@ -1,11 +1,9 @@
-# Generated from /data/Coding/LLM4DB/antlr_gram/pg/PostgreSQLParser.g4 by ANTLR 4.13.1
+# Generated from PostgreSQLParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .PostgreSQLParser import PostgreSQLParser
 else:
     from PostgreSQLParser import PostgreSQLParser
-
-
 
 # This class defines a complete listener for a parse tree produced by PostgreSQLParser.
 class PostgreSQLParserListener(ParseTreeListener):
@@ -16,15 +14,6 @@ class PostgreSQLParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PostgreSQLParser#root.
     def exitRoot(self, ctx:PostgreSQLParser.RootContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#plsqlroot.
-    def enterPlsqlroot(self, ctx:PostgreSQLParser.PlsqlrootContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#plsqlroot.
-    def exitPlsqlroot(self, ctx:PostgreSQLParser.PlsqlrootContext):
         pass
 
 
@@ -55,15 +44,6 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#plsqlconsolecommand.
-    def enterPlsqlconsolecommand(self, ctx:PostgreSQLParser.PlsqlconsolecommandContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#plsqlconsolecommand.
-    def exitPlsqlconsolecommand(self, ctx:PostgreSQLParser.PlsqlconsolecommandContext):
-        pass
-
-
     # Enter a parse tree produced by PostgreSQLParser#callstmt.
     def enterCallstmt(self, ctx:PostgreSQLParser.CallstmtContext):
         pass
@@ -82,12 +62,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_with.
-    def enterOpt_with(self, ctx:PostgreSQLParser.Opt_withContext):
+    # Enter a parse tree produced by PostgreSQLParser#with_.
+    def enterWith_(self, ctx:PostgreSQLParser.With_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_with.
-    def exitOpt_with(self, ctx:PostgreSQLParser.Opt_withContext):
+    # Exit a parse tree produced by PostgreSQLParser#with_.
+    def exitWith_(self, ctx:PostgreSQLParser.With_Context):
         pass
 
 
@@ -145,12 +125,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_in_database.
-    def enterOpt_in_database(self, ctx:PostgreSQLParser.Opt_in_databaseContext):
+    # Enter a parse tree produced by PostgreSQLParser#in_database_.
+    def enterIn_database_(self, ctx:PostgreSQLParser.In_database_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_in_database.
-    def exitOpt_in_database(self, ctx:PostgreSQLParser.Opt_in_databaseContext):
+    # Exit a parse tree produced by PostgreSQLParser#in_database_.
+    def exitIn_database_(self, ctx:PostgreSQLParser.In_database_Context):
         pass
 
 
@@ -307,12 +287,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_boolean_or_string.
-    def enterOpt_boolean_or_string(self, ctx:PostgreSQLParser.Opt_boolean_or_stringContext):
+    # Enter a parse tree produced by PostgreSQLParser#boolean_or_string_.
+    def enterBoolean_or_string_(self, ctx:PostgreSQLParser.Boolean_or_string_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_boolean_or_string.
-    def exitOpt_boolean_or_string(self, ctx:PostgreSQLParser.Opt_boolean_or_stringContext):
+    # Exit a parse tree produced by PostgreSQLParser#boolean_or_string_.
+    def exitBoolean_or_string_(self, ctx:PostgreSQLParser.Boolean_or_string_Context):
         pass
 
 
@@ -325,12 +305,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_encoding.
-    def enterOpt_encoding(self, ctx:PostgreSQLParser.Opt_encodingContext):
+    # Enter a parse tree produced by PostgreSQLParser#encoding_.
+    def enterEncoding_(self, ctx:PostgreSQLParser.Encoding_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_encoding.
-    def exitOpt_encoding(self, ctx:PostgreSQLParser.Opt_encodingContext):
+    # Exit a parse tree produced by PostgreSQLParser#encoding_.
+    def exitEncoding_(self, ctx:PostgreSQLParser.Encoding_Context):
         pass
 
 
@@ -496,21 +476,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_drop_behavior.
-    def enterOpt_drop_behavior(self, ctx:PostgreSQLParser.Opt_drop_behaviorContext):
+    # Enter a parse tree produced by PostgreSQLParser#drop_behavior_.
+    def enterDrop_behavior_(self, ctx:PostgreSQLParser.Drop_behavior_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_drop_behavior.
-    def exitOpt_drop_behavior(self, ctx:PostgreSQLParser.Opt_drop_behaviorContext):
+    # Exit a parse tree produced by PostgreSQLParser#drop_behavior_.
+    def exitDrop_behavior_(self, ctx:PostgreSQLParser.Drop_behavior_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_collate_clause.
-    def enterOpt_collate_clause(self, ctx:PostgreSQLParser.Opt_collate_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#collate_clause_.
+    def enterCollate_clause_(self, ctx:PostgreSQLParser.Collate_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_collate_clause.
-    def exitOpt_collate_clause(self, ctx:PostgreSQLParser.Opt_collate_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#collate_clause_.
+    def exitCollate_clause_(self, ctx:PostgreSQLParser.Collate_clause_Context):
         pass
 
 
@@ -541,12 +521,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_reloptions.
-    def enterOpt_reloptions(self, ctx:PostgreSQLParser.Opt_reloptionsContext):
+    # Enter a parse tree produced by PostgreSQLParser#reloptions_.
+    def enterReloptions_(self, ctx:PostgreSQLParser.Reloptions_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_reloptions.
-    def exitOpt_reloptions(self, ctx:PostgreSQLParser.Opt_reloptionsContext):
+    # Exit a parse tree produced by PostgreSQLParser#reloptions_.
+    def exitReloptions_(self, ctx:PostgreSQLParser.Reloptions_Context):
         pass
 
 
@@ -667,12 +647,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_program.
-    def enterOpt_program(self, ctx:PostgreSQLParser.Opt_programContext):
+    # Enter a parse tree produced by PostgreSQLParser#program_.
+    def enterProgram_(self, ctx:PostgreSQLParser.Program_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_program.
-    def exitOpt_program(self, ctx:PostgreSQLParser.Opt_programContext):
+    # Exit a parse tree produced by PostgreSQLParser#program_.
+    def exitProgram_(self, ctx:PostgreSQLParser.Program_Context):
         pass
 
 
@@ -712,12 +692,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_binary.
-    def enterOpt_binary(self, ctx:PostgreSQLParser.Opt_binaryContext):
+    # Enter a parse tree produced by PostgreSQLParser#binary_.
+    def enterBinary_(self, ctx:PostgreSQLParser.Binary_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_binary.
-    def exitOpt_binary(self, ctx:PostgreSQLParser.Opt_binaryContext):
+    # Exit a parse tree produced by PostgreSQLParser#binary_.
+    def exitBinary_(self, ctx:PostgreSQLParser.Binary_Context):
         pass
 
 
@@ -730,12 +710,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_using.
-    def enterOpt_using(self, ctx:PostgreSQLParser.Opt_usingContext):
+    # Enter a parse tree produced by PostgreSQLParser#using_.
+    def enterUsing_(self, ctx:PostgreSQLParser.Using_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_using.
-    def exitOpt_using(self, ctx:PostgreSQLParser.Opt_usingContext):
+    # Exit a parse tree produced by PostgreSQLParser#using_.
+    def exitUsing_(self, ctx:PostgreSQLParser.Using_Context):
         pass
 
 
@@ -964,21 +944,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_no_inherit.
-    def enterOpt_no_inherit(self, ctx:PostgreSQLParser.Opt_no_inheritContext):
+    # Enter a parse tree produced by PostgreSQLParser#no_inherit_.
+    def enterNo_inherit_(self, ctx:PostgreSQLParser.No_inherit_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_no_inherit.
-    def exitOpt_no_inherit(self, ctx:PostgreSQLParser.Opt_no_inheritContext):
+    # Exit a parse tree produced by PostgreSQLParser#no_inherit_.
+    def exitNo_inherit_(self, ctx:PostgreSQLParser.No_inherit_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_column_list.
-    def enterOpt_column_list(self, ctx:PostgreSQLParser.Opt_column_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#column_list_.
+    def enterColumn_list_(self, ctx:PostgreSQLParser.Column_list_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_column_list.
-    def exitOpt_column_list(self, ctx:PostgreSQLParser.Opt_column_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#column_list_.
+    def exitColumn_list_(self, ctx:PostgreSQLParser.Column_list_Context):
         pass
 
 
@@ -1000,12 +980,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_c_include.
-    def enterOpt_c_include(self, ctx:PostgreSQLParser.Opt_c_includeContext):
+    # Enter a parse tree produced by PostgreSQLParser#c_include_.
+    def enterC_include_(self, ctx:PostgreSQLParser.C_include_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_c_include.
-    def exitOpt_c_include(self, ctx:PostgreSQLParser.Opt_c_includeContext):
+    # Exit a parse tree produced by PostgreSQLParser#c_include_.
+    def exitC_include_(self, ctx:PostgreSQLParser.C_include_Context):
         pass
 
 
@@ -1216,12 +1196,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_with_data.
-    def enterOpt_with_data(self, ctx:PostgreSQLParser.Opt_with_dataContext):
+    # Enter a parse tree produced by PostgreSQLParser#with_data_.
+    def enterWith_data_(self, ctx:PostgreSQLParser.With_data_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_with_data.
-    def exitOpt_with_data(self, ctx:PostgreSQLParser.Opt_with_dataContext):
+    # Exit a parse tree produced by PostgreSQLParser#with_data_.
+    def exitWith_data_(self, ctx:PostgreSQLParser.With_data_Context):
         pass
 
 
@@ -1315,12 +1295,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_by.
-    def enterOpt_by(self, ctx:PostgreSQLParser.Opt_byContext):
+    # Enter a parse tree produced by PostgreSQLParser#by_.
+    def enterBy_(self, ctx:PostgreSQLParser.By_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_by.
-    def exitOpt_by(self, ctx:PostgreSQLParser.Opt_byContext):
+    # Exit a parse tree produced by PostgreSQLParser#by_.
+    def exitBy_(self, ctx:PostgreSQLParser.By_Context):
         pass
 
 
@@ -1351,12 +1331,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_trusted.
-    def enterOpt_trusted(self, ctx:PostgreSQLParser.Opt_trustedContext):
+    # Enter a parse tree produced by PostgreSQLParser#trusted_.
+    def enterTrusted_(self, ctx:PostgreSQLParser.Trusted_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_trusted.
-    def exitOpt_trusted(self, ctx:PostgreSQLParser.Opt_trustedContext):
+    # Exit a parse tree produced by PostgreSQLParser#trusted_.
+    def exitTrusted_(self, ctx:PostgreSQLParser.Trusted_Context):
         pass
 
 
@@ -1369,12 +1349,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_inline_handler.
-    def enterOpt_inline_handler(self, ctx:PostgreSQLParser.Opt_inline_handlerContext):
+    # Enter a parse tree produced by PostgreSQLParser#inline_handler_.
+    def enterInline_handler_(self, ctx:PostgreSQLParser.Inline_handler_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_inline_handler.
-    def exitOpt_inline_handler(self, ctx:PostgreSQLParser.Opt_inline_handlerContext):
+    # Exit a parse tree produced by PostgreSQLParser#inline_handler_.
+    def exitInline_handler_(self, ctx:PostgreSQLParser.Inline_handler_Context):
         pass
 
 
@@ -1387,21 +1367,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_validator.
-    def enterOpt_validator(self, ctx:PostgreSQLParser.Opt_validatorContext):
+    # Enter a parse tree produced by PostgreSQLParser#validator_.
+    def enterValidator_(self, ctx:PostgreSQLParser.Validator_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_validator.
-    def exitOpt_validator(self, ctx:PostgreSQLParser.Opt_validatorContext):
+    # Exit a parse tree produced by PostgreSQLParser#validator_.
+    def exitValidator_(self, ctx:PostgreSQLParser.Validator_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_procedural.
-    def enterOpt_procedural(self, ctx:PostgreSQLParser.Opt_proceduralContext):
+    # Enter a parse tree produced by PostgreSQLParser#procedural_.
+    def enterProcedural_(self, ctx:PostgreSQLParser.Procedural_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_procedural.
-    def exitOpt_procedural(self, ctx:PostgreSQLParser.Opt_proceduralContext):
+    # Exit a parse tree produced by PostgreSQLParser#procedural_.
+    def exitProcedural_(self, ctx:PostgreSQLParser.Procedural_Context):
         pass
 
 
@@ -1522,12 +1502,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_fdw_options.
-    def enterOpt_fdw_options(self, ctx:PostgreSQLParser.Opt_fdw_optionsContext):
+    # Enter a parse tree produced by PostgreSQLParser#fdw_options_.
+    def enterFdw_options_(self, ctx:PostgreSQLParser.Fdw_options_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_fdw_options.
-    def exitOpt_fdw_options(self, ctx:PostgreSQLParser.Opt_fdw_optionsContext):
+    # Exit a parse tree produced by PostgreSQLParser#fdw_options_.
+    def exitFdw_options_(self, ctx:PostgreSQLParser.Fdw_options_Context):
         pass
 
 
@@ -1621,12 +1601,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_type.
-    def enterOpt_type(self, ctx:PostgreSQLParser.Opt_typeContext):
+    # Enter a parse tree produced by PostgreSQLParser#type_.
+    def enterType_(self, ctx:PostgreSQLParser.Type_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_type.
-    def exitOpt_type(self, ctx:PostgreSQLParser.Opt_typeContext):
+    # Exit a parse tree produced by PostgreSQLParser#type_.
+    def exitType_(self, ctx:PostgreSQLParser.Type_Context):
         pass
 
 
@@ -1639,12 +1619,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_foreign_server_version.
-    def enterOpt_foreign_server_version(self, ctx:PostgreSQLParser.Opt_foreign_server_versionContext):
+    # Enter a parse tree produced by PostgreSQLParser#foreign_server_version_.
+    def enterForeign_server_version_(self, ctx:PostgreSQLParser.Foreign_server_version_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_foreign_server_version.
-    def exitOpt_foreign_server_version(self, ctx:PostgreSQLParser.Opt_foreign_server_versionContext):
+    # Exit a parse tree produced by PostgreSQLParser#foreign_server_version_.
+    def exitForeign_server_version_(self, ctx:PostgreSQLParser.Foreign_server_version_Context):
         pass
 
 
@@ -2143,12 +2123,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_enum_val_list.
-    def enterOpt_enum_val_list(self, ctx:PostgreSQLParser.Opt_enum_val_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#enum_val_list_.
+    def enterEnum_val_list_(self, ctx:PostgreSQLParser.Enum_val_list_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_enum_val_list.
-    def exitOpt_enum_val_list(self, ctx:PostgreSQLParser.Opt_enum_val_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#enum_val_list_.
+    def exitEnum_val_list_(self, ctx:PostgreSQLParser.Enum_val_list_Context):
         pass
 
 
@@ -2170,12 +2150,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_if_not_exists.
-    def enterOpt_if_not_exists(self, ctx:PostgreSQLParser.Opt_if_not_existsContext):
+    # Enter a parse tree produced by PostgreSQLParser#if_not_exists_.
+    def enterIf_not_exists_(self, ctx:PostgreSQLParser.If_not_exists_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_if_not_exists.
-    def exitOpt_if_not_exists(self, ctx:PostgreSQLParser.Opt_if_not_existsContext):
+    # Exit a parse tree produced by PostgreSQLParser#if_not_exists_.
+    def exitIf_not_exists_(self, ctx:PostgreSQLParser.If_not_exists_Context):
         pass
 
 
@@ -2206,21 +2186,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_default.
-    def enterOpt_default(self, ctx:PostgreSQLParser.Opt_defaultContext):
+    # Enter a parse tree produced by PostgreSQLParser#default_.
+    def enterDefault_(self, ctx:PostgreSQLParser.Default_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_default.
-    def exitOpt_default(self, ctx:PostgreSQLParser.Opt_defaultContext):
+    # Exit a parse tree produced by PostgreSQLParser#default_.
+    def exitDefault_(self, ctx:PostgreSQLParser.Default_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_opfamily.
-    def enterOpt_opfamily(self, ctx:PostgreSQLParser.Opt_opfamilyContext):
+    # Enter a parse tree produced by PostgreSQLParser#opfamily_.
+    def enterOpfamily_(self, ctx:PostgreSQLParser.Opfamily_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_opfamily.
-    def exitOpt_opfamily(self, ctx:PostgreSQLParser.Opt_opfamilyContext):
+    # Exit a parse tree produced by PostgreSQLParser#opfamily_.
+    def exitOpfamily_(self, ctx:PostgreSQLParser.Opfamily_Context):
         pass
 
 
@@ -2233,12 +2213,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_recheck.
-    def enterOpt_recheck(self, ctx:PostgreSQLParser.Opt_recheckContext):
+    # Enter a parse tree produced by PostgreSQLParser#recheck_.
+    def enterRecheck_(self, ctx:PostgreSQLParser.Recheck_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_recheck.
-    def exitOpt_recheck(self, ctx:PostgreSQLParser.Opt_recheckContext):
+    # Exit a parse tree produced by PostgreSQLParser#recheck_.
+    def exitRecheck_(self, ctx:PostgreSQLParser.Recheck_Context):
         pass
 
 
@@ -2359,12 +2339,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#any_name_list.
-    def enterAny_name_list(self, ctx:PostgreSQLParser.Any_name_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#any_name_list_.
+    def enterAny_name_list_(self, ctx:PostgreSQLParser.Any_name_list_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#any_name_list.
-    def exitAny_name_list(self, ctx:PostgreSQLParser.Any_name_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#any_name_list_.
+    def exitAny_name_list_(self, ctx:PostgreSQLParser.Any_name_list_Context):
         pass
 
 
@@ -2404,12 +2384,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_restart_seqs.
-    def enterOpt_restart_seqs(self, ctx:PostgreSQLParser.Opt_restart_seqsContext):
+    # Enter a parse tree produced by PostgreSQLParser#restart_seqs_.
+    def enterRestart_seqs_(self, ctx:PostgreSQLParser.Restart_seqs_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_restart_seqs.
-    def exitOpt_restart_seqs(self, ctx:PostgreSQLParser.Opt_restart_seqsContext):
+    # Exit a parse tree produced by PostgreSQLParser#restart_seqs_.
+    def exitRestart_seqs_(self, ctx:PostgreSQLParser.Restart_seqs_Context):
         pass
 
 
@@ -2440,12 +2420,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_provider.
-    def enterOpt_provider(self, ctx:PostgreSQLParser.Opt_providerContext):
+    # Enter a parse tree produced by PostgreSQLParser#provider_.
+    def enterProvider_(self, ctx:PostgreSQLParser.Provider_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_provider.
-    def exitOpt_provider(self, ctx:PostgreSQLParser.Opt_providerContext):
+    # Exit a parse tree produced by PostgreSQLParser#provider_.
+    def exitProvider_(self, ctx:PostgreSQLParser.Provider_Context):
         pass
 
 
@@ -2485,12 +2465,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_from_in.
-    def enterOpt_from_in(self, ctx:PostgreSQLParser.Opt_from_inContext):
+    # Enter a parse tree produced by PostgreSQLParser#from_in_.
+    def enterFrom_in_(self, ctx:PostgreSQLParser.From_in_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_from_in.
-    def exitOpt_from_in(self, ctx:PostgreSQLParser.Opt_from_inContext):
+    # Exit a parse tree produced by PostgreSQLParser#from_in_.
+    def exitFrom_in_(self, ctx:PostgreSQLParser.From_in_Context):
         pass
 
 
@@ -2566,12 +2546,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_grant_grant_option.
-    def enterOpt_grant_grant_option(self, ctx:PostgreSQLParser.Opt_grant_grant_optionContext):
+    # Enter a parse tree produced by PostgreSQLParser#grant_grant_option_.
+    def enterGrant_grant_option_(self, ctx:PostgreSQLParser.Grant_grant_option_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_grant_grant_option.
-    def exitOpt_grant_grant_option(self, ctx:PostgreSQLParser.Opt_grant_grant_optionContext):
+    # Exit a parse tree produced by PostgreSQLParser#grant_grant_option_.
+    def exitGrant_grant_option_(self, ctx:PostgreSQLParser.Grant_grant_option_Context):
         pass
 
 
@@ -2593,21 +2573,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_grant_admin_option.
-    def enterOpt_grant_admin_option(self, ctx:PostgreSQLParser.Opt_grant_admin_optionContext):
+    # Enter a parse tree produced by PostgreSQLParser#grant_admin_option_.
+    def enterGrant_admin_option_(self, ctx:PostgreSQLParser.Grant_admin_option_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_grant_admin_option.
-    def exitOpt_grant_admin_option(self, ctx:PostgreSQLParser.Opt_grant_admin_optionContext):
+    # Exit a parse tree produced by PostgreSQLParser#grant_admin_option_.
+    def exitGrant_admin_option_(self, ctx:PostgreSQLParser.Grant_admin_option_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_granted_by.
-    def enterOpt_granted_by(self, ctx:PostgreSQLParser.Opt_granted_byContext):
+    # Enter a parse tree produced by PostgreSQLParser#granted_by_.
+    def enterGranted_by_(self, ctx:PostgreSQLParser.Granted_by_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_granted_by.
-    def exitOpt_granted_by(self, ctx:PostgreSQLParser.Opt_granted_byContext):
+    # Exit a parse tree produced by PostgreSQLParser#granted_by_.
+    def exitGranted_by_(self, ctx:PostgreSQLParser.Granted_by_Context):
         pass
 
 
@@ -2665,30 +2645,39 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_unique.
-    def enterOpt_unique(self, ctx:PostgreSQLParser.Opt_uniqueContext):
+    # Enter a parse tree produced by PostgreSQLParser#unique_.
+    def enterUnique_(self, ctx:PostgreSQLParser.Unique_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_unique.
-    def exitOpt_unique(self, ctx:PostgreSQLParser.Opt_uniqueContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_concurrently.
-    def enterOpt_concurrently(self, ctx:PostgreSQLParser.Opt_concurrentlyContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_concurrently.
-    def exitOpt_concurrently(self, ctx:PostgreSQLParser.Opt_concurrentlyContext):
+    # Exit a parse tree produced by PostgreSQLParser#unique_.
+    def exitUnique_(self, ctx:PostgreSQLParser.Unique_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_index_name.
-    def enterOpt_index_name(self, ctx:PostgreSQLParser.Opt_index_nameContext):
+    # Enter a parse tree produced by PostgreSQLParser#single_name_.
+    def enterSingle_name_(self, ctx:PostgreSQLParser.Single_name_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_index_name.
-    def exitOpt_index_name(self, ctx:PostgreSQLParser.Opt_index_nameContext):
+    # Exit a parse tree produced by PostgreSQLParser#single_name_.
+    def exitSingle_name_(self, ctx:PostgreSQLParser.Single_name_Context):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#concurrently_.
+    def enterConcurrently_(self, ctx:PostgreSQLParser.Concurrently_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#concurrently_.
+    def exitConcurrently_(self, ctx:PostgreSQLParser.Concurrently_Context):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#index_name_.
+    def enterIndex_name_(self, ctx:PostgreSQLParser.Index_name_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#index_name_.
+    def exitIndex_name_(self, ctx:PostgreSQLParser.Index_name_Context):
         pass
 
 
@@ -2728,12 +2717,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_include.
-    def enterOpt_include(self, ctx:PostgreSQLParser.Opt_includeContext):
+    # Enter a parse tree produced by PostgreSQLParser#include_.
+    def enterInclude_(self, ctx:PostgreSQLParser.Include_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_include.
-    def exitOpt_include(self, ctx:PostgreSQLParser.Opt_includeContext):
+    # Exit a parse tree produced by PostgreSQLParser#include_.
+    def exitInclude_(self, ctx:PostgreSQLParser.Include_Context):
         pass
 
 
@@ -2746,39 +2735,39 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_collate.
-    def enterOpt_collate(self, ctx:PostgreSQLParser.Opt_collateContext):
+    # Enter a parse tree produced by PostgreSQLParser#collate_.
+    def enterCollate_(self, ctx:PostgreSQLParser.Collate_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_collate.
-    def exitOpt_collate(self, ctx:PostgreSQLParser.Opt_collateContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_class.
-    def enterOpt_class(self, ctx:PostgreSQLParser.Opt_classContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_class.
-    def exitOpt_class(self, ctx:PostgreSQLParser.Opt_classContext):
+    # Exit a parse tree produced by PostgreSQLParser#collate_.
+    def exitCollate_(self, ctx:PostgreSQLParser.Collate_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_asc_desc.
-    def enterOpt_asc_desc(self, ctx:PostgreSQLParser.Opt_asc_descContext):
+    # Enter a parse tree produced by PostgreSQLParser#class_.
+    def enterClass_(self, ctx:PostgreSQLParser.Class_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_asc_desc.
-    def exitOpt_asc_desc(self, ctx:PostgreSQLParser.Opt_asc_descContext):
+    # Exit a parse tree produced by PostgreSQLParser#class_.
+    def exitClass_(self, ctx:PostgreSQLParser.Class_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_nulls_order.
-    def enterOpt_nulls_order(self, ctx:PostgreSQLParser.Opt_nulls_orderContext):
+    # Enter a parse tree produced by PostgreSQLParser#asc_desc_.
+    def enterAsc_desc_(self, ctx:PostgreSQLParser.Asc_desc_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_nulls_order.
-    def exitOpt_nulls_order(self, ctx:PostgreSQLParser.Opt_nulls_orderContext):
+    # Exit a parse tree produced by PostgreSQLParser#asc_desc_.
+    def exitAsc_desc_(self, ctx:PostgreSQLParser.Asc_desc_Context):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#nulls_order_.
+    def enterNulls_order_(self, ctx:PostgreSQLParser.Nulls_order_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#nulls_order_.
+    def exitNulls_order_(self, ctx:PostgreSQLParser.Nulls_order_Context):
         pass
 
 
@@ -2791,12 +2780,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_or_replace.
-    def enterOpt_or_replace(self, ctx:PostgreSQLParser.Opt_or_replaceContext):
+    # Enter a parse tree produced by PostgreSQLParser#or_replace_.
+    def enterOr_replace_(self, ctx:PostgreSQLParser.Or_replace_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_or_replace.
-    def exitOpt_or_replace(self, ctx:PostgreSQLParser.Opt_or_replaceContext):
+    # Exit a parse tree produced by PostgreSQLParser#or_replace_.
+    def exitOr_replace_(self, ctx:PostgreSQLParser.Or_replace_Context):
         pass
 
 
@@ -2998,12 +2987,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_definition.
-    def enterOpt_definition(self, ctx:PostgreSQLParser.Opt_definitionContext):
+    # Enter a parse tree produced by PostgreSQLParser#definition_.
+    def enterDefinition_(self, ctx:PostgreSQLParser.Definition_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_definition.
-    def exitOpt_definition(self, ctx:PostgreSQLParser.Opt_definitionContext):
+    # Exit a parse tree produced by PostgreSQLParser#definition_.
+    def exitDefinition_(self, ctx:PostgreSQLParser.Definition_Context):
         pass
 
 
@@ -3043,12 +3032,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_restrict.
-    def enterOpt_restrict(self, ctx:PostgreSQLParser.Opt_restrictContext):
+    # Enter a parse tree produced by PostgreSQLParser#restrict_.
+    def enterRestrict_(self, ctx:PostgreSQLParser.Restrict_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_restrict.
-    def exitOpt_restrict(self, ctx:PostgreSQLParser.Opt_restrictContext):
+    # Exit a parse tree produced by PostgreSQLParser#restrict_.
+    def exitRestrict_(self, ctx:PostgreSQLParser.Restrict_Context):
         pass
 
 
@@ -3169,12 +3158,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_if_exists.
-    def enterOpt_if_exists(self, ctx:PostgreSQLParser.Opt_if_existsContext):
+    # Enter a parse tree produced by PostgreSQLParser#if_exists_.
+    def enterIf_exists_(self, ctx:PostgreSQLParser.If_exists_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_if_exists.
-    def exitOpt_if_exists(self, ctx:PostgreSQLParser.Opt_if_existsContext):
+    # Exit a parse tree produced by PostgreSQLParser#if_exists_.
+    def exitIf_exists_(self, ctx:PostgreSQLParser.If_exists_Context):
         pass
 
 
@@ -3214,21 +3203,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#reindex_target_type.
-    def enterReindex_target_type(self, ctx:PostgreSQLParser.Reindex_target_typeContext):
+    # Enter a parse tree produced by PostgreSQLParser#reindex_target_relation.
+    def enterReindex_target_relation(self, ctx:PostgreSQLParser.Reindex_target_relationContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#reindex_target_type.
-    def exitReindex_target_type(self, ctx:PostgreSQLParser.Reindex_target_typeContext):
+    # Exit a parse tree produced by PostgreSQLParser#reindex_target_relation.
+    def exitReindex_target_relation(self, ctx:PostgreSQLParser.Reindex_target_relationContext):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#reindex_target_multitable.
-    def enterReindex_target_multitable(self, ctx:PostgreSQLParser.Reindex_target_multitableContext):
+    # Enter a parse tree produced by PostgreSQLParser#reindex_target_all.
+    def enterReindex_target_all(self, ctx:PostgreSQLParser.Reindex_target_allContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#reindex_target_multitable.
-    def exitReindex_target_multitable(self, ctx:PostgreSQLParser.Reindex_target_multitableContext):
+    # Exit a parse tree produced by PostgreSQLParser#reindex_target_all.
+    def exitReindex_target_all(self, ctx:PostgreSQLParser.Reindex_target_allContext):
         pass
 
 
@@ -3238,15 +3227,6 @@ class PostgreSQLParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PostgreSQLParser#reindex_option_list.
     def exitReindex_option_list(self, ctx:PostgreSQLParser.Reindex_option_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#reindex_option_elem.
-    def enterReindex_option_elem(self, ctx:PostgreSQLParser.Reindex_option_elemContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#reindex_option_elem.
-    def exitReindex_option_elem(self, ctx:PostgreSQLParser.Reindex_option_elemContext):
         pass
 
 
@@ -3268,21 +3248,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_column.
-    def enterOpt_column(self, ctx:PostgreSQLParser.Opt_columnContext):
+    # Enter a parse tree produced by PostgreSQLParser#column_.
+    def enterColumn_(self, ctx:PostgreSQLParser.Column_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_column.
-    def exitOpt_column(self, ctx:PostgreSQLParser.Opt_columnContext):
+    # Exit a parse tree produced by PostgreSQLParser#column_.
+    def exitColumn_(self, ctx:PostgreSQLParser.Column_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_set_data.
-    def enterOpt_set_data(self, ctx:PostgreSQLParser.Opt_set_dataContext):
+    # Enter a parse tree produced by PostgreSQLParser#set_data_.
+    def enterSet_data_(self, ctx:PostgreSQLParser.Set_data_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_set_data.
-    def exitOpt_set_data(self, ctx:PostgreSQLParser.Opt_set_dataContext):
+    # Exit a parse tree produced by PostgreSQLParser#set_data_.
+    def exitSet_data_(self, ctx:PostgreSQLParser.Set_data_Context):
         pass
 
 
@@ -3295,12 +3275,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_no.
-    def enterOpt_no(self, ctx:PostgreSQLParser.Opt_noContext):
+    # Enter a parse tree produced by PostgreSQLParser#no_.
+    def enterNo_(self, ctx:PostgreSQLParser.No_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_no.
-    def exitOpt_no(self, ctx:PostgreSQLParser.Opt_noContext):
+    # Exit a parse tree produced by PostgreSQLParser#no_.
+    def exitNo_(self, ctx:PostgreSQLParser.No_Context):
         pass
 
 
@@ -3376,12 +3356,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_publication_for_tables.
-    def enterOpt_publication_for_tables(self, ctx:PostgreSQLParser.Opt_publication_for_tablesContext):
+    # Enter a parse tree produced by PostgreSQLParser#publication_for_tables_.
+    def enterPublication_for_tables_(self, ctx:PostgreSQLParser.Publication_for_tables_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_publication_for_tables.
-    def exitOpt_publication_for_tables(self, ctx:PostgreSQLParser.Opt_publication_for_tablesContext):
+    # Exit a parse tree produced by PostgreSQLParser#publication_for_tables_.
+    def exitPublication_for_tables_(self, ctx:PostgreSQLParser.Publication_for_tables_Context):
         pass
 
 
@@ -3502,12 +3482,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_instead.
-    def enterOpt_instead(self, ctx:PostgreSQLParser.Opt_insteadContext):
+    # Enter a parse tree produced by PostgreSQLParser#instead_.
+    def enterInstead_(self, ctx:PostgreSQLParser.Instead_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_instead.
-    def exitOpt_instead(self, ctx:PostgreSQLParser.Opt_insteadContext):
+    # Exit a parse tree produced by PostgreSQLParser#instead_.
+    def exitInstead_(self, ctx:PostgreSQLParser.Instead_Context):
         pass
 
 
@@ -3556,12 +3536,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_transaction.
-    def enterOpt_transaction(self, ctx:PostgreSQLParser.Opt_transactionContext):
+    # Enter a parse tree produced by PostgreSQLParser#transaction_.
+    def enterTransaction_(self, ctx:PostgreSQLParser.Transaction_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_transaction.
-    def exitOpt_transaction(self, ctx:PostgreSQLParser.Opt_transactionContext):
+    # Exit a parse tree produced by PostgreSQLParser#transaction_.
+    def exitTransaction_(self, ctx:PostgreSQLParser.Transaction_Context):
         pass
 
 
@@ -3592,12 +3572,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_transaction_chain.
-    def enterOpt_transaction_chain(self, ctx:PostgreSQLParser.Opt_transaction_chainContext):
+    # Enter a parse tree produced by PostgreSQLParser#transaction_chain_.
+    def enterTransaction_chain_(self, ctx:PostgreSQLParser.Transaction_chain_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_transaction_chain.
-    def exitOpt_transaction_chain(self, ctx:PostgreSQLParser.Opt_transaction_chainContext):
+    # Exit a parse tree produced by PostgreSQLParser#transaction_chain_.
+    def exitTransaction_chain_(self, ctx:PostgreSQLParser.Transaction_chain_Context):
         pass
 
 
@@ -3610,12 +3590,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_check_option.
-    def enterOpt_check_option(self, ctx:PostgreSQLParser.Opt_check_optionContext):
+    # Enter a parse tree produced by PostgreSQLParser#check_option_.
+    def enterCheck_option_(self, ctx:PostgreSQLParser.Check_option_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_check_option.
-    def exitOpt_check_option(self, ctx:PostgreSQLParser.Opt_check_optionContext):
+    # Exit a parse tree produced by PostgreSQLParser#check_option_.
+    def exitCheck_option_(self, ctx:PostgreSQLParser.Check_option_Context):
         pass
 
 
@@ -3673,12 +3653,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_equal.
-    def enterOpt_equal(self, ctx:PostgreSQLParser.Opt_equalContext):
+    # Enter a parse tree produced by PostgreSQLParser#equal_.
+    def enterEqual_(self, ctx:PostgreSQLParser.Equal_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_equal.
-    def exitOpt_equal(self, ctx:PostgreSQLParser.Opt_equalContext):
+    # Exit a parse tree produced by PostgreSQLParser#equal_.
+    def exitEqual_(self, ctx:PostgreSQLParser.Equal_Context):
         pass
 
 
@@ -3763,12 +3743,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_as.
-    def enterOpt_as(self, ctx:PostgreSQLParser.Opt_asContext):
+    # Enter a parse tree produced by PostgreSQLParser#as_.
+    def enterAs_(self, ctx:PostgreSQLParser.As_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_as.
-    def exitOpt_as(self, ctx:PostgreSQLParser.Opt_asContext):
+    # Exit a parse tree produced by PostgreSQLParser#as_.
+    def exitAs_(self, ctx:PostgreSQLParser.As_Context):
         pass
 
 
@@ -3844,6 +3824,15 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PostgreSQLParser#utility_option_list.
+    def enterUtility_option_list(self, ctx:PostgreSQLParser.Utility_option_listContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#utility_option_list.
+    def exitUtility_option_list(self, ctx:PostgreSQLParser.Utility_option_listContext):
+        pass
+
+
     # Enter a parse tree produced by PostgreSQLParser#vac_analyze_option_list.
     def enterVac_analyze_option_list(self, ctx:PostgreSQLParser.Vac_analyze_option_listContext):
         pass
@@ -3859,6 +3848,33 @@ class PostgreSQLParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PostgreSQLParser#analyze_keyword.
     def exitAnalyze_keyword(self, ctx:PostgreSQLParser.Analyze_keywordContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#utility_option_elem.
+    def enterUtility_option_elem(self, ctx:PostgreSQLParser.Utility_option_elemContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#utility_option_elem.
+    def exitUtility_option_elem(self, ctx:PostgreSQLParser.Utility_option_elemContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#utility_option_name.
+    def enterUtility_option_name(self, ctx:PostgreSQLParser.Utility_option_nameContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#utility_option_name.
+    def exitUtility_option_name(self, ctx:PostgreSQLParser.Utility_option_nameContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#utility_option_arg.
+    def enterUtility_option_arg(self, ctx:PostgreSQLParser.Utility_option_argContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#utility_option_arg.
+    def exitUtility_option_arg(self, ctx:PostgreSQLParser.Utility_option_argContext):
         pass
 
 
@@ -3889,48 +3905,48 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_analyze.
-    def enterOpt_analyze(self, ctx:PostgreSQLParser.Opt_analyzeContext):
+    # Enter a parse tree produced by PostgreSQLParser#analyze_.
+    def enterAnalyze_(self, ctx:PostgreSQLParser.Analyze_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_analyze.
-    def exitOpt_analyze(self, ctx:PostgreSQLParser.Opt_analyzeContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_verbose.
-    def enterOpt_verbose(self, ctx:PostgreSQLParser.Opt_verboseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_verbose.
-    def exitOpt_verbose(self, ctx:PostgreSQLParser.Opt_verboseContext):
+    # Exit a parse tree produced by PostgreSQLParser#analyze_.
+    def exitAnalyze_(self, ctx:PostgreSQLParser.Analyze_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_full.
-    def enterOpt_full(self, ctx:PostgreSQLParser.Opt_fullContext):
+    # Enter a parse tree produced by PostgreSQLParser#verbose_.
+    def enterVerbose_(self, ctx:PostgreSQLParser.Verbose_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_full.
-    def exitOpt_full(self, ctx:PostgreSQLParser.Opt_fullContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_freeze.
-    def enterOpt_freeze(self, ctx:PostgreSQLParser.Opt_freezeContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_freeze.
-    def exitOpt_freeze(self, ctx:PostgreSQLParser.Opt_freezeContext):
+    # Exit a parse tree produced by PostgreSQLParser#verbose_.
+    def exitVerbose_(self, ctx:PostgreSQLParser.Verbose_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_name_list.
-    def enterOpt_name_list(self, ctx:PostgreSQLParser.Opt_name_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#full_.
+    def enterFull_(self, ctx:PostgreSQLParser.Full_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_name_list.
-    def exitOpt_name_list(self, ctx:PostgreSQLParser.Opt_name_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#full_.
+    def exitFull_(self, ctx:PostgreSQLParser.Full_Context):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#freeze_.
+    def enterFreeze_(self, ctx:PostgreSQLParser.Freeze_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#freeze_.
+    def exitFreeze_(self, ctx:PostgreSQLParser.Freeze_Context):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#name_list_.
+    def enterName_list_(self, ctx:PostgreSQLParser.Name_list_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#name_list_.
+    def exitName_list_(self, ctx:PostgreSQLParser.Name_list_Context):
         pass
 
 
@@ -3952,12 +3968,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_vacuum_relation_list.
-    def enterOpt_vacuum_relation_list(self, ctx:PostgreSQLParser.Opt_vacuum_relation_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#vacuum_relation_list_.
+    def enterVacuum_relation_list_(self, ctx:PostgreSQLParser.Vacuum_relation_list_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_vacuum_relation_list.
-    def exitOpt_vacuum_relation_list(self, ctx:PostgreSQLParser.Opt_vacuum_relation_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#vacuum_relation_list_.
+    def exitVacuum_relation_list_(self, ctx:PostgreSQLParser.Vacuum_relation_list_Context):
         pass
 
 
@@ -4123,21 +4139,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_on_conflict.
-    def enterOpt_on_conflict(self, ctx:PostgreSQLParser.Opt_on_conflictContext):
+    # Enter a parse tree produced by PostgreSQLParser#on_conflict_.
+    def enterOn_conflict_(self, ctx:PostgreSQLParser.On_conflict_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_on_conflict.
-    def exitOpt_on_conflict(self, ctx:PostgreSQLParser.Opt_on_conflictContext):
+    # Exit a parse tree produced by PostgreSQLParser#on_conflict_.
+    def exitOn_conflict_(self, ctx:PostgreSQLParser.On_conflict_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_conf_expr.
-    def enterOpt_conf_expr(self, ctx:PostgreSQLParser.Opt_conf_exprContext):
+    # Enter a parse tree produced by PostgreSQLParser#conf_expr_.
+    def enterConf_expr_(self, ctx:PostgreSQLParser.Conf_expr_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_conf_expr.
-    def exitOpt_conf_expr(self, ctx:PostgreSQLParser.Opt_conf_exprContext):
+    # Exit a parse tree produced by PostgreSQLParser#conf_expr_.
+    def exitConf_expr_(self, ctx:PostgreSQLParser.Conf_expr_Context):
         pass
 
 
@@ -4213,12 +4229,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_lock.
-    def enterOpt_lock(self, ctx:PostgreSQLParser.Opt_lockContext):
+    # Enter a parse tree produced by PostgreSQLParser#lock_.
+    def enterLock_(self, ctx:PostgreSQLParser.Lock_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_lock.
-    def exitOpt_lock(self, ctx:PostgreSQLParser.Opt_lockContext):
+    # Exit a parse tree produced by PostgreSQLParser#lock_.
+    def exitLock_(self, ctx:PostgreSQLParser.Lock_Context):
         pass
 
 
@@ -4231,21 +4247,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_nowait.
-    def enterOpt_nowait(self, ctx:PostgreSQLParser.Opt_nowaitContext):
+    # Enter a parse tree produced by PostgreSQLParser#nowait_.
+    def enterNowait_(self, ctx:PostgreSQLParser.Nowait_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_nowait.
-    def exitOpt_nowait(self, ctx:PostgreSQLParser.Opt_nowaitContext):
+    # Exit a parse tree produced by PostgreSQLParser#nowait_.
+    def exitNowait_(self, ctx:PostgreSQLParser.Nowait_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_nowait_or_skip.
-    def enterOpt_nowait_or_skip(self, ctx:PostgreSQLParser.Opt_nowait_or_skipContext):
+    # Enter a parse tree produced by PostgreSQLParser#nowait_or_skip_.
+    def enterNowait_or_skip_(self, ctx:PostgreSQLParser.Nowait_or_skip_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_nowait_or_skip.
-    def exitOpt_nowait_or_skip(self, ctx:PostgreSQLParser.Opt_nowait_or_skipContext):
+    # Exit a parse tree produced by PostgreSQLParser#nowait_or_skip_.
+    def exitNowait_or_skip_(self, ctx:PostgreSQLParser.Nowait_or_skip_Context):
         pass
 
 
@@ -4321,12 +4337,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_hold.
-    def enterOpt_hold(self, ctx:PostgreSQLParser.Opt_holdContext):
+    # Enter a parse tree produced by PostgreSQLParser#hold_.
+    def enterHold_(self, ctx:PostgreSQLParser.Hold_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_hold.
-    def exitOpt_hold(self, ctx:PostgreSQLParser.Opt_holdContext):
+    # Exit a parse tree produced by PostgreSQLParser#hold_.
+    def exitHold_(self, ctx:PostgreSQLParser.Hold_Context):
         pass
 
 
@@ -4411,21 +4427,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_materialized.
-    def enterOpt_materialized(self, ctx:PostgreSQLParser.Opt_materializedContext):
+    # Enter a parse tree produced by PostgreSQLParser#materialized_.
+    def enterMaterialized_(self, ctx:PostgreSQLParser.Materialized_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_materialized.
-    def exitOpt_materialized(self, ctx:PostgreSQLParser.Opt_materializedContext):
+    # Exit a parse tree produced by PostgreSQLParser#materialized_.
+    def exitMaterialized_(self, ctx:PostgreSQLParser.Materialized_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_with_clause.
-    def enterOpt_with_clause(self, ctx:PostgreSQLParser.Opt_with_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#with_clause_.
+    def enterWith_clause_(self, ctx:PostgreSQLParser.With_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_with_clause.
-    def exitOpt_with_clause(self, ctx:PostgreSQLParser.Opt_with_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#with_clause_.
+    def exitWith_clause_(self, ctx:PostgreSQLParser.With_clause_Context):
         pass
 
 
@@ -4438,12 +4454,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_strict.
-    def enterOpt_strict(self, ctx:PostgreSQLParser.Opt_strictContext):
+    # Enter a parse tree produced by PostgreSQLParser#strict_.
+    def enterStrict_(self, ctx:PostgreSQLParser.Strict_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_strict.
-    def exitOpt_strict(self, ctx:PostgreSQLParser.Opt_strictContext):
+    # Exit a parse tree produced by PostgreSQLParser#strict_.
+    def exitStrict_(self, ctx:PostgreSQLParser.Strict_Context):
         pass
 
 
@@ -4456,12 +4472,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_table.
-    def enterOpt_table(self, ctx:PostgreSQLParser.Opt_tableContext):
+    # Enter a parse tree produced by PostgreSQLParser#table_.
+    def enterTable_(self, ctx:PostgreSQLParser.Table_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_table.
-    def exitOpt_table(self, ctx:PostgreSQLParser.Opt_tableContext):
+    # Exit a parse tree produced by PostgreSQLParser#table_.
+    def exitTable_(self, ctx:PostgreSQLParser.Table_Context):
         pass
 
 
@@ -4483,21 +4499,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_all_clause.
-    def enterOpt_all_clause(self, ctx:PostgreSQLParser.Opt_all_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#all_clause_.
+    def enterAll_clause_(self, ctx:PostgreSQLParser.All_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_all_clause.
-    def exitOpt_all_clause(self, ctx:PostgreSQLParser.Opt_all_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#all_clause_.
+    def exitAll_clause_(self, ctx:PostgreSQLParser.All_clause_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_sort_clause.
-    def enterOpt_sort_clause(self, ctx:PostgreSQLParser.Opt_sort_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#sort_clause_.
+    def enterSort_clause_(self, ctx:PostgreSQLParser.Sort_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_sort_clause.
-    def exitOpt_sort_clause(self, ctx:PostgreSQLParser.Opt_sort_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#sort_clause_.
+    def exitSort_clause_(self, ctx:PostgreSQLParser.Sort_clause_Context):
         pass
 
 
@@ -4537,12 +4553,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_select_limit.
-    def enterOpt_select_limit(self, ctx:PostgreSQLParser.Opt_select_limitContext):
+    # Enter a parse tree produced by PostgreSQLParser#select_limit_.
+    def enterSelect_limit_(self, ctx:PostgreSQLParser.Select_limit_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_select_limit.
-    def exitOpt_select_limit(self, ctx:PostgreSQLParser.Opt_select_limitContext):
+    # Exit a parse tree produced by PostgreSQLParser#select_limit_.
+    def exitSelect_limit_(self, ctx:PostgreSQLParser.Select_limit_Context):
         pass
 
 
@@ -4699,12 +4715,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_for_locking_clause.
-    def enterOpt_for_locking_clause(self, ctx:PostgreSQLParser.Opt_for_locking_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#for_locking_clause_.
+    def enterFor_locking_clause_(self, ctx:PostgreSQLParser.For_locking_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_for_locking_clause.
-    def exitOpt_for_locking_clause(self, ctx:PostgreSQLParser.Opt_for_locking_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#for_locking_clause_.
+    def exitFor_locking_clause_(self, ctx:PostgreSQLParser.For_locking_clause_Context):
         pass
 
 
@@ -4771,15 +4787,6 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#non_ansi_join.
-    def enterNon_ansi_join(self, ctx:PostgreSQLParser.Non_ansi_joinContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#non_ansi_join.
-    def exitNon_ansi_join(self, ctx:PostgreSQLParser.Non_ansi_joinContext):
-        pass
-
-
     # Enter a parse tree produced by PostgreSQLParser#table_ref.
     def enterTable_ref(self, ctx:PostgreSQLParser.Table_refContext):
         pass
@@ -4795,24 +4802,6 @@ class PostgreSQLParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PostgreSQLParser#alias_clause.
     def exitAlias_clause(self, ctx:PostgreSQLParser.Alias_clauseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_alias_clause.
-    def enterOpt_alias_clause(self, ctx:PostgreSQLParser.Opt_alias_clauseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_alias_clause.
-    def exitOpt_alias_clause(self, ctx:PostgreSQLParser.Opt_alias_clauseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#table_alias_clause.
-    def enterTable_alias_clause(self, ctx:PostgreSQLParser.Table_alias_clauseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#table_alias_clause.
-    def exitTable_alias_clause(self, ctx:PostgreSQLParser.Table_alias_clauseContext):
         pass
 
 
@@ -4879,12 +4868,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_repeatable_clause.
-    def enterOpt_repeatable_clause(self, ctx:PostgreSQLParser.Opt_repeatable_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#repeatable_clause_.
+    def enterRepeatable_clause_(self, ctx:PostgreSQLParser.Repeatable_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_repeatable_clause.
-    def exitOpt_repeatable_clause(self, ctx:PostgreSQLParser.Opt_repeatable_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#repeatable_clause_.
+    def exitRepeatable_clause_(self, ctx:PostgreSQLParser.Repeatable_clause_Context):
         pass
 
 
@@ -4915,21 +4904,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_col_def_list.
-    def enterOpt_col_def_list(self, ctx:PostgreSQLParser.Opt_col_def_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#col_def_list_.
+    def enterCol_def_list_(self, ctx:PostgreSQLParser.Col_def_list_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_col_def_list.
-    def exitOpt_col_def_list(self, ctx:PostgreSQLParser.Opt_col_def_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#col_def_list_.
+    def exitCol_def_list_(self, ctx:PostgreSQLParser.Col_def_list_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_ordinality.
-    def enterOpt_ordinality(self, ctx:PostgreSQLParser.Opt_ordinalityContext):
+    # Enter a parse tree produced by PostgreSQLParser#ordinality_.
+    def enterOrdinality_(self, ctx:PostgreSQLParser.Ordinality_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_ordinality.
-    def exitOpt_ordinality(self, ctx:PostgreSQLParser.Opt_ordinalityContext):
+    # Exit a parse tree produced by PostgreSQLParser#ordinality_.
+    def exitOrdinality_(self, ctx:PostgreSQLParser.Ordinality_Context):
         pass
 
 
@@ -5086,12 +5075,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_type_modifiers.
-    def enterOpt_type_modifiers(self, ctx:PostgreSQLParser.Opt_type_modifiersContext):
+    # Enter a parse tree produced by PostgreSQLParser#type_modifiers_.
+    def enterType_modifiers_(self, ctx:PostgreSQLParser.Type_modifiers_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_type_modifiers.
-    def exitOpt_type_modifiers(self, ctx:PostgreSQLParser.Opt_type_modifiersContext):
+    # Exit a parse tree produced by PostgreSQLParser#type_modifiers_.
+    def exitType_modifiers_(self, ctx:PostgreSQLParser.Type_modifiers_Context):
         pass
 
 
@@ -5104,12 +5093,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_float.
-    def enterOpt_float(self, ctx:PostgreSQLParser.Opt_floatContext):
+    # Enter a parse tree produced by PostgreSQLParser#float_.
+    def enterFloat_(self, ctx:PostgreSQLParser.Float_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_float.
-    def exitOpt_float(self, ctx:PostgreSQLParser.Opt_floatContext):
+    # Exit a parse tree produced by PostgreSQLParser#float_.
+    def exitFloat_(self, ctx:PostgreSQLParser.Float_Context):
         pass
 
 
@@ -5176,12 +5165,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_varying.
-    def enterOpt_varying(self, ctx:PostgreSQLParser.Opt_varyingContext):
+    # Enter a parse tree produced by PostgreSQLParser#varying_.
+    def enterVarying_(self, ctx:PostgreSQLParser.Varying_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_varying.
-    def exitOpt_varying(self, ctx:PostgreSQLParser.Opt_varyingContext):
+    # Exit a parse tree produced by PostgreSQLParser#varying_.
+    def exitVarying_(self, ctx:PostgreSQLParser.Varying_Context):
         pass
 
 
@@ -5203,21 +5192,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_timezone.
-    def enterOpt_timezone(self, ctx:PostgreSQLParser.Opt_timezoneContext):
+    # Enter a parse tree produced by PostgreSQLParser#timezone_.
+    def enterTimezone_(self, ctx:PostgreSQLParser.Timezone_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_timezone.
-    def exitOpt_timezone(self, ctx:PostgreSQLParser.Opt_timezoneContext):
+    # Exit a parse tree produced by PostgreSQLParser#timezone_.
+    def exitTimezone_(self, ctx:PostgreSQLParser.Timezone_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_interval.
-    def enterOpt_interval(self, ctx:PostgreSQLParser.Opt_intervalContext):
+    # Enter a parse tree produced by PostgreSQLParser#interval_.
+    def enterInterval_(self, ctx:PostgreSQLParser.Interval_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_interval.
-    def exitOpt_interval(self, ctx:PostgreSQLParser.Opt_intervalContext):
+    # Exit a parse tree produced by PostgreSQLParser#interval_.
+    def exitInterval_(self, ctx:PostgreSQLParser.Interval_Context):
         pass
 
 
@@ -5230,12 +5219,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_escape.
-    def enterOpt_escape(self, ctx:PostgreSQLParser.Opt_escapeContext):
+    # Enter a parse tree produced by PostgreSQLParser#jsonType.
+    def enterJsonType(self, ctx:PostgreSQLParser.JsonTypeContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_escape.
-    def exitOpt_escape(self, ctx:PostgreSQLParser.Opt_escapeContext):
+    # Exit a parse tree produced by PostgreSQLParser#jsonType.
+    def exitJsonType(self, ctx:PostgreSQLParser.JsonTypeContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#escape_.
+    def enterEscape_(self, ctx:PostgreSQLParser.Escape_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#escape_.
+    def exitEscape_(self, ctx:PostgreSQLParser.Escape_Context):
         pass
 
 
@@ -5518,12 +5516,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_xml_root_standalone.
-    def enterOpt_xml_root_standalone(self, ctx:PostgreSQLParser.Opt_xml_root_standaloneContext):
+    # Enter a parse tree produced by PostgreSQLParser#xml_root_standalone_.
+    def enterXml_root_standalone_(self, ctx:PostgreSQLParser.Xml_root_standalone_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_xml_root_standalone.
-    def exitOpt_xml_root_standalone(self, ctx:PostgreSQLParser.Opt_xml_root_standaloneContext):
+    # Exit a parse tree produced by PostgreSQLParser#xml_root_standalone_.
+    def exitXml_root_standalone_(self, ctx:PostgreSQLParser.Xml_root_standalone_Context):
         pass
 
 
@@ -5653,30 +5651,30 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_existing_window_name.
-    def enterOpt_existing_window_name(self, ctx:PostgreSQLParser.Opt_existing_window_nameContext):
+    # Enter a parse tree produced by PostgreSQLParser#existing_window_name_.
+    def enterExisting_window_name_(self, ctx:PostgreSQLParser.Existing_window_name_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_existing_window_name.
-    def exitOpt_existing_window_name(self, ctx:PostgreSQLParser.Opt_existing_window_nameContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_partition_clause.
-    def enterOpt_partition_clause(self, ctx:PostgreSQLParser.Opt_partition_clauseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_partition_clause.
-    def exitOpt_partition_clause(self, ctx:PostgreSQLParser.Opt_partition_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#existing_window_name_.
+    def exitExisting_window_name_(self, ctx:PostgreSQLParser.Existing_window_name_Context):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_frame_clause.
-    def enterOpt_frame_clause(self, ctx:PostgreSQLParser.Opt_frame_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#partition_clause_.
+    def enterPartition_clause_(self, ctx:PostgreSQLParser.Partition_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_frame_clause.
-    def exitOpt_frame_clause(self, ctx:PostgreSQLParser.Opt_frame_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#partition_clause_.
+    def exitPartition_clause_(self, ctx:PostgreSQLParser.Partition_clause_Context):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#frame_clause_.
+    def enterFrame_clause_(self, ctx:PostgreSQLParser.Frame_clause_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#frame_clause_.
+    def exitFrame_clause_(self, ctx:PostgreSQLParser.Frame_clause_Context):
         pass
 
 
@@ -5698,12 +5696,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_window_exclusion_clause.
-    def enterOpt_window_exclusion_clause(self, ctx:PostgreSQLParser.Opt_window_exclusion_clauseContext):
+    # Enter a parse tree produced by PostgreSQLParser#window_exclusion_clause_.
+    def enterWindow_exclusion_clause_(self, ctx:PostgreSQLParser.Window_exclusion_clause_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_window_exclusion_clause.
-    def exitOpt_window_exclusion_clause(self, ctx:PostgreSQLParser.Opt_window_exclusion_clauseContext):
+    # Exit a parse tree produced by PostgreSQLParser#window_exclusion_clause_.
+    def exitWindow_exclusion_clause_(self, ctx:PostgreSQLParser.Window_exclusion_clause_Context):
         pass
 
 
@@ -5986,12 +5984,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_slice_bound.
-    def enterOpt_slice_bound(self, ctx:PostgreSQLParser.Opt_slice_boundContext):
+    # Enter a parse tree produced by PostgreSQLParser#slice_bound_.
+    def enterSlice_bound_(self, ctx:PostgreSQLParser.Slice_bound_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_slice_bound.
-    def exitOpt_slice_bound(self, ctx:PostgreSQLParser.Opt_slice_boundContext):
+    # Exit a parse tree produced by PostgreSQLParser#slice_bound_.
+    def exitSlice_bound_(self, ctx:PostgreSQLParser.Slice_bound_Context):
         pass
 
 
@@ -6013,12 +6011,201 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_target_list.
-    def enterOpt_target_list(self, ctx:PostgreSQLParser.Opt_target_listContext):
+    # Enter a parse tree produced by PostgreSQLParser#json_passing_clause.
+    def enterJson_passing_clause(self, ctx:PostgreSQLParser.Json_passing_clauseContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_target_list.
-    def exitOpt_target_list(self, ctx:PostgreSQLParser.Opt_target_listContext):
+    # Exit a parse tree produced by PostgreSQLParser#json_passing_clause.
+    def exitJson_passing_clause(self, ctx:PostgreSQLParser.Json_passing_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_arguments.
+    def enterJson_arguments(self, ctx:PostgreSQLParser.Json_argumentsContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_arguments.
+    def exitJson_arguments(self, ctx:PostgreSQLParser.Json_argumentsContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_argument.
+    def enterJson_argument(self, ctx:PostgreSQLParser.Json_argumentContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_argument.
+    def exitJson_argument(self, ctx:PostgreSQLParser.Json_argumentContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_wrapper_behavior.
+    def enterJson_wrapper_behavior(self, ctx:PostgreSQLParser.Json_wrapper_behaviorContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_wrapper_behavior.
+    def exitJson_wrapper_behavior(self, ctx:PostgreSQLParser.Json_wrapper_behaviorContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_behavior.
+    def enterJson_behavior(self, ctx:PostgreSQLParser.Json_behaviorContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_behavior.
+    def exitJson_behavior(self, ctx:PostgreSQLParser.Json_behaviorContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_behavior_type.
+    def enterJson_behavior_type(self, ctx:PostgreSQLParser.Json_behavior_typeContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_behavior_type.
+    def exitJson_behavior_type(self, ctx:PostgreSQLParser.Json_behavior_typeContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_behavior_clause.
+    def enterJson_behavior_clause(self, ctx:PostgreSQLParser.Json_behavior_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_behavior_clause.
+    def exitJson_behavior_clause(self, ctx:PostgreSQLParser.Json_behavior_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_on_error_clause.
+    def enterJson_on_error_clause(self, ctx:PostgreSQLParser.Json_on_error_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_on_error_clause.
+    def exitJson_on_error_clause(self, ctx:PostgreSQLParser.Json_on_error_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_value_expr.
+    def enterJson_value_expr(self, ctx:PostgreSQLParser.Json_value_exprContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_value_expr.
+    def exitJson_value_expr(self, ctx:PostgreSQLParser.Json_value_exprContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_format_clause.
+    def enterJson_format_clause(self, ctx:PostgreSQLParser.Json_format_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_format_clause.
+    def exitJson_format_clause(self, ctx:PostgreSQLParser.Json_format_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_quotes_clause.
+    def enterJson_quotes_clause(self, ctx:PostgreSQLParser.Json_quotes_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_quotes_clause.
+    def exitJson_quotes_clause(self, ctx:PostgreSQLParser.Json_quotes_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_returning_clause.
+    def enterJson_returning_clause(self, ctx:PostgreSQLParser.Json_returning_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_returning_clause.
+    def exitJson_returning_clause(self, ctx:PostgreSQLParser.Json_returning_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_predicate_type_constraint.
+    def enterJson_predicate_type_constraint(self, ctx:PostgreSQLParser.Json_predicate_type_constraintContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_predicate_type_constraint.
+    def exitJson_predicate_type_constraint(self, ctx:PostgreSQLParser.Json_predicate_type_constraintContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_key_uniqueness_constraint.
+    def enterJson_key_uniqueness_constraint(self, ctx:PostgreSQLParser.Json_key_uniqueness_constraintContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_key_uniqueness_constraint.
+    def exitJson_key_uniqueness_constraint(self, ctx:PostgreSQLParser.Json_key_uniqueness_constraintContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_name_and_value_list.
+    def enterJson_name_and_value_list(self, ctx:PostgreSQLParser.Json_name_and_value_listContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_name_and_value_list.
+    def exitJson_name_and_value_list(self, ctx:PostgreSQLParser.Json_name_and_value_listContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_name_and_value.
+    def enterJson_name_and_value(self, ctx:PostgreSQLParser.Json_name_and_valueContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_name_and_value.
+    def exitJson_name_and_value(self, ctx:PostgreSQLParser.Json_name_and_valueContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_object_constructor_null_clause.
+    def enterJson_object_constructor_null_clause(self, ctx:PostgreSQLParser.Json_object_constructor_null_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_object_constructor_null_clause.
+    def exitJson_object_constructor_null_clause(self, ctx:PostgreSQLParser.Json_object_constructor_null_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_array_constructor_null_clause.
+    def enterJson_array_constructor_null_clause(self, ctx:PostgreSQLParser.Json_array_constructor_null_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_array_constructor_null_clause.
+    def exitJson_array_constructor_null_clause(self, ctx:PostgreSQLParser.Json_array_constructor_null_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_value_expr_list.
+    def enterJson_value_expr_list(self, ctx:PostgreSQLParser.Json_value_expr_listContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_value_expr_list.
+    def exitJson_value_expr_list(self, ctx:PostgreSQLParser.Json_value_expr_listContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_aggregate_func.
+    def enterJson_aggregate_func(self, ctx:PostgreSQLParser.Json_aggregate_funcContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_aggregate_func.
+    def exitJson_aggregate_func(self, ctx:PostgreSQLParser.Json_aggregate_funcContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#json_array_aggregate_order_by_clause.
+    def enterJson_array_aggregate_order_by_clause(self, ctx:PostgreSQLParser.Json_array_aggregate_order_by_clauseContext):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#json_array_aggregate_order_by_clause.
+    def exitJson_array_aggregate_order_by_clause(self, ctx:PostgreSQLParser.Json_array_aggregate_order_by_clauseContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgreSQLParser#target_list_.
+    def enterTarget_list_(self, ctx:PostgreSQLParser.Target_list_Context):
+        pass
+
+    # Exit a parse tree produced by PostgreSQLParser#target_list_.
+    def exitTarget_list_(self, ctx:PostgreSQLParser.Target_list_Context):
         pass
 
 
@@ -6175,12 +6362,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#opt_uescape.
-    def enterOpt_uescape(self, ctx:PostgreSQLParser.Opt_uescapeContext):
+    # Enter a parse tree produced by PostgreSQLParser#uescape_.
+    def enterUescape_(self, ctx:PostgreSQLParser.Uescape_Context):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#opt_uescape.
-    def exitOpt_uescape(self, ctx:PostgreSQLParser.Opt_uescapeContext):
+    # Exit a parse tree produced by PostgreSQLParser#uescape_.
+    def exitUescape_(self, ctx:PostgreSQLParser.Uescape_Context):
         pass
 
 
@@ -6229,15 +6416,6 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#table_alias.
-    def enterTable_alias(self, ctx:PostgreSQLParser.Table_aliasContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#table_alias.
-    def exitTable_alias(self, ctx:PostgreSQLParser.Table_aliasContext):
-        pass
-
-
     # Enter a parse tree produced by PostgreSQLParser#type_function_name.
     def enterType_function_name(self, ctx:PostgreSQLParser.Type_function_nameContext):
         pass
@@ -6256,30 +6434,21 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#collabel.
-    def enterCollabel(self, ctx:PostgreSQLParser.CollabelContext):
+    # Enter a parse tree produced by PostgreSQLParser#colLabel.
+    def enterColLabel(self, ctx:PostgreSQLParser.ColLabelContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#collabel.
-    def exitCollabel(self, ctx:PostgreSQLParser.CollabelContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#identifier.
-    def enterIdentifier(self, ctx:PostgreSQLParser.IdentifierContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#identifier.
-    def exitIdentifier(self, ctx:PostgreSQLParser.IdentifierContext):
+    # Exit a parse tree produced by PostgreSQLParser#colLabel.
+    def exitColLabel(self, ctx:PostgreSQLParser.ColLabelContext):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#plsqlidentifier.
-    def enterPlsqlidentifier(self, ctx:PostgreSQLParser.PlsqlidentifierContext):
+    # Enter a parse tree produced by PostgreSQLParser#bareColLabel.
+    def enterBareColLabel(self, ctx:PostgreSQLParser.BareColLabelContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#plsqlidentifier.
-    def exitPlsqlidentifier(self, ctx:PostgreSQLParser.PlsqlidentifierContext):
+    # Exit a parse tree produced by PostgreSQLParser#bareColLabel.
+    def exitBareColLabel(self, ctx:PostgreSQLParser.BareColLabelContext):
         pass
 
 
@@ -6319,957 +6488,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#builtin_function_name.
-    def enterBuiltin_function_name(self, ctx:PostgreSQLParser.Builtin_function_nameContext):
+    # Enter a parse tree produced by PostgreSQLParser#bare_label_keyword.
+    def enterBare_label_keyword(self, ctx:PostgreSQLParser.Bare_label_keywordContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#builtin_function_name.
-    def exitBuiltin_function_name(self, ctx:PostgreSQLParser.Builtin_function_nameContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#pl_function.
-    def enterPl_function(self, ctx:PostgreSQLParser.Pl_functionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#pl_function.
-    def exitPl_function(self, ctx:PostgreSQLParser.Pl_functionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#comp_options.
-    def enterComp_options(self, ctx:PostgreSQLParser.Comp_optionsContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#comp_options.
-    def exitComp_options(self, ctx:PostgreSQLParser.Comp_optionsContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#comp_option.
-    def enterComp_option(self, ctx:PostgreSQLParser.Comp_optionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#comp_option.
-    def exitComp_option(self, ctx:PostgreSQLParser.Comp_optionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#sharp.
-    def enterSharp(self, ctx:PostgreSQLParser.SharpContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#sharp.
-    def exitSharp(self, ctx:PostgreSQLParser.SharpContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#option_value.
-    def enterOption_value(self, ctx:PostgreSQLParser.Option_valueContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#option_value.
-    def exitOption_value(self, ctx:PostgreSQLParser.Option_valueContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_semi.
-    def enterOpt_semi(self, ctx:PostgreSQLParser.Opt_semiContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_semi.
-    def exitOpt_semi(self, ctx:PostgreSQLParser.Opt_semiContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#pl_block.
-    def enterPl_block(self, ctx:PostgreSQLParser.Pl_blockContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#pl_block.
-    def exitPl_block(self, ctx:PostgreSQLParser.Pl_blockContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_sect.
-    def enterDecl_sect(self, ctx:PostgreSQLParser.Decl_sectContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_sect.
-    def exitDecl_sect(self, ctx:PostgreSQLParser.Decl_sectContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_start.
-    def enterDecl_start(self, ctx:PostgreSQLParser.Decl_startContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_start.
-    def exitDecl_start(self, ctx:PostgreSQLParser.Decl_startContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_stmts.
-    def enterDecl_stmts(self, ctx:PostgreSQLParser.Decl_stmtsContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_stmts.
-    def exitDecl_stmts(self, ctx:PostgreSQLParser.Decl_stmtsContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#label_decl.
-    def enterLabel_decl(self, ctx:PostgreSQLParser.Label_declContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#label_decl.
-    def exitLabel_decl(self, ctx:PostgreSQLParser.Label_declContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_stmt.
-    def enterDecl_stmt(self, ctx:PostgreSQLParser.Decl_stmtContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_stmt.
-    def exitDecl_stmt(self, ctx:PostgreSQLParser.Decl_stmtContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_statement.
-    def enterDecl_statement(self, ctx:PostgreSQLParser.Decl_statementContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_statement.
-    def exitDecl_statement(self, ctx:PostgreSQLParser.Decl_statementContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_scrollable.
-    def enterOpt_scrollable(self, ctx:PostgreSQLParser.Opt_scrollableContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_scrollable.
-    def exitOpt_scrollable(self, ctx:PostgreSQLParser.Opt_scrollableContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_cursor_query.
-    def enterDecl_cursor_query(self, ctx:PostgreSQLParser.Decl_cursor_queryContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_cursor_query.
-    def exitDecl_cursor_query(self, ctx:PostgreSQLParser.Decl_cursor_queryContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_cursor_args.
-    def enterDecl_cursor_args(self, ctx:PostgreSQLParser.Decl_cursor_argsContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_cursor_args.
-    def exitDecl_cursor_args(self, ctx:PostgreSQLParser.Decl_cursor_argsContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_cursor_arglist.
-    def enterDecl_cursor_arglist(self, ctx:PostgreSQLParser.Decl_cursor_arglistContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_cursor_arglist.
-    def exitDecl_cursor_arglist(self, ctx:PostgreSQLParser.Decl_cursor_arglistContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_cursor_arg.
-    def enterDecl_cursor_arg(self, ctx:PostgreSQLParser.Decl_cursor_argContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_cursor_arg.
-    def exitDecl_cursor_arg(self, ctx:PostgreSQLParser.Decl_cursor_argContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_is_for.
-    def enterDecl_is_for(self, ctx:PostgreSQLParser.Decl_is_forContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_is_for.
-    def exitDecl_is_for(self, ctx:PostgreSQLParser.Decl_is_forContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_aliasitem.
-    def enterDecl_aliasitem(self, ctx:PostgreSQLParser.Decl_aliasitemContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_aliasitem.
-    def exitDecl_aliasitem(self, ctx:PostgreSQLParser.Decl_aliasitemContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_varname.
-    def enterDecl_varname(self, ctx:PostgreSQLParser.Decl_varnameContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_varname.
-    def exitDecl_varname(self, ctx:PostgreSQLParser.Decl_varnameContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_const.
-    def enterDecl_const(self, ctx:PostgreSQLParser.Decl_constContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_const.
-    def exitDecl_const(self, ctx:PostgreSQLParser.Decl_constContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_datatype.
-    def enterDecl_datatype(self, ctx:PostgreSQLParser.Decl_datatypeContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_datatype.
-    def exitDecl_datatype(self, ctx:PostgreSQLParser.Decl_datatypeContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_collate.
-    def enterDecl_collate(self, ctx:PostgreSQLParser.Decl_collateContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_collate.
-    def exitDecl_collate(self, ctx:PostgreSQLParser.Decl_collateContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_notnull.
-    def enterDecl_notnull(self, ctx:PostgreSQLParser.Decl_notnullContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_notnull.
-    def exitDecl_notnull(self, ctx:PostgreSQLParser.Decl_notnullContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_defval.
-    def enterDecl_defval(self, ctx:PostgreSQLParser.Decl_defvalContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_defval.
-    def exitDecl_defval(self, ctx:PostgreSQLParser.Decl_defvalContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#decl_defkey.
-    def enterDecl_defkey(self, ctx:PostgreSQLParser.Decl_defkeyContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#decl_defkey.
-    def exitDecl_defkey(self, ctx:PostgreSQLParser.Decl_defkeyContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#assign_operator.
-    def enterAssign_operator(self, ctx:PostgreSQLParser.Assign_operatorContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#assign_operator.
-    def exitAssign_operator(self, ctx:PostgreSQLParser.Assign_operatorContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#proc_sect.
-    def enterProc_sect(self, ctx:PostgreSQLParser.Proc_sectContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#proc_sect.
-    def exitProc_sect(self, ctx:PostgreSQLParser.Proc_sectContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#proc_stmt.
-    def enterProc_stmt(self, ctx:PostgreSQLParser.Proc_stmtContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#proc_stmt.
-    def exitProc_stmt(self, ctx:PostgreSQLParser.Proc_stmtContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_perform.
-    def enterStmt_perform(self, ctx:PostgreSQLParser.Stmt_performContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_perform.
-    def exitStmt_perform(self, ctx:PostgreSQLParser.Stmt_performContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_call.
-    def enterStmt_call(self, ctx:PostgreSQLParser.Stmt_callContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_call.
-    def exitStmt_call(self, ctx:PostgreSQLParser.Stmt_callContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_expr_list.
-    def enterOpt_expr_list(self, ctx:PostgreSQLParser.Opt_expr_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_expr_list.
-    def exitOpt_expr_list(self, ctx:PostgreSQLParser.Opt_expr_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_assign.
-    def enterStmt_assign(self, ctx:PostgreSQLParser.Stmt_assignContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_assign.
-    def exitStmt_assign(self, ctx:PostgreSQLParser.Stmt_assignContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_getdiag.
-    def enterStmt_getdiag(self, ctx:PostgreSQLParser.Stmt_getdiagContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_getdiag.
-    def exitStmt_getdiag(self, ctx:PostgreSQLParser.Stmt_getdiagContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#getdiag_area_opt.
-    def enterGetdiag_area_opt(self, ctx:PostgreSQLParser.Getdiag_area_optContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#getdiag_area_opt.
-    def exitGetdiag_area_opt(self, ctx:PostgreSQLParser.Getdiag_area_optContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#getdiag_list.
-    def enterGetdiag_list(self, ctx:PostgreSQLParser.Getdiag_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#getdiag_list.
-    def exitGetdiag_list(self, ctx:PostgreSQLParser.Getdiag_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#getdiag_list_item.
-    def enterGetdiag_list_item(self, ctx:PostgreSQLParser.Getdiag_list_itemContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#getdiag_list_item.
-    def exitGetdiag_list_item(self, ctx:PostgreSQLParser.Getdiag_list_itemContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#getdiag_item.
-    def enterGetdiag_item(self, ctx:PostgreSQLParser.Getdiag_itemContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#getdiag_item.
-    def exitGetdiag_item(self, ctx:PostgreSQLParser.Getdiag_itemContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#getdiag_target.
-    def enterGetdiag_target(self, ctx:PostgreSQLParser.Getdiag_targetContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#getdiag_target.
-    def exitGetdiag_target(self, ctx:PostgreSQLParser.Getdiag_targetContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#assign_var.
-    def enterAssign_var(self, ctx:PostgreSQLParser.Assign_varContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#assign_var.
-    def exitAssign_var(self, ctx:PostgreSQLParser.Assign_varContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_if.
-    def enterStmt_if(self, ctx:PostgreSQLParser.Stmt_ifContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_if.
-    def exitStmt_if(self, ctx:PostgreSQLParser.Stmt_ifContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_elsifs.
-    def enterStmt_elsifs(self, ctx:PostgreSQLParser.Stmt_elsifsContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_elsifs.
-    def exitStmt_elsifs(self, ctx:PostgreSQLParser.Stmt_elsifsContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_else.
-    def enterStmt_else(self, ctx:PostgreSQLParser.Stmt_elseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_else.
-    def exitStmt_else(self, ctx:PostgreSQLParser.Stmt_elseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_case.
-    def enterStmt_case(self, ctx:PostgreSQLParser.Stmt_caseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_case.
-    def exitStmt_case(self, ctx:PostgreSQLParser.Stmt_caseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_expr_until_when.
-    def enterOpt_expr_until_when(self, ctx:PostgreSQLParser.Opt_expr_until_whenContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_expr_until_when.
-    def exitOpt_expr_until_when(self, ctx:PostgreSQLParser.Opt_expr_until_whenContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#case_when_list.
-    def enterCase_when_list(self, ctx:PostgreSQLParser.Case_when_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#case_when_list.
-    def exitCase_when_list(self, ctx:PostgreSQLParser.Case_when_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#case_when.
-    def enterCase_when(self, ctx:PostgreSQLParser.Case_whenContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#case_when.
-    def exitCase_when(self, ctx:PostgreSQLParser.Case_whenContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_case_else.
-    def enterOpt_case_else(self, ctx:PostgreSQLParser.Opt_case_elseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_case_else.
-    def exitOpt_case_else(self, ctx:PostgreSQLParser.Opt_case_elseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_loop.
-    def enterStmt_loop(self, ctx:PostgreSQLParser.Stmt_loopContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_loop.
-    def exitStmt_loop(self, ctx:PostgreSQLParser.Stmt_loopContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_while.
-    def enterStmt_while(self, ctx:PostgreSQLParser.Stmt_whileContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_while.
-    def exitStmt_while(self, ctx:PostgreSQLParser.Stmt_whileContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_for.
-    def enterStmt_for(self, ctx:PostgreSQLParser.Stmt_forContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_for.
-    def exitStmt_for(self, ctx:PostgreSQLParser.Stmt_forContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#for_control.
-    def enterFor_control(self, ctx:PostgreSQLParser.For_controlContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#for_control.
-    def exitFor_control(self, ctx:PostgreSQLParser.For_controlContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_for_using_expression.
-    def enterOpt_for_using_expression(self, ctx:PostgreSQLParser.Opt_for_using_expressionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_for_using_expression.
-    def exitOpt_for_using_expression(self, ctx:PostgreSQLParser.Opt_for_using_expressionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_cursor_parameters.
-    def enterOpt_cursor_parameters(self, ctx:PostgreSQLParser.Opt_cursor_parametersContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_cursor_parameters.
-    def exitOpt_cursor_parameters(self, ctx:PostgreSQLParser.Opt_cursor_parametersContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_reverse.
-    def enterOpt_reverse(self, ctx:PostgreSQLParser.Opt_reverseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_reverse.
-    def exitOpt_reverse(self, ctx:PostgreSQLParser.Opt_reverseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_by_expression.
-    def enterOpt_by_expression(self, ctx:PostgreSQLParser.Opt_by_expressionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_by_expression.
-    def exitOpt_by_expression(self, ctx:PostgreSQLParser.Opt_by_expressionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#for_variable.
-    def enterFor_variable(self, ctx:PostgreSQLParser.For_variableContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#for_variable.
-    def exitFor_variable(self, ctx:PostgreSQLParser.For_variableContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_foreach_a.
-    def enterStmt_foreach_a(self, ctx:PostgreSQLParser.Stmt_foreach_aContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_foreach_a.
-    def exitStmt_foreach_a(self, ctx:PostgreSQLParser.Stmt_foreach_aContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#foreach_slice.
-    def enterForeach_slice(self, ctx:PostgreSQLParser.Foreach_sliceContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#foreach_slice.
-    def exitForeach_slice(self, ctx:PostgreSQLParser.Foreach_sliceContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_exit.
-    def enterStmt_exit(self, ctx:PostgreSQLParser.Stmt_exitContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_exit.
-    def exitStmt_exit(self, ctx:PostgreSQLParser.Stmt_exitContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#exit_type.
-    def enterExit_type(self, ctx:PostgreSQLParser.Exit_typeContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#exit_type.
-    def exitExit_type(self, ctx:PostgreSQLParser.Exit_typeContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_return.
-    def enterStmt_return(self, ctx:PostgreSQLParser.Stmt_returnContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_return.
-    def exitStmt_return(self, ctx:PostgreSQLParser.Stmt_returnContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_return_result.
-    def enterOpt_return_result(self, ctx:PostgreSQLParser.Opt_return_resultContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_return_result.
-    def exitOpt_return_result(self, ctx:PostgreSQLParser.Opt_return_resultContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_raise.
-    def enterStmt_raise(self, ctx:PostgreSQLParser.Stmt_raiseContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_raise.
-    def exitStmt_raise(self, ctx:PostgreSQLParser.Stmt_raiseContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_stmt_raise_level.
-    def enterOpt_stmt_raise_level(self, ctx:PostgreSQLParser.Opt_stmt_raise_levelContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_stmt_raise_level.
-    def exitOpt_stmt_raise_level(self, ctx:PostgreSQLParser.Opt_stmt_raise_levelContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_raise_list.
-    def enterOpt_raise_list(self, ctx:PostgreSQLParser.Opt_raise_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_raise_list.
-    def exitOpt_raise_list(self, ctx:PostgreSQLParser.Opt_raise_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_raise_using.
-    def enterOpt_raise_using(self, ctx:PostgreSQLParser.Opt_raise_usingContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_raise_using.
-    def exitOpt_raise_using(self, ctx:PostgreSQLParser.Opt_raise_usingContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_raise_using_elem.
-    def enterOpt_raise_using_elem(self, ctx:PostgreSQLParser.Opt_raise_using_elemContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_raise_using_elem.
-    def exitOpt_raise_using_elem(self, ctx:PostgreSQLParser.Opt_raise_using_elemContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_raise_using_elem_list.
-    def enterOpt_raise_using_elem_list(self, ctx:PostgreSQLParser.Opt_raise_using_elem_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_raise_using_elem_list.
-    def exitOpt_raise_using_elem_list(self, ctx:PostgreSQLParser.Opt_raise_using_elem_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_assert.
-    def enterStmt_assert(self, ctx:PostgreSQLParser.Stmt_assertContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_assert.
-    def exitStmt_assert(self, ctx:PostgreSQLParser.Stmt_assertContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_stmt_assert_message.
-    def enterOpt_stmt_assert_message(self, ctx:PostgreSQLParser.Opt_stmt_assert_messageContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_stmt_assert_message.
-    def exitOpt_stmt_assert_message(self, ctx:PostgreSQLParser.Opt_stmt_assert_messageContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#loop_body.
-    def enterLoop_body(self, ctx:PostgreSQLParser.Loop_bodyContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#loop_body.
-    def exitLoop_body(self, ctx:PostgreSQLParser.Loop_bodyContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_execsql.
-    def enterStmt_execsql(self, ctx:PostgreSQLParser.Stmt_execsqlContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_execsql.
-    def exitStmt_execsql(self, ctx:PostgreSQLParser.Stmt_execsqlContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_dynexecute.
-    def enterStmt_dynexecute(self, ctx:PostgreSQLParser.Stmt_dynexecuteContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_dynexecute.
-    def exitStmt_dynexecute(self, ctx:PostgreSQLParser.Stmt_dynexecuteContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_execute_using.
-    def enterOpt_execute_using(self, ctx:PostgreSQLParser.Opt_execute_usingContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_execute_using.
-    def exitOpt_execute_using(self, ctx:PostgreSQLParser.Opt_execute_usingContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_execute_using_list.
-    def enterOpt_execute_using_list(self, ctx:PostgreSQLParser.Opt_execute_using_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_execute_using_list.
-    def exitOpt_execute_using_list(self, ctx:PostgreSQLParser.Opt_execute_using_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_execute_into.
-    def enterOpt_execute_into(self, ctx:PostgreSQLParser.Opt_execute_intoContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_execute_into.
-    def exitOpt_execute_into(self, ctx:PostgreSQLParser.Opt_execute_intoContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_open.
-    def enterStmt_open(self, ctx:PostgreSQLParser.Stmt_openContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_open.
-    def exitStmt_open(self, ctx:PostgreSQLParser.Stmt_openContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_open_bound_list_item.
-    def enterOpt_open_bound_list_item(self, ctx:PostgreSQLParser.Opt_open_bound_list_itemContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_open_bound_list_item.
-    def exitOpt_open_bound_list_item(self, ctx:PostgreSQLParser.Opt_open_bound_list_itemContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_open_bound_list.
-    def enterOpt_open_bound_list(self, ctx:PostgreSQLParser.Opt_open_bound_listContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_open_bound_list.
-    def exitOpt_open_bound_list(self, ctx:PostgreSQLParser.Opt_open_bound_listContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_open_using.
-    def enterOpt_open_using(self, ctx:PostgreSQLParser.Opt_open_usingContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_open_using.
-    def exitOpt_open_using(self, ctx:PostgreSQLParser.Opt_open_usingContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_scroll_option.
-    def enterOpt_scroll_option(self, ctx:PostgreSQLParser.Opt_scroll_optionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_scroll_option.
-    def exitOpt_scroll_option(self, ctx:PostgreSQLParser.Opt_scroll_optionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_scroll_option_no.
-    def enterOpt_scroll_option_no(self, ctx:PostgreSQLParser.Opt_scroll_option_noContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_scroll_option_no.
-    def exitOpt_scroll_option_no(self, ctx:PostgreSQLParser.Opt_scroll_option_noContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_fetch.
-    def enterStmt_fetch(self, ctx:PostgreSQLParser.Stmt_fetchContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_fetch.
-    def exitStmt_fetch(self, ctx:PostgreSQLParser.Stmt_fetchContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#into_target.
-    def enterInto_target(self, ctx:PostgreSQLParser.Into_targetContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#into_target.
-    def exitInto_target(self, ctx:PostgreSQLParser.Into_targetContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_cursor_from.
-    def enterOpt_cursor_from(self, ctx:PostgreSQLParser.Opt_cursor_fromContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_cursor_from.
-    def exitOpt_cursor_from(self, ctx:PostgreSQLParser.Opt_cursor_fromContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_fetch_direction.
-    def enterOpt_fetch_direction(self, ctx:PostgreSQLParser.Opt_fetch_directionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_fetch_direction.
-    def exitOpt_fetch_direction(self, ctx:PostgreSQLParser.Opt_fetch_directionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_move.
-    def enterStmt_move(self, ctx:PostgreSQLParser.Stmt_moveContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_move.
-    def exitStmt_move(self, ctx:PostgreSQLParser.Stmt_moveContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_close.
-    def enterStmt_close(self, ctx:PostgreSQLParser.Stmt_closeContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_close.
-    def exitStmt_close(self, ctx:PostgreSQLParser.Stmt_closeContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_null.
-    def enterStmt_null(self, ctx:PostgreSQLParser.Stmt_nullContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_null.
-    def exitStmt_null(self, ctx:PostgreSQLParser.Stmt_nullContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_commit.
-    def enterStmt_commit(self, ctx:PostgreSQLParser.Stmt_commitContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_commit.
-    def exitStmt_commit(self, ctx:PostgreSQLParser.Stmt_commitContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_rollback.
-    def enterStmt_rollback(self, ctx:PostgreSQLParser.Stmt_rollbackContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_rollback.
-    def exitStmt_rollback(self, ctx:PostgreSQLParser.Stmt_rollbackContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#plsql_opt_transaction_chain.
-    def enterPlsql_opt_transaction_chain(self, ctx:PostgreSQLParser.Plsql_opt_transaction_chainContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#plsql_opt_transaction_chain.
-    def exitPlsql_opt_transaction_chain(self, ctx:PostgreSQLParser.Plsql_opt_transaction_chainContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#stmt_set.
-    def enterStmt_set(self, ctx:PostgreSQLParser.Stmt_setContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#stmt_set.
-    def exitStmt_set(self, ctx:PostgreSQLParser.Stmt_setContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#cursor_variable.
-    def enterCursor_variable(self, ctx:PostgreSQLParser.Cursor_variableContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#cursor_variable.
-    def exitCursor_variable(self, ctx:PostgreSQLParser.Cursor_variableContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#exception_sect.
-    def enterException_sect(self, ctx:PostgreSQLParser.Exception_sectContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#exception_sect.
-    def exitException_sect(self, ctx:PostgreSQLParser.Exception_sectContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#proc_exceptions.
-    def enterProc_exceptions(self, ctx:PostgreSQLParser.Proc_exceptionsContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#proc_exceptions.
-    def exitProc_exceptions(self, ctx:PostgreSQLParser.Proc_exceptionsContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#proc_exception.
-    def enterProc_exception(self, ctx:PostgreSQLParser.Proc_exceptionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#proc_exception.
-    def exitProc_exception(self, ctx:PostgreSQLParser.Proc_exceptionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#proc_conditions.
-    def enterProc_conditions(self, ctx:PostgreSQLParser.Proc_conditionsContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#proc_conditions.
-    def exitProc_conditions(self, ctx:PostgreSQLParser.Proc_conditionsContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#proc_condition.
-    def enterProc_condition(self, ctx:PostgreSQLParser.Proc_conditionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#proc_condition.
-    def exitProc_condition(self, ctx:PostgreSQLParser.Proc_conditionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_block_label.
-    def enterOpt_block_label(self, ctx:PostgreSQLParser.Opt_block_labelContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_block_label.
-    def exitOpt_block_label(self, ctx:PostgreSQLParser.Opt_block_labelContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_loop_label.
-    def enterOpt_loop_label(self, ctx:PostgreSQLParser.Opt_loop_labelContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_loop_label.
-    def exitOpt_loop_label(self, ctx:PostgreSQLParser.Opt_loop_labelContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_label.
-    def enterOpt_label(self, ctx:PostgreSQLParser.Opt_labelContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_label.
-    def exitOpt_label(self, ctx:PostgreSQLParser.Opt_labelContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_exitcond.
-    def enterOpt_exitcond(self, ctx:PostgreSQLParser.Opt_exitcondContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_exitcond.
-    def exitOpt_exitcond(self, ctx:PostgreSQLParser.Opt_exitcondContext):
+    # Exit a parse tree produced by PostgreSQLParser#bare_label_keyword.
+    def exitBare_label_keyword(self, ctx:PostgreSQLParser.Bare_label_keywordContext):
         pass
 
 
@@ -7282,75 +6506,12 @@ class PostgreSQLParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgreSQLParser#plsql_unreserved_keyword.
-    def enterPlsql_unreserved_keyword(self, ctx:PostgreSQLParser.Plsql_unreserved_keywordContext):
+    # Enter a parse tree produced by PostgreSQLParser#identifier.
+    def enterIdentifier(self, ctx:PostgreSQLParser.IdentifierContext):
         pass
 
-    # Exit a parse tree produced by PostgreSQLParser#plsql_unreserved_keyword.
-    def exitPlsql_unreserved_keyword(self, ctx:PostgreSQLParser.Plsql_unreserved_keywordContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#sql_expression.
-    def enterSql_expression(self, ctx:PostgreSQLParser.Sql_expressionContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#sql_expression.
-    def exitSql_expression(self, ctx:PostgreSQLParser.Sql_expressionContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#expr_until_then.
-    def enterExpr_until_then(self, ctx:PostgreSQLParser.Expr_until_thenContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#expr_until_then.
-    def exitExpr_until_then(self, ctx:PostgreSQLParser.Expr_until_thenContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#expr_until_semi.
-    def enterExpr_until_semi(self, ctx:PostgreSQLParser.Expr_until_semiContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#expr_until_semi.
-    def exitExpr_until_semi(self, ctx:PostgreSQLParser.Expr_until_semiContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#expr_until_rightbracket.
-    def enterExpr_until_rightbracket(self, ctx:PostgreSQLParser.Expr_until_rightbracketContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#expr_until_rightbracket.
-    def exitExpr_until_rightbracket(self, ctx:PostgreSQLParser.Expr_until_rightbracketContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#expr_until_loop.
-    def enterExpr_until_loop(self, ctx:PostgreSQLParser.Expr_until_loopContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#expr_until_loop.
-    def exitExpr_until_loop(self, ctx:PostgreSQLParser.Expr_until_loopContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#make_execsql_stmt.
-    def enterMake_execsql_stmt(self, ctx:PostgreSQLParser.Make_execsql_stmtContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#make_execsql_stmt.
-    def exitMake_execsql_stmt(self, ctx:PostgreSQLParser.Make_execsql_stmtContext):
-        pass
-
-
-    # Enter a parse tree produced by PostgreSQLParser#opt_returning_clause_into.
-    def enterOpt_returning_clause_into(self, ctx:PostgreSQLParser.Opt_returning_clause_intoContext):
-        pass
-
-    # Exit a parse tree produced by PostgreSQLParser#opt_returning_clause_into.
-    def exitOpt_returning_clause_into(self, ctx:PostgreSQLParser.Opt_returning_clause_intoContext):
+    # Exit a parse tree produced by PostgreSQLParser#identifier.
+    def exitIdentifier(self, ctx:PostgreSQLParser.IdentifierContext):
         pass
 
 
