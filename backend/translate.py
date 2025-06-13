@@ -999,7 +999,7 @@ def main():
 
             if not tgt_db_config or not vector_config:
                 if not args.llm_model_name and (args.src_dialect in DIALECT_LIST_RULE
-                                                or args.tgt_dialect not in DIALECT_LIST_RULE):
+                                                and args.tgt_dialect in DIALECT_LIST_RULE):
                     translated_sql, model_ans_list, \
                         used_pieces, lift_histories = translator.rule_rewrite()
                 else:
