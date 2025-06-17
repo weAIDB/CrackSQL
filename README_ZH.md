@@ -5,7 +5,7 @@
 </p>
 
 <div align="center">
-  
+
   <a>![方言](https://img.shields.io/badge/SQL%20方言-3+24-blue?style=flat-square)</a>
   <a>![基准测试](https://img.shields.io/badge/转换基准测试-501+-blue?style=flat-square)</a>
   <a>![大模型](https://img.shields.io/badge/微调大语言模型-4-green?style=flat-square)</a>
@@ -30,6 +30,8 @@
 <p align="center">
   <b>点亮星标 ⭐ 并订阅 🔔 获取最新功能和改进！</b>
 </p>
+
+![CrackSQL](./data/images/CrackSQL.png)
 
 ## ✨ 项目介绍
 

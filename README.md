@@ -5,7 +5,7 @@
 </p>
 
 <div align="center">
-  
+
   <a>![Dialect](https://img.shields.io/badge/SQL%20Dialect-3+24-blue?style=flat-square)</a>
   <a>![Benchmark](https://img.shields.io/badge/Translation%20Benchmark-501+-blue?style=flat-square)</a>
   <a>![LLM](https://img.shields.io/badge/Finetuned%20LLM-4-green?style=flat-square)</a>
@@ -30,6 +30,8 @@
 <p align="center">
   <b>Star ⭐ and subscribe 🔔 for the latest features and improvements!</b>
 </p>
+
+![CrackSQL](./data/images/CrackSQL.png)
 
 ## ✨ Project Introduction
 
