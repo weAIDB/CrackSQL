@@ -1,16 +1,16 @@
-# CrackSQL
+<div align= "left">
+    <h1> <img src="./data/images/CrackSQL.png" width="200px"> CrackSQL </h1>
+</div>
 
 <p align="center">
   <b>📄 Unlock seamless SQL translation – effortless, precise, and efficient across databases~ 🐬</b>
 </p>
 
 <div align="center">
-
   <a>![Dialect](https://img.shields.io/badge/SQL%20Dialect-3+24-blue?style=flat-square)</a>
   <a>![Benchmark](https://img.shields.io/badge/Translation%20Benchmark-501+-blue?style=flat-square)</a>
   <a>![LLM](https://img.shields.io/badge/Finetuned%20LLM-4-green?style=flat-square)</a>
   <a>![Embedding Model](https://img.shields.io/badge/Finetuned%20Embedding%20Model-3-green?style=flat-square)</a>
-
 </div>
 
 <p align="center">
@@ -30,8 +30,6 @@
 <p align="center">
   <b>Star ⭐ and subscribe 🔔 for the latest features and improvements!</b>
 </p>
-
-![CrackSQL](./data/images/CrackSQL.png)
 
 ## ✨ Project Introduction
 

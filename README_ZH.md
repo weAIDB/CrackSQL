@@ -1,4 +1,6 @@
-# CrackSQL
+<div align= "left">
+    <h1> <img src="./data/images/CrackSQL.png" width="200px"> CrackSQL </h1>
+</div>
 
 <p align="center">
   <b>📄 解锁无缝SQL方言转换 – 轻松、精确、高效~ 🐬</b>
@@ -30,8 +32,6 @@
 <p align="center">
   <b>点亮星标 ⭐ 并订阅 🔔 获取最新功能和改进！</b>
 </p>
-
-![CrackSQL](./data/images/CrackSQL.png)
 
 ## ✨ 项目介绍
 
