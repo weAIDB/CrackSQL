@@ -37,6 +37,7 @@
 
 CrackSQL是一款强大的SQL方言转换工具，集成了基于规则的策略和大语言模型，以实现高精度的转换。它支持不同SQL方言之间的无缝转换（如PostgreSQL到MySQL），并提供Python API、命令行和Web界面等多种灵活访问方式。
 
+> - **2025年6月:** 我们荣幸地收到Ploutos社区的邀请，在其[直播活动](https://app.ploutos.dev/streams/literate-cobra)中深度解析CrackSQL！🎥
 > - **2025年4月:** 我们在网上发布了关于这个项目的 [demo论文](https://arxiv.org/abs/2504.00882)！📚
 > - **2025年3月:** 我们重构了代码并在多个开源平台上发布了我们的项目（[PyPI](https://pypi.org/project/cracksql/0.0.0b0/)）。我们目前正在开发[新功能](#待办事项)，欢迎更多贡献者加入！:wave: 👫
 > - **2025年2月:** 我们的论文"*Cracking SQL Barrier: An LLM-based Dialect Translation System*"已被SIGMOD 2025接收！:tada: :tada: :tada:

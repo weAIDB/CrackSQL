@@ -11,6 +11,7 @@
   <a>![Benchmark](https://img.shields.io/badge/Translation%20Benchmark-501+-blue?style=flat-square)</a>
   <a>![LLM](https://img.shields.io/badge/Finetuned%20LLM-4-green?style=flat-square)</a>
   <a>![Embedding Model](https://img.shields.io/badge/Finetuned%20Embedding%20Model-3-green?style=flat-square)</a>
+
 </div>
 
 <p align="center">
@@ -36,6 +37,7 @@
 CrackSQL is a powerful SQL dialect translation tool that integrates rule-based strategies with LLMs for high accuracy.
 It enables seamless conversion between dialects (e.g., PostgreSQL → MySQL) with flexible access through Python API, command line, and web interface.
 
+> - **06/2025:** We have been invited by the Ploutos community to present CrackSQL at their  [livestream event](https://app.ploutos.dev/streams/literate-cobra)! 🎥
 > - **04/2025:** We have released our demo paper about this project that can be found [online](https://arxiv.org/abs/2504.00882)! 📚
 > - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). We are currently working on [new features](#todo) and more contributors are welcomed! :wave: 👫
 > - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
