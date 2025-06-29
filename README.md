@@ -41,7 +41,7 @@ It enables seamless conversion between dialects (e.g., PostgreSQL → MySQL) wit
 > - **06/2025:** We have been invited by the Ploutos community to present CrackSQL at their  [livestream event](https://app.ploutos.dev/streams/literate-cobra)! 🎥
 > - **04/2025:** We have released our demo paper about this project that can be found [online](https://arxiv.org/abs/2504.00882)! 📚
 > - **03/2025:** We have refactored the code and released our project across multiple open-source platforms ([PyPI](https://pypi.org/project/cracksql/0.0.0b0/)). We are currently working on [new features](#todo) and more contributors are welcomed! :wave: 👫
-> - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by SIGMOD 2025! :tada: :tada: :tada:
+> - **02/2025:** Our paper "*Cracking SQL Barrier: An LLM-based Dialect Translation System*" has been accepted by [SIGMOD 2025](https://dl.acm.org/doi/10.1145/3725278)! :tada: :tada: :tada:
 
 ## 📚 Features
 
